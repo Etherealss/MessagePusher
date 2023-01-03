@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+== 发送 ==
+ClientA -> Server: 发送 msg
+note left: 上行阶段
+Server -> ClientA: ack 已收到 msg
+
+Server -> ClientB: 推送 msg
+
+ClientB -> Server: ack 已收到 msg
+
+
+note left: 下行阶段
+Server -> ClientA: ack 已送达 msg
+ClientA -> Server: ack 收到
+note right: ClientA 可确信 msg 送到 ClientB
+
+== 已读 ==
+ClientB -> Server: ack 已读
+Server -> ClientA: ack 已读
+ClientA -> Server: ack 收到
+
+@enduml
