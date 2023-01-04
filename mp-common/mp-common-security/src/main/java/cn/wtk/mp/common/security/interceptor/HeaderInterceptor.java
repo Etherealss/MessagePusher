@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class HeaderInterceptor implements ConfigHandlerInterceptor {
 
-    private final ICredentialVerifier tokenVerifier;
+    private final ICredentialVerifier<ServerCredential> tokenVerifier;
     private final ServerCredentialConfig serverCredentialConfig;
 
     @Override
@@ -42,7 +42,7 @@ public class HeaderInterceptor implements ConfigHandlerInterceptor {
         String serverToken = request.getHeader(serverCredentialConfig.getHeaderName());
         if (StringUtils.hasText(serverToken)) {
             try {
-                ServerCredential credential = tokenVerifier.verify(serverToken, ServerCredential.class);
+                ServerCredential credential = tokenVerifier.verify(serverToken);
                 ServerSecurityContextHolder.set(credential);
             } catch (TokenException ignored) {}
         }
