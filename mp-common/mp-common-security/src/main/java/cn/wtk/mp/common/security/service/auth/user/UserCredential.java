@@ -21,6 +21,9 @@ public class UserCredential extends Credential {
 
     Serializable userId;
 
+    /**
+     * 应用id，用于区分不同应用下的userId
+     */
     Long appId;
 
     /**

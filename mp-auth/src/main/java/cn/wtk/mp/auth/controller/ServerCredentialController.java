@@ -6,8 +6,10 @@ import cn.wtk.mp.auth.domain.auth.server.credential.ServerCredentialService;
 import cn.wtk.mp.auth.domain.auth.server.info.RegisterServerCommand;
 import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoService;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
+import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
 import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
+import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -40,15 +42,17 @@ public class ServerCredentialController {
     /**
      * 创建 token
      */
-    @PostMapping("/{serverId}/credentials")
-    public ServerCredential createCredential(@PathVariable Long serverId,
-                                             @Validated @RequestBody ServerAuthCommand command) {
+    @InternalAuth
+    @PostMapping("/credentials")
+    public ServerCredential createCredential(@Validated @RequestBody ServerAuthCommand command) {
+        Long serverId = ServerSecurityContextHolder.require().getServerId();
         return serverApplicationService.createServerCredential(serverId, command);
     }
 
-    @GetMapping("/{serverId}/credentials/{token}")
-    public ServerCredential verify(@PathVariable Long serverId,
-                                   @PathVariable String token) {
+    @InternalAuth
+    @GetMapping("/credentials/{token}")
+    public ServerCredential verify(@PathVariable String token) {
+        Long serverId = ServerSecurityContextHolder.require().getServerId();
         return serverCredentialService.verifyAndGet(serverId, token);
     }
 }

@@ -2,13 +2,9 @@ package cn.wtk.mp.common.security.config;
 
 
 import cn.wtk.mp.common.security.feign.ServerCredentialFeign;
-import cn.wtk.mp.common.security.service.auth.CredentialCacheHandler;
 import cn.wtk.mp.common.security.service.auth.ICredentialVerifier;
-import cn.wtk.mp.common.security.service.auth.RemoteCredentialVerifier;
-import cn.wtk.mp.common.security.service.auth.server.IServerCredentialProvider;
-import cn.wtk.mp.common.security.service.auth.server.RemoteIServerCredentialProvider;
-import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
-import cn.wtk.mp.common.security.service.auth.server.ServerDigestGenerator;
+import cn.wtk.mp.common.security.service.auth.RemoteServerCredentialVerifier;
+import cn.wtk.mp.common.security.service.auth.server.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -43,13 +39,13 @@ public class ServerCredentialConfiguration {
 
     /**
      * WebMvcConfigurer -> Interceptor -> Feign 会导致循环依赖，需要使用 @Lazy 延迟加载
-     * @param userTokenFeign
+     * @param credentialCacheHandler
      * @return
      */
     @Bean
     @ConditionalOnMissingBean
-    public ICredentialVerifier remoteTokenVerifier(@Lazy CredentialCacheHandler userTokenFeign) {
-        log.info("非 auth 服务，使用 RemoteTokenVerifier 验证 Token");
-        return new RemoteCredentialVerifier(userTokenFeign);
+    public ICredentialVerifier remoteTokenVerifier(@Lazy ServerCredentialCacheHandler credentialCacheHandler) {
+        log.info("非 auth 服务，使用 RemoteServerCredentialVerifier 验证 Token");
+        return new RemoteServerCredentialVerifier(credentialCacheHandler);
     }
 }

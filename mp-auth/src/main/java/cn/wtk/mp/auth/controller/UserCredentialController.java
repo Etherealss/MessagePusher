@@ -3,6 +3,8 @@ package cn.wtk.mp.auth.controller;
 
 import cn.wtk.mp.auth.domain.auth.user.credential.UserCredentialService;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
+import cn.wtk.mp.common.security.annotation.InternalAuth;
+import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.common.security.service.auth.user.UserCredential;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +18,7 @@ import java.io.Serializable;
  */
 @Slf4j
 @RestController
-@RequestMapping("/apps/{appId}/users/{userId}/credentials")
+@RequestMapping("/apps/users/{userId}/credentials")
 @RequiredArgsConstructor
 @ResponseAdvice
 public class UserCredentialController {
@@ -26,16 +28,18 @@ public class UserCredentialController {
     /**
      * 创建 token
      */
+    @InternalAuth
     @PostMapping
-    public UserCredential createCredential(@PathVariable Long appId,
-                                             @PathVariable Serializable userId) {
+    public UserCredential createCredential(@PathVariable Serializable userId) {
+        Long appId = ServerSecurityContextHolder.require().getServerId();
         return userCredentialService.create(appId, userId);
     }
 
+    @InternalAuth
     @GetMapping("/{token}")
-    public UserCredential verify(@PathVariable Long appId,
-                                 @PathVariable Serializable userId,
+    public UserCredential verify(@PathVariable Serializable userId,
                                  @PathVariable String token) {
+        Long appId = ServerSecurityContextHolder.require().getServerId();
         return userCredentialService.verifyAndGet(appId, userId, token);
     }
 }
