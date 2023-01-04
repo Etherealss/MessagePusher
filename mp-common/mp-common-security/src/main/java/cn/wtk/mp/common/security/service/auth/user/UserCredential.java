@@ -5,8 +5,8 @@ import cn.wtk.mp.common.security.service.auth.Credential;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * @author wtk
@@ -19,29 +19,17 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCredential extends Credential {
 
-    Integer userId;
+    Serializable userId;
 
-    String username;
+    Long appId;
 
     /**
      * 登录时间
      */
     Date loginTime;
 
-    /**
-     * 用户权限
-     */
-    Set<String> permissions;
-
-    /**
-     * 用户角色
-     */
-    Set<String> roles;
-
-    public UserCredential(Integer userId, String username, Set<String> permissions, Set<String> roles) {
+    public UserCredential(Serializable userId, Long appId) {
         this.userId = userId;
-        this.username = username;
-        this.permissions = permissions;
-        this.roles = roles;
+        this.appId = appId;
     }
 }

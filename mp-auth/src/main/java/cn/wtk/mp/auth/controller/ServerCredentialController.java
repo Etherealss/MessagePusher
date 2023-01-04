@@ -6,7 +6,6 @@ import cn.wtk.mp.auth.domain.auth.server.credential.ServerCredentialService;
 import cn.wtk.mp.auth.domain.auth.server.info.RegisterServerCommand;
 import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoService;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
-import cn.wtk.mp.common.security.annotation.AnonymousAccess;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
 import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
 import lombok.RequiredArgsConstructor;
@@ -41,14 +40,12 @@ public class ServerCredentialController {
     /**
      * 创建 token
      */
-    @AnonymousAccess
     @PostMapping("/{serverId}/credentials")
     public ServerCredential createCredential(@PathVariable Long serverId,
                                              @Validated @RequestBody ServerAuthCommand command) {
         return serverApplicationService.createServerCredential(serverId, command);
     }
 
-    @AnonymousAccess
     @GetMapping("/{serverId}/credentials/{token}")
     public ServerCredential verify(@PathVariable Long serverId,
                                    @PathVariable String token) {

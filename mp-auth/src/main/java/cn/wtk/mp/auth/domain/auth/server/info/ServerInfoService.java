@@ -39,7 +39,7 @@ public class ServerInfoService {
                 command.getServerName(),
                 command.getSecret()
         );
-        serverInfoRepository.save(entity);
+        serverInfoRepository.insert(entity);
         return entity.getId();
     }
 }
