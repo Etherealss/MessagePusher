@@ -17,6 +17,7 @@
         <module>mp-auth</module>
         <module>mp-common</module>
         <module>mp-uid</module>
+        <module>mp-connect</module>
     </modules>
 
     <properties>
@@ -26,7 +27,7 @@
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.0.1.0</spring-cloud-alibaba.version>
         <jasypt.version>3.0.4</jasypt.version>
-        <hutool.version>5.7.21</hutool.version>
+        <hutool.version>5.8.11</hutool.version>
     </properties>
     <dependencyManagement>
         <dependencies>

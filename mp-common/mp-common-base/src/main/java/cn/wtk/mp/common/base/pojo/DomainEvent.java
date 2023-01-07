@@ -11,14 +11,12 @@ import java.util.UUID;
  */
 @Getter
 public abstract class DomainEvent extends ApplicationEvent {
-    private final String id;
-    private final Integer userId;
+    private final UUID id;
     private final LocalDateTime occurredOn;
 
     public DomainEvent(Object source, Integer userId) {
         super(source);
-        this.userId = userId;
         occurredOn = LocalDateTime.now();
-        id = UUID.randomUUID().toString().replace("-", "");
+        id = UUID.randomUUID();
     }
 }
