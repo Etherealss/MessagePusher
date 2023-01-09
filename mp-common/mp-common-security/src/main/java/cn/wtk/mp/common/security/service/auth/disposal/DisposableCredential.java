@@ -1,4 +1,4 @@
-package cn.wtk.mp.common.security.service.auth.user;
+package cn.wtk.mp.common.security.service.auth.disposal;
 
 
 import cn.wtk.mp.common.security.service.auth.Credential;
@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author wtk
@@ -17,22 +16,20 @@ import java.util.Date;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserCredential extends Credential {
-
-    Serializable userId;
+public class DisposableCredential extends Credential {
 
     /**
-     * 应用id，用于区分不同应用下的userId
+     * 用于标识凭证所有者
+     */
+    Serializable key;
+
+    /**
+     * 应用id，用于区分不同应用
      */
     Long appId;
 
-    /**
-     * 登录时间
-     */
-    Date loginTime;
-
-    public UserCredential(Serializable userId, Long appId) {
-        this.userId = userId;
+    public DisposableCredential(Serializable key, Long appId) {
+        this.key = key;
         this.appId = appId;
     }
 }

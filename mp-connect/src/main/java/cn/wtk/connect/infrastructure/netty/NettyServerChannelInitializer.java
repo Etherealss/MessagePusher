@@ -1,5 +1,6 @@
 package cn.wtk.connect.infrastructure.netty;
 
+import cn.wtk.connect.domain.server.ConnectionStateHandler;
 import cn.wtk.connect.infrastructure.config.NettyServerConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;

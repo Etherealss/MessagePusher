@@ -1,12 +1,14 @@
-package cn.wtk.connect.infrastructure.netty;
+package cn.wtk.connect.domain.server;
 
 import cn.wtk.connect.infrastructure.config.NettyServerConfig;
+import cn.wtk.connect.infrastructure.netty.NettyServerChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -26,9 +28,10 @@ import java.net.InetSocketAddress;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class NettyServerBootsrap implements ApplicationRunner, ApplicationListener<ContextClosedEvent> {
+@Getter
+public class NettyServer implements ApplicationRunner, ApplicationListener<ContextClosedEvent> {
 
-    private final NettyServerConfig nettyServerConfig;
+    private final NettyServerConfig config;
     private final NettyServerChannelInitializer nettyServerChannelInitializer;
 
     private Channel serverChannel;
@@ -49,14 +52,14 @@ public class NettyServerBootsrap implements ApplicationRunner, ApplicationListen
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .localAddress(new InetSocketAddress(nettyServerConfig.getPort()))
-                    .option(ChannelOption.SO_BACKLOG, nettyServerConfig.getIdleSeconds())
-                    .childOption(ChannelOption.SO_KEEPALIVE, nettyServerConfig.getEnableTcpKeepalive())
-                    .childOption(ChannelOption.TCP_NODELAY, nettyServerConfig.getEnableTcpNodelay())
+                    .localAddress(new InetSocketAddress(config.getIp(), config.getPort()))
+                    .option(ChannelOption.SO_BACKLOG, config.getIdleSeconds())
+                    .childOption(ChannelOption.SO_KEEPALIVE, config.getEnableTcpKeepalive())
+                    .childOption(ChannelOption.TCP_NODELAY, config.getEnableTcpNodelay())
                     .childHandler(nettyServerChannelInitializer);
             Channel channel = serverBootstrap.bind().sync().channel();
             this.serverChannel = channel;
-            log.info("websocket 服务启动，port={}", nettyServerConfig.getPort());
+            log.info("websocket 服务启动，IP={}, port={}", config.getIp(), config.getPort());
             channel.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
@@ -74,6 +77,7 @@ public class NettyServerBootsrap implements ApplicationRunner, ApplicationListen
         if (this.serverChannel != null) {
             this.serverChannel.close();
         }
+        // TODO 清空 Redis 连接信息
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
         log.info("websocket 服务停止");

@@ -78,14 +78,33 @@ public class RedisTokenHandlerImpl implements ITokenHandler {
     }
 
     @Override
-    public <T> void invalidateToken(String token, Class<T> credentialType, ICredentialCacheConfig config) {
+    public <T extends Credential> T verifyAndInvalidateToken(String token, Class<T> credentialType, ICredentialCacheConfig config) {
+        String tokenKey = tokenKey(token, config);
+        Credential credential = redisTemplate.opsForValue().getAndDelete(tokenKey(token, config));
+        if (credential == null || credential.getClass() != credentialType) {
+            throw new TokenException(ApiInfo.USER_TOKEN_INVALID);
+        }
+        credential.setTokenExpireAt(new Date());
+        credential.setRefreshTokenExpireAt(new Date());
+        if (StringUtils.hasText(credential.getRefreshToken())) {
+            String refreshTokenKey = refreshTokenKey(credential.getRefreshToken(), config);
+            redisTemplate.opsForValue().getAndDelete(refreshTokenKey);
+        }
+        return (T) credential;
+    }
+
+    @Override
+    public <T extends Credential> T invalidateToken(String token, Class<T> credentialType, ICredentialCacheConfig config) {
         // 来到这里，可以认为 token 有效
         String tokenKey = tokenKey(token, config);
         Credential credential = redisTemplate.opsForValue().getAndDelete(tokenKey);
         if (credential != null && StringUtils.hasText(credential.getRefreshToken())) {
+            credential.setTokenExpireAt(new Date());
+            credential.setRefreshTokenExpireAt(new Date());
             String refreshTokenKey = refreshTokenKey(credential.getRefreshToken(), config);
             redisTemplate.opsForValue().getAndDelete(refreshTokenKey);
         }
+        return (T) credential;
     }
 
     private String tokenKey(String token, ICredentialCacheConfig config) {

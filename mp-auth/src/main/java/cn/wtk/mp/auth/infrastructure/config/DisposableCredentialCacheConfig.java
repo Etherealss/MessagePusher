@@ -18,17 +18,17 @@ import javax.validation.constraints.NotNull;
 @Validated
 @Getter
 @Setter
-public class UserCredentialCacheConfig implements ICredentialCacheConfig {
-    @Value("${app.auth.user.token.expire-ms}")
+public class DisposableCredentialCacheConfig implements ICredentialCacheConfig {
+    @Value("${app.auth.disposable.token.expire-ms}")
     @NotNull
     private Long tokenExpireMs;
-    @Value("${app.auth.user.token.cache-key}")
+    @Value("${app.auth.disposable.token.cache-key}")
     @NotBlank
     private String tokenCacheKey;
 
-    @Value("${app.auth.user.refresh-token.expire-ms}")
+    @Value("${app.auth.disposable.refresh-token.expire-ms}")
     @NotNull
     private Long refreshTokenExpireMs;
-    @Value("${app.auth.user.refresh-token.cache-key}")
+    @Value("${app.auth.disposable.refresh-token.cache-key}")
     @NotBlank private String refreshTokenCacheKey;
 }

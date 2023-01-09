@@ -1,4 +1,4 @@
-package cn.wtk.connect.infrastructure.netty;
+package cn.wtk.connect.domain.server;
 
 import cn.wtk.connect.domain.server.ServerConnectionManager;
 import com.mongodb.event.ConnectionClosedEvent;
@@ -29,19 +29,18 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
     private final ServerConnectionManager serverConnectionManager;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public static final AttributeKey<String> RANDOM_CODE_KEY = AttributeKey.valueOf("randomCode");
-    public static final AttributeKey<String> TERMINAL_ID_KEY = AttributeKey.valueOf("terminalId");
-
+    public static final AttributeKey<String> CONNECTOR_ID = AttributeKey.valueOf("connectorId");
+    public static final AttributeKey<String> CONN_ID = AttributeKey.valueOf("connId");
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        String terminalId = null;
+        String connectToken = null;
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
             String origin = request.headers().get("Origin");
-            if (null != uri && uri.contains("?terminalId")) {
-                terminalId = getTerminalIdByUri(uri);
+            if (null != uri && uri.contains("?connectToken")) {
+                connectToken = getConnectTokenByUri(uri);
                 // WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对
                 // 如果URI一致，才会通过握手建立WebSocket连接
                 request.setUri("/");
@@ -51,12 +50,12 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
             }
         }
         super.channelRead(ctx, msg);
-        if (StringUtils.hasText(terminalId)) {
-            applicationEventPublisher.publishEvent(new ConnectionEstablishedEvent(terminalId, ctx));
+        if (StringUtils.hasText(connectToken)) {
+            applicationEventPublisher.publishEvent(new ConnectionEstablishedEvent(connectToken, ctx));
         }
     }
 
-    private String getTerminalIdByUri(String uri) {
+    private String getConnectTokenByUri(String uri) {
         String terminalId = null;
         String[] uriArray = uri.split("\\?");
         if (uriArray.length > 1) {
@@ -104,8 +103,8 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
     }
 
     private void publishConnectionClosedEvent(ChannelHandlerContext ctx) {
-        String terminalId = ctx.channel().attr(TERMINAL_ID_KEY).get();
-        String randomCode = ctx.channel().attr(RANDOM_CODE_KEY).get();
+        String terminalId = ctx.channel().attr(CONN_ID).get();
+        String randomCode = ctx.channel().attr(CONNECTOR_ID).get();
         applicationEventPublisher.publishEvent(new ConnectionClosedEvent(terminalId, randomCode));
     }
 
