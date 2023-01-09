@@ -1,6 +1,6 @@
 package cn.wtk.connect.domain.server;
 
-import cn.wtk.connect.infrastructure.netty.NettyServerHandler;
+import cn.wtk.connect.infrastructure.netty.ConnectionStateHandler;
 import cn.wtk.mp.common.base.exception.service.NotFoundException;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +60,8 @@ public class ServerConnectionManager {
         if (onlineTerminalMap.containsKey(terminalId)) {
             // 关闭旧连接
             ChannelHandlerContext oldCtx = onlineTerminalMap.remove(terminalId);
-            String oldTerminalId = oldCtx.channel().attr(NettyServerHandler.TERMINAL_ID_KEY).get();
-            String oldRandomCode = oldCtx.channel().attr(NettyServerHandler.RANDOM_CODE_KEY).get();
+            String oldTerminalId = oldCtx.channel().attr(ConnectionStateHandler.TERMINAL_ID_KEY).get();
+            String oldRandomCode = oldCtx.channel().attr(ConnectionStateHandler.RANDOM_CODE_KEY).get();
             oldCtx.close();
         }
         onlineTerminalMap.put(terminalId, newCtx);

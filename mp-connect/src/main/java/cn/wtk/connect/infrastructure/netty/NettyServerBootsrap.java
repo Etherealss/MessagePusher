@@ -9,12 +9,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
@@ -30,13 +26,11 @@ import java.net.InetSocketAddress;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class NettyServerBootsrap implements ApplicationRunner, ApplicationListener<ContextClosedEvent>, ApplicationContextAware {
+public class NettyServerBootsrap implements ApplicationRunner, ApplicationListener<ContextClosedEvent> {
 
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final NettyServerConfig nettyServerConfig;
     private final NettyServerChannelInitializer nettyServerChannelInitializer;
 
-    private ApplicationContext applicationContext;
     private Channel serverChannel;
     /**
      * Boss 线程组，用于服务端接受客户端的连接
@@ -46,11 +40,6 @@ public class NettyServerBootsrap implements ApplicationRunner, ApplicationListen
      * Worker 线程组，用于服务端接受客户端的数据读写
      */
     private EventLoopGroup workerGroup;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 /**
- * 实现客户端 Channel 建立连接、断开连接、异常时的处理。
+ * 实现对客户端 Channel 建立连接、断开连接、异常时的处理。
  * @author wtk
  * @date 2023-01-06
  */
@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class NettyServerHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     private final ServerConnectionManager serverConnectionManager;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -35,7 +35,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<WebSocketFra
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
         String terminalId = null;
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;

@@ -1,13 +1,153 @@
 @startuml
 'https://plantuml.com/class-diagram
 
-class NettyServer {
+class ChannelInboundHandlerAdapter
+class NettyServerConfig
+
+class NettyServerBootstrap {
+    NettyServerConfig nettyServerConfig
+    NettyServerInitializer nettyServerInitializer
+    + run()
+}
+
+class NettyServerInitializer {
+    - WebSocketMessageFrameHandler
+    - IdleTimeoutHandlerAdapter
+}
+note top of NettyServerInitializer: 配置并初始化服务端处理客户端Channel的Handlers
+
+class IdleTimeoutHandlerAdapter extends ChannelInboundHandlerAdapter {
+    - IdleConfig idleConfig;
+}
+
+NettyServerInitializer ..> IdleTimeoutHandlerAdapter : 心跳检测
+
+class IdleConfig {
+}
+
+IdleTimeoutHandlerAdapter ..> IdleConfig
+
+class ConnectionStateHandler extends ChannelInboundHandlerAdapter {
+    - AuthFeign authFeign;
+    - ReconnectHandler reconnectHandler;
+    - ServerConnManager serverConnManager;
+    + void channelActive() // 创建了新连接
+    - void auth() // 鉴权
+    + void channelRead() // 接收新消息
+    + void exceptionCaught() // 异常
+    + void channelInactive() // 断线、重连
+}
+
+class AuthFeign {
+    + Boolean authToken(ConnectorCredential credential);
+}
+
+note top of ConnectionStateHandler: 处理客户端连接的状态变更
+
+interface RetryPolicy {
+    + boolean allowRetry(int retryCount);
+    + long getSleepMs(int retryCount);
+}
+
+class ExponentialBackOffRetry implements RetryPolicy {
+    - long initialSleepMs;
+    - int maxRetryTimes;
+    - int maxSleepMs;
+}
+note bottom of ExponentialBackOffRetry
+随着重试次数的增加延长间隔时间
+end note
+
+class ReconnectHandler {
+    - final RetryPolicy retryPolicy; // 构造方法传入，保证多态灵活性
+    + void reconnect(ChannelHandlerContext ctx) throws Exception;
+}
+
+class ReconnectHandlerConfiguration {
 
 }
-class NettyClient
-class NettyServerBootstrap
-class ServerConnManager
-class AppConnManager
-class UserSessionManager
-class MsgConnection
+ReconnectHandlerConfiguration ..> ExponentialBackOffRetry: 创建
+ReconnectHandlerConfiguration ..> ReconnectHandler: 创建
+
+ConnectionStateHandler ..> ReconnectHandler: 断线重连
+
+NettyServerBootstrap ..> NettyServerInitializer : 初始化NettyServer
+NettyServerBootstrap ..> NettyServerConfig: 获取配置
+NettyServerInitializer ..> NettyServerConfig: 获取配置
+NettyServerInitializer ..> ConnectionStateHandler: 连接状态
+
+class NettyServer extends ApplicationListener {
+    - Channel serverChannel
+    - EventLoopGroup bossGroup
+    - EventLoopGroup workerGroup
+    + onApplicationEvent(ContextClosedEvent)
+}
+
+note left of NettyServer::onApplicationEvent
+关闭系统释放连接
+end note
+
+NettyServerBootstrap ..> NettyServer : 创建并启动
+
+class NettyClient {
+
+}
+
+class Message {
+    - ConnectorKey sender;
+    - ConnectorKey receiver;
+    - Date sendTime;
+    - String topic;
+    - String msgType;
+    - String data; // 二进制转字符串
+}
+class ConnectorKey {
+    - Serializable connectorId;
+    - Long appId;
+}
+note bottom of ConnectorKey: 连接者需要用两个字段标识，是一个VO
+
+interface ConnComposite {
+    + void addConn(ConnectorKey, Connection)
+    + void removeConn(ConnectorKey, connId)
+    + Connection getConn(ConnectorKey, connId)
+    + Map<ConnId, Connection> getConns(ConnectorKey)
+    + boolean containsConn(Connector)
+    + Result sendMsg(Message)
+    + Result sendMsg(Message, UUID connId)
+}
+note right of ConnComposite : 组合模式
+
+ConnComposite --> Message : 传输消息
+
+class ServerConnManager implements ConnComposite {
+    - Map<AppId, AppConnManager> apps;
+    - RedisTemplate<AppId+ConnectorId, Host+Port> redis;
+    - void addOnlineInfo(Connector)
+    - void removeOnlineInfo(Connector)
+    - ServerInfo serverRoute(Message, UUID connId)
+}
+
+class AppConnManager implements ConnComposite {
+    - Long appId;
+    - Map<ConnectorId, Connector> connectors;
+}
+
+class Connector implements ConnComposite {
+    - Long appId;
+    - Serializable connectorId;
+    - Map<connId, Connection> conns;
+}
+
+class Connection {
+    - UUID connId;
+    - Channel channel;
+    - Serializable connectorId;
+}
+
+ConnectionStateHandler ..> ServerConnManager: 保存Channel连接
+ServerConnManager o-- AppConnManager
+AppConnManager o-- Connector
+Connector o-- Connection
+
 @enduml
