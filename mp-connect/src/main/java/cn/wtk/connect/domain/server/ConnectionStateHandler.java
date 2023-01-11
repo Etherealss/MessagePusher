@@ -1,6 +1,10 @@
 package cn.wtk.connect.domain.server;
 
-import cn.wtk.connect.domain.server.ServerConnectionManager;
+import cn.wtk.connect.domain.server.app.connector.ConnectorKey;
+import cn.wtk.connect.domain.server.app.connector.connection.Connection;
+import cn.wtk.connect.domain.server.app.connector.connection.MessageSender;
+import cn.wtk.mp.common.base.utils.UUIDUtil;
+import cn.wtk.mp.common.base.utils.UrlUtil;
 import com.mongodb.event.ConnectionClosedEvent;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -11,9 +15,12 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 实现对客户端 Channel 建立连接、断开连接、异常时的处理。
@@ -26,11 +33,14 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
+    private static final AttributeKey<ConnectorKey> ATTRIBUTE_KEY_CONNECTOR_KEY
+            = AttributeKey.valueOf("connectorKey");
+    private static final AttributeKey<UUID> ATTRIBUTE_KEY_CONN_ID = AttributeKey.valueOf("connId");
+
     private final ServerConnectionManager serverConnectionManager;
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    public static final AttributeKey<String> CONNECTOR_ID = AttributeKey.valueOf("connectorId");
-    public static final AttributeKey<String> CONN_ID = AttributeKey.valueOf("connId");
+    private final ConnectTokenAuthService connectTokenAuthService;
+    private final MessageSender messageSender;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -39,33 +49,30 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
             String origin = request.headers().get("Origin");
-            if (null != uri && uri.contains("?connectToken")) {
-                connectToken = getConnectTokenByUri(uri);
-                // WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对
-                // 如果URI一致，才会通过握手建立WebSocket连接
-                request.setUri("/");
-            } else {
-                log.info("不允许终端 [ {} ] 连接，强制断开", origin);
+            Map<String, String> urlParameters = UrlUtil.getUrlParameters(uri);
+            AuthResult authResult = connectTokenAuthService.doAuth(urlParameters);
+            // TODO WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对，如果URI一致，才会通过握手建立WebSocket连接
+//            request.setUri("/");
+            if (!authResult.isSuccess()) {
+                // TODO 发送给客户端的数据结构
+                messageSender.send(ctx.channel(), authResult.getErrorMsg());
                 ctx.close();
+                return;
             }
+            // 认证完毕，可以建立连接
+            ConnectorKey connectorKey = new ConnectorKey(
+                    authResult.getAppId(),
+                    authResult.getConnectorId()
+            );
+            UUID connId = UUIDUtil.get();
+            Connection conn = new Connection(connId, connectorKey, ctx);
+            ctx.channel().attr(ATTRIBUTE_KEY_CONNECTOR_KEY).set(connectorKey);
+            ctx.channel().attr(ATTRIBUTE_KEY_CONN_ID).set(connId);
+            serverConnectionManager.addConn(conn);
         }
         super.channelRead(ctx, msg);
-        if (StringUtils.hasText(connectToken)) {
-            applicationEventPublisher.publishEvent(new ConnectionEstablishedEvent(connectToken, ctx));
-        }
     }
 
-    private String getConnectTokenByUri(String uri) {
-        String terminalId = null;
-        String[] uriArray = uri.split("\\?");
-        if (uriArray.length > 1) {
-            String[] paramsArray = uriArray[1].split("=");
-            if (paramsArray.length > 1) {
-                terminalId = paramsArray[1];
-            }
-        }
-        return terminalId;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
@@ -82,35 +89,36 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        serverConnectionManager.remove(ctx);
-        publishConnectionClosedEvent(ctx);
+        removeConn(ctx);
         ctx.close();
-        log.error("服务器发生了异常: [ {} ]", cause);
+        log.warn("服务器发生了异常:", cause);
+    }
+
+    private void removeConn(ChannelHandlerContext ctx) {
+        ConnectorKey connectorKey = ctx.channel().attr(ATTRIBUTE_KEY_CONNECTOR_KEY).get();
+        UUID connId = ctx.channel().attr(ATTRIBUTE_KEY_CONN_ID).get();
+        serverConnectionManager.removeConn(connectorKey, connId);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        publishConnectionClosedEvent(ctx);
-        serverConnectionManager.remove(ctx);
+        removeConn(ctx);
         super.channelInactive(ctx);
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        publishConnectionClosedEvent(ctx);
-        serverConnectionManager.remove(ctx);
+        removeConn(ctx);
         super.channelUnregistered(ctx);
-    }
-
-    private void publishConnectionClosedEvent(ChannelHandlerContext ctx) {
-        String terminalId = ctx.channel().attr(CONN_ID).get();
-        String randomCode = ctx.channel().attr(CONNECTOR_ID).get();
-        applicationEventPublisher.publishEvent(new ConnectionClosedEvent(terminalId, randomCode));
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        log.info("链接创建：{}", ctx.channel().remoteAddress());
+        ConnectorKey connectorKey = ctx.channel().attr(ATTRIBUTE_KEY_CONNECTOR_KEY).get();
+        UUID connId = ctx.channel().attr(ATTRIBUTE_KEY_CONN_ID).get();
+        log.info("链接创建：RemoteIP={}, connectorKey={}, connId={}",
+                ctx.channel().remoteAddress(), connectorKey, connId
+        );
     }
 }

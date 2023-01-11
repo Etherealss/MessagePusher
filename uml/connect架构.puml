@@ -126,7 +126,7 @@ class Connector implements ConnComposite {
 
 class Connection {
     - UUID connId;
-    - Channel channel;
+    - ChannelHandlerContext ctx;
     - Serializable connectorId;
 }
 

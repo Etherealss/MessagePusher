@@ -1,28 +1,43 @@
-package cn.wtk.connect.domain.server;
+package cn.wtk.connect.domain.server.app;
 
-import cn.wtk.connect.domain.server.app.AppConnManager;
+import cn.wtk.connect.domain.server.ConnComposite;
+import cn.wtk.connect.domain.server.app.connector.Connector;
 import cn.wtk.connect.domain.server.app.connector.ConnectorKey;
 import cn.wtk.connect.domain.server.app.connector.connection.Connection;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wtk
- * @date 2023-01-06
+ * @date 2023-01-11
  */
 @Component
 @Slf4j
-@RequiredArgsConstructor
-public class ServerConnectionManager implements ConnComposite {
+public class AppConnManager implements ConnComposite {
+    private final Long appId;
+    private final Map<UUID, Connector> connectors = new ConcurrentHashMap<>();
 
-    private final Map<Long, AppConnManager> apps = new ConcurrentHashMap<>();
-    private final RedisTemplate<String, String> redisTemplate;
+    public AppConnManager(Long appId) {
+        this.appId = appId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppConnManager that = (AppConnManager) o;
+        return appId.equals(that.appId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(appId);
+    }
 
     @Override
     public void addConn(Connection conn) {
