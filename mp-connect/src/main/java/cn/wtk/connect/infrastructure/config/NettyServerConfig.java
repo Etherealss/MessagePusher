@@ -30,7 +30,7 @@ public class NettyServerConfig {
     private String path;
 
     @NotNull
-    private Integer maxFrameSize;
+    private Integer maxFrameSize = 1024;
 
     /**
      * 心跳检测超时时间，默认两分半钟
@@ -42,17 +42,17 @@ public class NettyServerConfig {
      * 服务端 accept 队列大小
      */
     @NotNull
-    private Integer serverTcpBlacklog;
+    private Integer serverTcpBlacklog = 1024;
 
     /**
      * TCP Keepalive 机制，实现 TCP 层级的心跳保活功能
      */
     @NotNull
-    private Boolean enableTcpKeepalive;
+    private Boolean enableTcpKeepalive = true;
 
     /**
      * 允许较小的数据包的发送，降低延迟
      */
     @NotNull
-    private Boolean enableTcpNodelay;
+    private Boolean enableTcpNodelay = true;
 }

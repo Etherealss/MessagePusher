@@ -33,8 +33,6 @@ public class ServerCredentialCacheHandler extends CredentialCacheHandler {
 
     @Override
     protected Credential verifyAndGetCredential(String token) {
-        return serverCredentialFeign.verify(
-                serverCredentialConfig.getServerId(), token
-        );
+        return serverCredentialFeign.verify(token, new ServerTokenVerifyCommand(serverCredentialConfig.getServerId()));
     }
 }

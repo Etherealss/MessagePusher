@@ -55,7 +55,7 @@ public class AppConnManager implements ConnComposite {
     }
 
     @Override
-    public Map<UUID, Connection> getConnServices(ConnectorKey connectorKey) {
+    public Map<UUID, Connection> getConns(ConnectorKey connectorKey) {
         return null;
     }
 

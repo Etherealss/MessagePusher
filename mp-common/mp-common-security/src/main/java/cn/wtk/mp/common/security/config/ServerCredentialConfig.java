@@ -2,11 +2,13 @@ package cn.wtk.mp.common.security.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -22,6 +24,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 @Getter
 @Setter
+@ToString
 public class ServerCredentialConfig {
     /**
      * 获取 server-token 的 headerName
@@ -52,4 +55,9 @@ public class ServerCredentialConfig {
      */
     @NotEmpty
     private String cacheKey;
+
+    @PostConstruct
+    public void init() {
+        System.out.println(this.toString());
+    }
 }

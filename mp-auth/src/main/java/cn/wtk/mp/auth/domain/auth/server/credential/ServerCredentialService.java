@@ -5,6 +5,7 @@ import cn.wtk.mp.auth.infrastructure.config.ServerCredentialCacheConfig;
 import cn.wtk.mp.auth.infrastructure.token.ITokenHandler;
 import cn.wtk.mp.common.base.exception.rest.ParamErrorException;
 import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
+import cn.wtk.mp.common.security.service.auth.server.ServerTokenVerifyCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,9 @@ public class ServerCredentialService {
         return serverCredential;
     }
 
-    public ServerCredential verifyAndGet(Long serverId, String token) {
+    public ServerCredential verifyAndGet(String token, ServerTokenVerifyCommand command) {
         ServerCredential serverCredential = tokenHandler.verifyToken(token, ServerCredential.class, credentialCacheConfig);
-        if (!serverId.equals(serverCredential.getServerId())) {
+        if (!command.getServerId().equals(serverCredential.getServerId())) {
             throw new ParamErrorException("serverId 不匹配");
         }
         return serverCredential;

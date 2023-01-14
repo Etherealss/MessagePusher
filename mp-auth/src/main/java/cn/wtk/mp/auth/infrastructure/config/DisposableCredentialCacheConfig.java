@@ -19,16 +19,16 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class DisposableCredentialCacheConfig implements ICredentialCacheConfig {
-    @Value("${app.auth.disposable.token.expire-ms}")
+    @Value("${mp.auth.disposable.token.expire-ms}")
     @NotNull
     private Long tokenExpireMs;
-    @Value("${app.auth.disposable.token.cache-key}")
+    @Value("${mp.auth.disposable.token.cache-key}")
     @NotBlank
     private String tokenCacheKey;
 
-    @Value("${app.auth.disposable.refresh-token.expire-ms}")
+    @Value("${mp.auth.disposable.refresh-token.expire-ms}")
     @NotNull
     private Long refreshTokenExpireMs;
-    @Value("${app.auth.disposable.refresh-token.cache-key}")
+    @Value("${mp.auth.disposable.refresh-token.cache-key}")
     @NotBlank private String refreshTokenCacheKey;
 }

@@ -5,8 +5,6 @@ import cn.wtk.mp.common.security.service.auth.Credential;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-
 /**
  * @author wtk
  * @date 2022-08-30
@@ -17,7 +15,6 @@ import java.util.Set;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServerCredential extends Credential {
-
     Long serverId;
     String serverName;
 }

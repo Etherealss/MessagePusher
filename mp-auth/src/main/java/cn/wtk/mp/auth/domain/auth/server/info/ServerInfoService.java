@@ -24,7 +24,8 @@ public class ServerInfoService {
     private final ServerDigestValidator serverDigestValidator;
 
     @Transactional(rollbackFor = Exception.class)
-    public ServerInfoEntity verifyAndGetInfo(ServerAuthCommand command, Long serverId) {
+    public ServerInfoEntity verifyAndGetInfo(ServerAuthCommand command) {
+        Long serverId = command.getServerId();
         ServerInfoEntity serverInfoEntity = serverInfoRepository.findById(serverId)
                 .orElseThrow(() -> new NotFoundException("服务：" + serverId + "不存在"));
         if (!serverDigestValidator.validate(command.getUserInputDigest(), serverInfoEntity)) {

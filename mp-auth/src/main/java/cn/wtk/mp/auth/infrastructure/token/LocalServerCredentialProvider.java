@@ -2,7 +2,6 @@ package cn.wtk.mp.auth.infrastructure.token;
 
 
 import cn.wtk.mp.auth.application.ServerApplicationService;
-import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoService;
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.service.auth.server.IServerCredentialProvider;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
@@ -31,8 +30,8 @@ public class LocalServerCredentialProvider implements IServerCredentialProvider 
                 serverCredentialConfig.getServerName(),
                 serverCredentialConfig.getSecret()
         );
-        ServerAuthCommand command = new ServerAuthCommand(digest);
+        ServerAuthCommand command = new ServerAuthCommand(serverCredentialConfig.getServerId(), digest);
         Long serverId = serverCredentialConfig.getServerId();
-        return serverApplicationService.createServerCredential(serverId, command);
+        return serverApplicationService.createServerCredential(command);
     }
 }

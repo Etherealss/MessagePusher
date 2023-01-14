@@ -14,7 +14,7 @@ public interface ConnComposite {
     void addConn(Connection conn);
     Connection removeConn(ConnectorKey connectorKey, UUID connId);
     Connection getConn(ConnectorKey connectorKey, UUID connId);
-    Map<UUID, Connection> getConnServices(ConnectorKey connectorKey);
+    Map<UUID, Connection> getConns(ConnectorKey connectorKey);
     boolean containsConn(ConnectorKey connectorKey);
     // TODO sendMsg
 }

@@ -35,13 +35,13 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
     @Override
     protected void initChannel(SocketChannel socketChannel) {
         // websocket协议配置
-        WebSocketServerProtocolHandler webSocketServerProtocolHandler = new WebSocketServerProtocolHandler(
-                WebSocketServerProtocolConfig.newBuilder()
-                        .websocketPath(nettyServerConfig.getPath())
-                        .allowExtensions(true)
-                        .maxFramePayloadLength(nettyServerConfig.getMaxFrameSize())
-                        .build()
-        );
+        WebSocketServerProtocolConfig webSocketConfig = WebSocketServerProtocolConfig.newBuilder()
+                .websocketPath(nettyServerConfig.getPath())
+                .allowExtensions(true)
+                .maxFramePayloadLength(nettyServerConfig.getMaxFrameSize())
+                .build();
+        WebSocketServerProtocolHandler webSocketServerProtocolHandler =
+                new WebSocketServerProtocolHandler(webSocketConfig);
         ChannelHandler[] handlers = {
                 // Channel空闲监听
                 new IdleStateHandler(0, 0, nettyServerConfig.getIdleSeconds(), TimeUnit.SECONDS),

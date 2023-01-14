@@ -6,16 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+/**
+ * @author wtk
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ServerAuthCommand {
+public class ServerTokenVerifyCommand {
     @NotNull
     Long serverId;
-    @NotEmpty
-    byte[] userInputDigest;
 }

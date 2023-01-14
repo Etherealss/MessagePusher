@@ -48,7 +48,7 @@ public class ConnectTokenAuthService {
 
         try {
             // TODO 设置 serverToken
-            authFeign.verify(connectorId, connectToken);
+            // authFeign.verify(connectorId, connectToken);
             return new AuthResult(true, null);
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getMsg());

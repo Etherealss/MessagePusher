@@ -5,7 +5,6 @@ import cn.wtk.connect.domain.server.app.connector.connection.Connection;
 import cn.wtk.connect.domain.server.app.connector.connection.MessageSender;
 import cn.wtk.mp.common.base.utils.UUIDUtil;
 import cn.wtk.mp.common.base.utils.UrlUtil;
-import com.mongodb.event.ConnectionClosedEvent;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +14,6 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +77,8 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
         if (msg instanceof TextWebSocketFrame) {
             TextWebSocketFrame textWebSocketFrame = (TextWebSocketFrame) msg;
             String text = textWebSocketFrame.text();
-            ctx.channel().writeAndFlush(new WebSocketMessage<>("pong", text));
+//            ctx.channel().writeAndFlush(new WebSocketMessage<>("pong", text));
+            ctx.channel().writeAndFlush("ack:" + text);
         } else if (msg instanceof PingWebSocketFrame) {
             ctx.channel().writeAndFlush(new PongWebSocketFrame(msg.content().retain()));
         } else {

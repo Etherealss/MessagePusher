@@ -21,9 +21,9 @@ public class ServerApplicationService {
     private final ServerInfoService serviceInfoService;
     private final ServerCredentialService serverCredentialService;
 
-    public ServerCredential createServerCredential(Long serverId, ServerAuthCommand command) {
+    public ServerCredential createServerCredential(ServerAuthCommand command) {
         ServerInfoEntity serverInfoEntity = serviceInfoService.verifyAndGetInfo(
-                command, serverId
+                command
         );
         return serverCredentialService.create(serverInfoEntity);
     }

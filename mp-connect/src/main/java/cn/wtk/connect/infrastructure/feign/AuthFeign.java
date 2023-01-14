@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @date 2023-01-09
  */
 @FeignClient(
-        value = "auth",
+        value = "mp-auth",
         path = "/auth"
 )
 public interface AuthFeign {
