@@ -48,6 +48,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
         if (this.isAuthenticated(ctx.channel())) {
+            ctx.fireChannelRead(msg);
             return;
         }
         if (msg instanceof FullHttpRequest) {
@@ -57,7 +58,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
             Map<String, String> urlParameters = UrlUtil.getUrlParameters(uri);
             AuthResult authResult = this.doAuth(urlParameters);
             // TODO WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对，如果URI一致，才会通过握手建立WebSocket连接
-//            request.setUri("/");
+            request.setUri("/");
             if (authResult.isSuccess()) {
                 addToManager(ctx, authResult);
             } else {
@@ -66,9 +67,9 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
                 ctx.close();
             }
         } else {
-            log.info("连接尚未认证");
             messageSender.send(ctx.channel(), "连接尚未认证");
             ctx.close();
+            log.info("连接尚未认证，关闭连接");
         }
     }
 
@@ -96,7 +97,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
         try {
             // TODO 设置 serverToken
             // authFeign.verify(connectorId, connectToken);
-            return new AuthResult(true, null);
+            return new AuthResult(connectorId, Long.valueOf(appIdStr));
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getMsg());
             return new AuthResult(false, "token无效或appId错误");
@@ -123,6 +124,9 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
         ctx.channel().attr(ChannelAttrKey.CONNECTOR).set(connectorKey);
         ctx.channel().attr(ChannelAttrKey.CONN_ID).set(connId);
         serverConnectionManager.addConn(conn);
+        log.info("链接创建：RemoteIP={}, connectorKey={}, connId={}",
+                ctx.channel().remoteAddress(), connectorKey, connId
+        );
     }
 
     private boolean isAuthenticated(Channel channel) {
@@ -131,11 +135,6 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ConnectorKey connectorKey = ctx.channel().attr(ChannelAttrKey.CONNECTOR).get();
-        UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).get();
-        log.info("链接创建：RemoteIP={}, connectorKey={}, connId={}",
-                ctx.channel().remoteAddress(), connectorKey, connId
-        );
         super.channelActive(ctx);
     }
 }

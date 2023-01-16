@@ -34,8 +34,7 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
         if (msg instanceof TextWebSocketFrame) {
             TextWebSocketFrame textWebSocketFrame = (TextWebSocketFrame) msg;
             String text = textWebSocketFrame.text();
-//            ctx.channel().writeAndFlush(new WebSocketMessage<>("pong", text));
-            ctx.channel().writeAndFlush("ack:" + text);
+            ctx.channel().writeAndFlush(new TextWebSocketFrame("ack:" + text));
         } else if (msg instanceof PingWebSocketFrame) {
             ctx.channel().writeAndFlush(new PongWebSocketFrame(msg.content().retain()));
         } else {

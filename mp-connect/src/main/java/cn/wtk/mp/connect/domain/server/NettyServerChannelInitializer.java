@@ -1,7 +1,5 @@
-package cn.wtk.mp.connect.infrastructure.netty;
+package cn.wtk.mp.connect.domain.server;
 
-import cn.wtk.mp.connect.domain.server.ConnectionAuthHandler;
-import cn.wtk.mp.connect.domain.server.ConnectionStateHandler;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
@@ -32,7 +30,7 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
     private final ConnectionAuthHandler connectionAuthHandler;
     private final ConnectionStateHandler connectionStateHandler;
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
-    private final WebSocketMessageFrameHandler webSocketMessageFrameHandler;
+    private final MsgPushHandler msgPushHandler;
 
     @Override
     protected void initChannel(SocketChannel socketChannel) {
@@ -45,23 +43,23 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
         WebSocketServerProtocolHandler webSocketServerProtocolHandler =
                 new WebSocketServerProtocolHandler(webSocketConfig);
         ChannelHandler[] handlers = {
-                // Channel空闲监听
+//                // Channel空闲监听
                 new IdleStateHandler(0, 0, nettyServerConfig.getIdleSeconds(), TimeUnit.SECONDS),
-                // HTTP请求的解码和编码
+                // HTTP请求的解码和编码，用于ws握手
                 new HttpServerCodec(),
                 // 处理大数据流
                 new ChunkedWriteHandler(),
                 // HttpServerCodec 会在每个HTTP消息中生成多个消息对象，
                 // 使用下面的对象把多个消息转换为一个单一的 FullHttpRequest 或是 FullHttpResponse
                 new HttpObjectAggregator(65536),
-                // 处理 WebSocket 数据压缩
+//                // 处理 WebSocket 数据压缩
                 new WebSocketServerCompressionHandler(),
-                connectionAuthHandler,
                 // WebSocket 协议配置
                 webSocketServerProtocolHandler,
+                connectionAuthHandler,
                 connectionStateHandler,
                 idleTimeoutHandlerAdapter,
-//                webSocketMessageFrameHandler,
+                msgPushHandler,
         };
         // 按序添加Handler
         socketChannel.pipeline().addLast(handlers);

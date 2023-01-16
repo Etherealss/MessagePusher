@@ -36,7 +36,7 @@ public class NettyServerConfig {
      * 心跳检测超时时间，默认两分半钟
      */
     @NotNull
-    private Integer idleSeconds = 150;
+    private Integer idleSeconds = 10;
 
     /**
      * 服务端 accept 队列大小

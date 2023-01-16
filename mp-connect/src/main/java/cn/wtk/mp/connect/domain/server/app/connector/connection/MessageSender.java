@@ -1,6 +1,8 @@
 package cn.wtk.mp.connect.domain.server.app.connector.connection;
 
+import cn.wtk.mp.common.base.utils.JsonUtil;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,6 @@ public class MessageSender {
             log.warn("Channel 未激活");
             return;
         }
-        channel.writeAndFlush(data);
+        channel.writeAndFlush(new TextWebSocketFrame(JsonUtil.toJsonString(data)));
     }
 }

@@ -1,7 +1,6 @@
 package cn.wtk.mp.connect.domain.server;
 
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
-import cn.wtk.mp.connect.infrastructure.netty.NettyServerChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;

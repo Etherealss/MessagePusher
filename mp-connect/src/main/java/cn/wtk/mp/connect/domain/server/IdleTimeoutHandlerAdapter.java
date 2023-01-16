@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.netty;
+package cn.wtk.mp.connect.domain.server;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,11 +19,6 @@ import org.springframework.stereotype.Component;
 public class IdleTimeoutHandlerAdapter extends ChannelInboundHandlerAdapter {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
-    }
-
-    @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
@@ -32,10 +27,5 @@ public class IdleTimeoutHandlerAdapter extends ChannelInboundHandlerAdapter {
                 ctx.close();
             }
         }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ctx.close();
     }
 }

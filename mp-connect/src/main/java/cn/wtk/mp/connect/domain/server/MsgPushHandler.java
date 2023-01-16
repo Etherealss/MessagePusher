@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.netty;
+package cn.wtk.mp.connect.domain.server;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,9 +14,10 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 @Component
 @Slf4j
-public class WebSocketMessageFrameHandler extends ChannelOutboundHandlerAdapter {
+public class MsgPushHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        log.info("写消息：{}", msg);
 //        if (msg instanceof WebSocketMessage<?>) {
 //            String json = JsonUtil.toJsonStr(msg);
 //            super.write(ctx, new TextWebSocketFrame(json), promise);

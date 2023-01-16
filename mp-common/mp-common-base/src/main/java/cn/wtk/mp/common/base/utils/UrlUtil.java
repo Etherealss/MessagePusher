@@ -29,7 +29,7 @@ public class UrlUtil {
     private static String truncateUrlPage(String url) {
         String strAllParam = null;
         String[] arrSplit;
-        url = url.trim().toLowerCase();
+        url = url.trim();
         arrSplit = url.split("[?]");
         if (url.length() > 1) {
             if (arrSplit.length > 1) {
