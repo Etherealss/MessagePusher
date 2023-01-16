@@ -30,6 +30,7 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
+        log.info("收到消息：{}", msg);
         if (msg instanceof TextWebSocketFrame) {
             TextWebSocketFrame textWebSocketFrame = (TextWebSocketFrame) msg;
             String text = textWebSocketFrame.text();

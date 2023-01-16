@@ -1,5 +1,6 @@
 package cn.wtk.mp.connect.infrastructure.netty;
 
+import cn.wtk.mp.connect.domain.server.ConnectionAuthHandler;
 import cn.wtk.mp.connect.domain.server.ConnectionStateHandler;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import io.netty.channel.ChannelHandler;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class NettyServerChannelInitializer extends ChannelInitializer<SocketChannel> {
     private final NettyServerConfig nettyServerConfig;
+    private final ConnectionAuthHandler connectionAuthHandler;
     private final ConnectionStateHandler connectionStateHandler;
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
     private final WebSocketMessageFrameHandler webSocketMessageFrameHandler;
@@ -54,6 +56,7 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
                 new HttpObjectAggregator(65536),
                 // 处理 WebSocket 数据压缩
                 new WebSocketServerCompressionHandler(),
+                connectionAuthHandler,
                 // WebSocket 协议配置
                 webSocketServerProtocolHandler,
                 connectionStateHandler,

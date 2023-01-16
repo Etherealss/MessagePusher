@@ -35,7 +35,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnectAuthHandler extends SimpleChannelInboundHandler<Object> {
+public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
 
     private static final String PARAM_NAME_CONNECT_TOKEN = "connectToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
@@ -126,7 +126,7 @@ public class ConnectAuthHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     private boolean isAuthenticated(Channel channel) {
-        return channel.attr(ChannelAttrKey.CONN_ID) != null;
+        return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
     }
 
     @Override
