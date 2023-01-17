@@ -29,7 +29,6 @@ class IdleTimeoutHandlerAdapter extends ChannelInboundHandlerAdapter {
 NettyServerInitializer ..> IdleTimeoutHandlerAdapter : 心跳检测
 
 class ConnectionStateHandler extends ChannelInboundHandlerAdapter {
-    - AuthFeign authFeign;
     - ReconnectHandler reconnectHandler;
     - ServerConnManager serverConnManager;
     + void channelActive() // 创建了新连接
@@ -39,10 +38,14 @@ class ConnectionStateHandler extends ChannelInboundHandlerAdapter {
     + void channelInactive() // 断线、重连
 }
 
+class ConnectionAuthHandler extends ChannelInboundHandlerAdapter {
+    - AuthFeign authFeign;
+}
+
 class AuthFeign {
     + Boolean authToken(ConnectorCredential credential);
 }
-ConnectionStateHandler ..> AuthFeign: 鉴权
+ConnectionAuthHandler ..> AuthFeign: 鉴权
 
 note top of ConnectionStateHandler: 处理客户端连接的状态变更
 

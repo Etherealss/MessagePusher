@@ -31,6 +31,7 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
     private final ConnectionStateHandler connectionStateHandler;
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
     private final MsgPushHandler msgPushHandler;
+    private final MsgReceiverHandler msgReceiverHandler;
 
     @Override
     protected void initChannel(SocketChannel socketChannel) {
@@ -56,6 +57,7 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
                 new WebSocketServerCompressionHandler(),
                 // WebSocket 协议配置
                 webSocketServerProtocolHandler,
+                msgReceiverHandler,
                 connectionAuthHandler,
                 connectionStateHandler,
                 idleTimeoutHandlerAdapter,
