@@ -1,6 +1,6 @@
 package cn.wtk.mp.connect.domain.server;
 
-import cn.wtk.mp.connect.domain.server.app.AppConnManager;
+import cn.wtk.mp.connect.domain.server.app.AppConnContainer;
 import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
 import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ServerConnectionManager implements ConnComposite {
+public class ServerConnContainer implements ConnContainer {
 
-    private final Map<Long, AppConnManager> apps = new ConcurrentHashMap<>();
+    private final Map<Long, AppConnContainer> apps = new ConcurrentHashMap<>();
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void addConn(Connection conn) {
-
+        Long appId = conn.getConnectorKey().getAppId();
+        AppConnContainer appConnContainer = apps.get(appId);
+        if (appConnContainer == null) {
+            appConnContainer = new AppConnContainer(appId);
+            apps.get(appId).addConn(conn);
+            apps.putIfAbsent(appId, appConnContainer);
+        } else {
+            appConnContainer.addConn(conn);
+        }
     }
 
     @Override
@@ -42,10 +50,5 @@ public class ServerConnectionManager implements ConnComposite {
     @Override
     public Map<UUID, Connection> getConns(ConnectorKey connectorKey) {
         return null;
-    }
-
-    @Override
-    public boolean containsConn(ConnectorKey connectorKey) {
-        return false;
     }
 }

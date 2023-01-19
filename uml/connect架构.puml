@@ -121,7 +121,7 @@ class AppConnManager implements ConnComposite {
     - Map<ConnectorId, Connector> connectors;
 }
 
-class Connector implements ConnComposite {
+class Connector {
     - Long appId;
     - Serializable connectorId;
     - Map<connId, Connection> conns;

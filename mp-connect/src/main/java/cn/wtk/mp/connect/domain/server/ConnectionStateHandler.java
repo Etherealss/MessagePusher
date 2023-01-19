@@ -25,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
-    private final ServerConnectionManager serverConnectionManager;
+    private final ServerConnContainer serverConnContainer;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -48,7 +48,7 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
     private void removeConn(ChannelHandlerContext ctx) {
         ConnectorKey connectorKey = ctx.channel().attr(ChannelAttrKey.CONNECTOR).get();
         UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).get();
-        serverConnectionManager.removeConn(connectorKey, connId);
+        serverConnContainer.removeConn(connectorKey, connId);
     }
 
     @Override

@@ -10,11 +10,10 @@ import java.util.UUID;
  * @author wtk
  * @date 2023-01-11
  */
-public interface ConnComposite {
+public interface ConnContainer {
     void addConn(Connection conn);
     Connection removeConn(ConnectorKey connectorKey, UUID connId);
     Connection getConn(ConnectorKey connectorKey, UUID connId);
     Map<UUID, Connection> getConns(ConnectorKey connectorKey);
-    boolean containsConn(ConnectorKey connectorKey);
     // TODO sendMsg
 }

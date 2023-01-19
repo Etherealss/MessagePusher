@@ -43,7 +43,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
 
     private final AuthFeign authFeign;
     private final MessageSender messageSender;
-    private final ServerConnectionManager serverConnectionManager;
+    private final ServerConnContainer serverConnContainer;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
@@ -123,7 +123,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
         Connection conn = new Connection(connId, connectorKey, ctx);
         ctx.channel().attr(ChannelAttrKey.CONNECTOR).set(connectorKey);
         ctx.channel().attr(ChannelAttrKey.CONN_ID).set(connId);
-        serverConnectionManager.addConn(conn);
+        serverConnContainer.addConn(conn);
         log.info("链接创建：RemoteIP={}, connectorKey={}, connId={}",
                 ctx.channel().remoteAddress(), connectorKey, connId
         );

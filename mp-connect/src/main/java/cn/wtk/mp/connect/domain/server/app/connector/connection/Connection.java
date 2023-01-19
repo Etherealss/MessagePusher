@@ -4,7 +4,6 @@ import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -14,7 +13,6 @@ import java.util.UUID;
  * @date 2023-01-11
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Connection {
     private UUID connId;
@@ -25,5 +23,13 @@ public class Connection {
         this.connId = connId;
         this.connectorKey = new ConnectorKey(appId, connectorId);
         this.ctx = ctx;
+    }
+
+    public Serializable getConnectorId() {
+        return this.connectorKey.getConnectorId();
+    }
+
+    public Long getAppId() {
+        return this.connectorKey.getAppId();
     }
 }

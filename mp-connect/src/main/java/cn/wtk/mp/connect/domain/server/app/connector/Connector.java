@@ -1,22 +1,33 @@
 package cn.wtk.mp.connect.domain.server.app.connector;
 
-import cn.wtk.mp.connect.domain.server.ConnComposite;
 import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author wtk
  * @date 2023-01-11
  */
 @Slf4j
-public class Connector implements ConnComposite {
-    private final ConnectorKey connectorKey;
+public class Connector {
+
     private final Map<UUID, Connection> conns = new ConcurrentHashMap<>();
+    @Getter
+    private final ConnectorKey connectorKey;
+    @Getter
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+    public int getConnSize() {
+        return conns.size();
+    }
 
     public Connector(ConnectorKey connectorKey) {
         this.connectorKey = connectorKey;
@@ -35,28 +46,23 @@ public class Connector implements ConnComposite {
         return Objects.hash(connectorKey);
     }
 
-    @Override
     public void addConn(Connection conn) {
-
+        conns.put(conn.getConnId(), conn);
     }
 
-    @Override
-    public Connection removeConn(ConnectorKey connectorKey, UUID connId) {
-        return null;
+    public Connection removeConn(UUID connId) {
+        return conns.remove(connId);
     }
 
-    @Override
-    public Connection getConn(ConnectorKey connectorKey, UUID connId) {
-        return null;
+    public Connection getConn(UUID connId) {
+        return conns.get(connId);
     }
 
-    @Override
-    public Map<UUID, Connection> getConns(ConnectorKey connectorKey) {
-        return null;
+    public Map<UUID, Connection> getConns() {
+        return new HashMap<>(conns);
     }
 
-    @Override
-    public boolean containsConn(ConnectorKey connectorKey) {
-        return false;
+    public boolean containsConn(UUID connId) {
+        return conns.containsKey(connId);
     }
 }
