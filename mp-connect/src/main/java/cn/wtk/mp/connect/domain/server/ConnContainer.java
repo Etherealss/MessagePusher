@@ -3,7 +3,6 @@ package cn.wtk.mp.connect.domain.server;
 import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
 import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -14,6 +13,5 @@ public interface ConnContainer {
     void addConn(Connection conn);
     Connection removeConn(ConnectorKey connectorKey, UUID connId);
     Connection getConn(ConnectorKey connectorKey, UUID connId);
-    Map<UUID, Connection> getConns(ConnectorKey connectorKey);
     // TODO sendMsg
 }

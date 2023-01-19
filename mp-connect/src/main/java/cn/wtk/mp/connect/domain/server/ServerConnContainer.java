@@ -30,25 +30,42 @@ public class ServerConnContainer implements ConnContainer {
         AppConnContainer appConnContainer = apps.get(appId);
         if (appConnContainer == null) {
             appConnContainer = new AppConnContainer(appId);
-            apps.get(appId).addConn(conn);
-            apps.putIfAbsent(appId, appConnContainer);
-        } else {
-            appConnContainer.addConn(conn);
         }
+        appConnContainer.addConn(conn);
+        addOrMergeContainer(appConnContainer);
     }
 
     @Override
     public Connection removeConn(ConnectorKey connectorKey, UUID connId) {
-        return null;
+        Long appId = connectorKey.getAppId();
+        AppConnContainer container = apps.get(appId);
+        if (container == null) {
+            return null;
+        }
+        Connection conn = container.removeConn(connectorKey, connId);
+        if (container.getConnectorSize() == 0) {
+            container.getRwLock().writeLock().lock();
+            if (container.getConnectorSize() == 0 && apps.containsValue(container)) {
+                apps.remove(container);
+            }
+            container.getRwLock().readLock().unlock();
+        }
+        return conn;
+    }
+
+    private void addOrMergeContainer(AppConnContainer container) {
+        Long appId = container.getAppId();
+        container.getRwLock().readLock().lock();
+        AppConnContainer preContainer = apps.put(appId, container);
+        if (preContainer != null) {
+            container.addAll(preContainer);
+        }
+        container.getRwLock().readLock().unlock();
     }
 
     @Override
     public Connection getConn(ConnectorKey connectorKey, UUID connId) {
-        return null;
-    }
-
-    @Override
-    public Map<UUID, Connection> getConns(ConnectorKey connectorKey) {
-        return null;
+        AppConnContainer appConnContainer = this.apps.get(connectorKey.getAppId());
+        return appConnContainer.getConn(connectorKey, connId);
     }
 }

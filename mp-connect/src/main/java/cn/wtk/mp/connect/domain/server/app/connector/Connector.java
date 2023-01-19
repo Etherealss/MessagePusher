@@ -4,7 +4,6 @@ import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -58,11 +57,11 @@ public class Connector {
         return conns.get(connId);
     }
 
-    public Map<UUID, Connection> getConns() {
-        return new HashMap<>(conns);
-    }
-
     public boolean containsConn(UUID connId) {
         return conns.containsKey(connId);
+    }
+
+    public void addAll(Connector other) {
+        this.conns.putAll(other.conns);
     }
 }

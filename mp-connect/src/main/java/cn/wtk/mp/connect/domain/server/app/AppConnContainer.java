@@ -4,6 +4,7 @@ import cn.wtk.mp.connect.domain.server.ConnContainer;
 import cn.wtk.mp.connect.domain.server.app.connector.Connector;
 import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
 import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * @author wtk
@@ -18,16 +20,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 public class AppConnContainer implements ConnContainer {
+    @Getter
     private final Long appId;
     private final Map<Serializable, Connector> connectors = new ConcurrentHashMap<>();
+    @Getter
+    private ReadWriteLock rwLock;
+
 
     public AppConnContainer(Long appId) {
         this.appId = appId;
     }
 
-    /**
-     * @param conn
-     */
+    public int getConnectorSize() {
+        return connectors.size();
+    }
+
     @Override
     public void addConn(Connection conn) {
         ConnectorKey connectorKey = conn.getConnectorKey();
@@ -76,9 +83,9 @@ public class AppConnContainer implements ConnContainer {
         // 因此也可以放心地将旧的connector的连接添加到新连接中
         Connector preConnector = connectors.put(connectorId, connector);
         if (preConnector != null) {
-            for (Connection c : preConnector.getConns().values()) {
-                connector.addConn(c);
-            }
+            preConnector.getRwLock().writeLock().lock();
+            connector.addAll(preConnector);
+            preConnector.getRwLock().writeLock().unlock();
         }
         connector.getRwLock().readLock().unlock();
     }
@@ -92,10 +99,8 @@ public class AppConnContainer implements ConnContainer {
         return connector.getConn(connId);
     }
 
-    @Override
-    public Map<UUID, Connection> getConns(ConnectorKey connectorKey) {
-        Connector connector = connectors.get(connectorKey.getConnectorId());
-        return connector.getConns();
+    public void addAll(AppConnContainer other) {
+        this.connectors.putAll(other.connectors);
     }
 
 
