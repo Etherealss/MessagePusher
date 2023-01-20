@@ -6,7 +6,6 @@
 <Configuration status="warn" monitorInterval="5">
     <!-- 集中配置属性进行管理。使用:${name} -->
     <properties>
-        <property name="fileLevel">trace</property>
         <!--控制台输出格式-->
         <!--%d{HH:mm:ss.SSS} [%t] [%-5level] %c{36}:%L - %m%n-->
         <property name="consolePatternLayout">
