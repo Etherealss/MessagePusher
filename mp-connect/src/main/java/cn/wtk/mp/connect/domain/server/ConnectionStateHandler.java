@@ -1,6 +1,5 @@
 package cn.wtk.mp.connect.domain.server;
 
-import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,9 +45,9 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
     }
 
     private void removeConn(ChannelHandlerContext ctx) {
-        ConnectorKey connectorKey = ctx.channel().attr(ChannelAttrKey.CONNECTOR).get();
+        Long connectorId = ctx.channel().attr(ChannelAttrKey.CONNECTOR).get();
         UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).get();
-        serverConnContainer.removeConn(connectorKey, connId);
+        serverConnContainer.removeConn(connectorId, connId);
     }
 
     @Override

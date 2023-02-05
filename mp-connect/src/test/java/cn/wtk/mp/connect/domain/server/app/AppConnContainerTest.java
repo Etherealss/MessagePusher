@@ -1,9 +1,9 @@
 package cn.wtk.mp.connect.domain.server.app;
 
 import cn.wtk.mp.common.base.utils.UUIDUtil;
-import cn.wtk.mp.connect.domain.server.app.connector.Connector;
-import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
-import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.server.ServerConnContainer;
+import cn.wtk.mp.connect.domain.server.connector.Connector;
+import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 class AppConnContainerTest {
     public static void main(String[] args) {
-        AppConnContainer container = new AppConnContainer(1L);
+        ServerConnContainer container = new ServerConnContainer();
         int size = 100;
         CyclicBarrier barrier = new CyclicBarrier(size);
         ThreadPoolExecutor threadExecutor = new ThreadPoolExecutor(
@@ -38,15 +38,15 @@ class AppConnContainerTest {
         } catch (InterruptedException | BrokenBarrierException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("最终connector数：" + container.getConnectorSize());
-        ConnectorKey connectorKey = new ConnectorKey(1L, 1L);
-        Connector connector = container.getConnector(connectorKey);
+        System.out.println("最终connector数：" + container.getConnetorSize());
+        long connectorId = 1L;
+        Connector connector = container.getConnector(connectorId);
         System.out.println("最终连接数：" + connector.getConnSize());
 
         // remove 测试
         barrier.reset();
         for (UUID connId : queue) {
-            MyRunnable2 task = new MyRunnable2(container, barrier, connectorKey, connId);
+            MyRunnable2 task = new MyRunnable2(container, barrier, connectorId, connId);
             threadExecutor.submit(task);
         }
         try {
@@ -63,7 +63,7 @@ class AppConnContainerTest {
 @Slf4j
 class MyRunnable1 implements Runnable {
 
-    private final AppConnContainer container;
+    private final ServerConnContainer container;
     private final CyclicBarrier barrier;
     private final int no;
     private final BlockingQueue<UUID> queue;
@@ -87,14 +87,14 @@ class MyRunnable1 implements Runnable {
 @Slf4j
 class MyRunnable2 implements Runnable {
 
-    private final AppConnContainer container;
+    private final ServerConnContainer container;
     private final CyclicBarrier barrier;
-    private final ConnectorKey connectorKey;
+    private final Long connectorId;
     private final UUID connId;
 
     @Override
     public void run() {
-        container.removeConn(connectorKey, connId);
+        container.removeConn(connectorId, connId);
         try {
             barrier.await();
         } catch (InterruptedException | BrokenBarrierException e) {

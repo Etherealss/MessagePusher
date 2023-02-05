@@ -1,7 +1,7 @@
 package cn.wtk.mp.connect.infrastructure.event;
 
 import cn.wtk.mp.common.base.pojo.DomainEvent;
-import cn.wtk.mp.connect.domain.server.app.connector.Connector;
+import cn.wtk.mp.connect.domain.server.connector.Connector;
 import lombok.Getter;
 
 /**

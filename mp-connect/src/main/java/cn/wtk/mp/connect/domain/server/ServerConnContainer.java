@@ -1,8 +1,7 @@
 package cn.wtk.mp.connect.domain.server;
 
-import cn.wtk.mp.connect.domain.server.app.AppConnContainer;
-import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
-import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.server.connector.Connector;
+import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -19,41 +19,55 @@ import java.util.concurrent.atomic.AtomicReference;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ServerConnContainer implements ConnContainer {
+public class ServerConnContainer {
 
-    private final Map<Long, AppConnContainer> apps = new ConcurrentHashMap<>();
+    private final Map<Long, Connector> connectors = new ConcurrentHashMap<>();
 
-    @Override
     public void addConn(Connection conn) {
-        Long appId = conn.getConnectorKey().getAppId();
-        AppConnContainer appConnContainer = apps.get(appId);
-        apps.compute(appId, (key, app) -> {
-            if (app == null) {
-                app = new AppConnContainer(appId);
+        Long connectorId = conn.getConnectorId();
+        AtomicBoolean create = new AtomicBoolean(false);
+        connectors.compute(connectorId, (k, connector) -> {
+            if (connector == null) {
+                connector = new Connector(connectorId, conn.getAppId());
+                create.set(true);
             }
-            app.addConn(conn);
-            return app;
+            connector.addConn(conn);
+            return connector;
         });
+        if (create.get()) {
+
+        }
     }
 
-    @Override
-    public Connection removeConn(ConnectorKey connectorKey, UUID connId) {
-        Long appId = connectorKey.getAppId();
+    public Connection removeConn(Long connectorId, UUID connId) {
+        // 要获取lambda表达式里的变量需要使用Atomic对象
         AtomicReference<Connection> connRef = new AtomicReference<>();
-        apps.computeIfPresent(appId, (key, app) -> {
-            connRef.set(app.removeConn(connectorKey, connId));
-            if (app.getConnectorSize() == 0) {
+        connectors.computeIfPresent(connectorId, (k, v) -> {
+            connRef.set(v.removeConn(connId));
+            // 如果connector的连接数为0，则return null使其从map中移出
+            if (v.getConnSize() == 0) {
                 return null;
             } else {
-                return app;
+                return v;
             }
         });
         return connRef.get();
     }
 
-    @Override
-    public Connection getConn(ConnectorKey connectorKey, UUID connId) {
-        AppConnContainer appConnContainer = this.apps.get(connectorKey.getAppId());
-        return appConnContainer.getConn(connectorKey, connId);
+    public Connection getConn(Long connectorId, UUID connId) {
+        Connector connector = connectors.get(connectorId);
+        if (connector == null) {
+            return null;
+        }
+        return connector.getConn(connId);
+    }
+
+    public Connector getConnector(Long connectorId) {
+        Connector connector = connectors.get(connectorId);
+        return connector;
+    }
+
+    public int getConnetorSize() {
+        return connectors.size();
     }
 }

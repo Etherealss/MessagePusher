@@ -3,9 +3,8 @@ package cn.wtk.mp.connect.domain.server;
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import cn.wtk.mp.common.base.utils.UUIDUtil;
 import cn.wtk.mp.common.base.utils.UrlUtil;
-import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
-import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
-import cn.wtk.mp.connect.domain.server.app.connector.connection.MessageSender;
+import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.server.connector.connection.MessageSender;
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
 import cn.wtk.mp.connect.infrastructure.feign.AuthFeign;
 import io.netty.channel.Channel;
@@ -22,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -82,25 +80,25 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
     public AuthResult doAuth(Map<String, String> urlParameters) {
         Objects.requireNonNull(urlParameters, "url参数Map不能为空");
         String connectToken = urlParameters.get(PARAM_NAME_CONNECT_TOKEN);
-        String connectorId = urlParameters.get(PARAM_NAME_CONNECTOR_ID);
+        String connectorIdStr = urlParameters.get(PARAM_NAME_CONNECTOR_ID);
         String appIdStr = urlParameters.get(PARAM_NAME_APP_ID);
-        if (!isNotBlack(connectToken, appIdStr, connectorId)) {
+        if (!isNotBlack(connectToken, appIdStr, connectorIdStr)) {
             log.info("缺少参数(connectToken, appId 或 connectorId)，不允许创建连接");
-            return new AuthResult(false, "缺少参数(connectToken, appId 或 connectorId)，不允许创建连接");
+            return AuthResult.fail("缺少参数(connectToken, appId 或 connectorId)，不允许创建连接");
         }
         try {
             Long appId = Long.valueOf(appIdStr);
         } catch (NumberFormatException e) {
-            return new AuthResult(false, "appId格式错误：非Long类型");
+            return AuthResult.fail("appId格式错误：非Long类型");
         }
 
         try {
             // TODO 设置 serverToken
             // authFeign.verify(connectorId, connectToken);
-            return new AuthResult(connectorId, Long.valueOf(appIdStr));
+            return AuthResult.success(Long.valueOf(connectorIdStr), Long.valueOf(appIdStr));
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getMsg());
-            return new AuthResult(false, "token无效或appId错误");
+            return AuthResult.fail("token无效或appId错误");
         }
     }
 
@@ -115,17 +113,17 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
 
     private void addToManager(ChannelHandlerContext ctx, AuthResult authResult) {
         // 认证完毕，可以建立连接
-        ConnectorKey connectorKey = new ConnectorKey(
-                authResult.getAppId(),
-                authResult.getConnectorId()
-        );
         UUID connId = UUIDUtil.get();
-        Connection conn = new Connection(connId, connectorKey, ctx);
-        ctx.channel().attr(ChannelAttrKey.CONNECTOR).set(connectorKey);
+        Long connectorId = authResult.getConnectorId();
+        Connection conn = new Connection(connId, connectorId, authResult.getAppId(), ctx);
+        ctx.channel().attr(ChannelAttrKey.CONNECTOR).set(connectorId);
         ctx.channel().attr(ChannelAttrKey.CONN_ID).set(connId);
         serverConnContainer.addConn(conn);
-        log.info("链接创建：RemoteIP={}, connectorKey={}, connId={}",
-                ctx.channel().remoteAddress(), connectorKey, connId
+        log.info("链接创建：RemoteIP={}, connectorId={}, appId={}, connId={}",
+                ctx.channel().remoteAddress(),
+                connectorId,
+                authResult.getAppId(),
+                connId
         );
     }
 
@@ -145,17 +143,21 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
 class AuthResult {
     boolean success;
     String errorMsg;
-    Serializable connectorId;
+    Long connectorId;
     Long appId;
 
-    public AuthResult(boolean success, String errorMsg) {
-        this.success = success;
-        this.errorMsg = errorMsg;
+    public static AuthResult success(Long connectorId, Long appId) {
+        AuthResult authResult = new AuthResult();
+        authResult.success = true;
+        authResult.connectorId = connectorId;
+        authResult.appId = appId;
+        return authResult;
     }
 
-    public AuthResult(Serializable connectorId, Long appId) {
-        this.success = true;
-        this.connectorId = connectorId;
-        this.appId = appId;
+    public static AuthResult fail(String errorMsg) {
+        AuthResult authResult = new AuthResult();
+        authResult.success = false;
+        authResult.errorMsg = errorMsg;
+        return authResult;
     }
 }

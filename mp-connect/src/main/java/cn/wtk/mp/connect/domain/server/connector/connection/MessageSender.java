@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.domain.server.app.connector.connection;
+package cn.wtk.mp.connect.domain.server.connector.connection;
 
 import cn.wtk.mp.common.base.utils.JsonUtil;
 import io.netty.channel.Channel;

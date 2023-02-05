@@ -1,6 +1,6 @@
-package cn.wtk.mp.connect.domain.server.app.connector;
+package cn.wtk.mp.connect.domain.server.connector;
 
-import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author wtk
@@ -20,29 +18,30 @@ public class Connector {
 
     private final Map<UUID, Connection> conns = new ConcurrentHashMap<>();
     @Getter
-    private final ConnectorKey connectorKey;
+    private final Long connectorId;
     @Getter
-    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private final Long appId;
 
     public int getConnSize() {
         return conns.size();
     }
 
-    public Connector(ConnectorKey connectorKey) {
-        this.connectorKey = connectorKey;
+    public Connector(Long connectorId, Long appId) {
+        this.connectorId = connectorId;
+        this.appId = appId;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Connector)) return false;
         Connector connector = (Connector) o;
-        return connectorKey.equals(connector.connectorKey);
+        return connectorId.equals(connector.connectorId) && appId.equals(connector.appId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(connectorKey);
+        return Objects.hash(connectorId, appId);
     }
 
     public void addConn(Connection conn) {

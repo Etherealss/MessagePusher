@@ -1,6 +1,6 @@
 package cn.wtk.mp.connect.domain.server;
 
-import cn.wtk.mp.connect.domain.server.app.connector.Connector;
+import cn.wtk.mp.connect.domain.server.connector.Connector;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
@@ -31,8 +31,8 @@ public class ConnectorManager {
     @EventListener(ConnectorCreatedEvent.class)
     public void handleConnectorCreated(ConnectorCreatedEvent event) {
         Connector connector = event.getConnector();
-        Long appId = connector.getConnectorKey().getAppId();
-        Serializable connectorId = connector.getConnectorKey().getConnectorId();
+        Long appId = connector.getAppId();
+        Serializable connectorId = connector.getConnectorId();
         String redisKey = mappingKeyPrefix + ":" + appId + ":" + connectorId;
         redisTemplate.opsForValue().set(redisKey, address);
     }
@@ -40,8 +40,8 @@ public class ConnectorManager {
     @EventListener(ConnectorRemovedEvent.class)
     public void handleConnectorCreated(ConnectorRemovedEvent event) {
         Connector connector = event.getConnector();
-        Long appId = connector.getConnectorKey().getAppId();
-        Serializable connectorId = connector.getConnectorKey().getConnectorId();
+        Long appId = connector.getAppId();
+        Serializable connectorId = connector.getConnectorId();
         String redisKey = mappingKeyPrefix + ":" + appId + ":" + connectorId;
         redisTemplate.opsForValue().getAndDelete(redisKey);
     }
