@@ -5,5 +5,5 @@ package cn.wtk.mp.common.security.service.auth.server;
  * @date 2022-10-17
  */
 public interface IServerCredentialProvider {
-    ServerCredential create();
+    ServerTokenCredential create();
 }

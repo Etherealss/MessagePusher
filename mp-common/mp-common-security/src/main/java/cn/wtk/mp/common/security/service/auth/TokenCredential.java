@@ -14,19 +14,17 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public abstract class Credential {
+public class TokenCredential {
 
     String token;
-
-    String refreshToken;
 
     /**
      * token 过期时间
      */
-    Date tokenExpireAt;
+    Date expireAt;
 
     /**
-     * refreshToken 过期时间
+     * token 业务用途
      */
-    Date refreshTokenExpireAt;
+    String tokenTopic;
 }

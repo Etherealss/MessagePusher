@@ -1,6 +1,6 @@
 package cn.wtk.mp.connect.infrastructure.feign;
 
-import cn.wtk.mp.common.security.service.auth.disposal.DisposableCredential;
+import cn.wtk.mp.common.security.service.auth.connector.ConnectorCredential;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +17,6 @@ import java.io.Serializable;
 )
 public interface AuthFeign {
     @GetMapping("/apps/consumables/{key}/credentials/{token}")
-    DisposableCredential verify(@PathVariable Serializable key,
-                                @PathVariable String token);
+    ConnectorCredential verify(@PathVariable Serializable key,
+                               @PathVariable String token);
 }

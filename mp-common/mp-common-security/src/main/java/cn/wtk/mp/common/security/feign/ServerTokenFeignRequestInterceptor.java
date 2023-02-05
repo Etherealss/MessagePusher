@@ -2,7 +2,7 @@ package cn.wtk.mp.common.security.feign;
 
 
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
-import cn.wtk.mp.common.security.service.auth.server.CurServerCredentialHolder;
+import cn.wtk.mp.common.security.service.auth.server.CurServerAuthenticationHolder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +21,12 @@ import org.springframework.util.StringUtils;
 public class ServerTokenFeignRequestInterceptor implements RequestInterceptor {
 
     private final ServerCredentialConfig config;
-    private final CurServerCredentialHolder curServerCredentialHolder;
+    private final CurServerAuthenticationHolder curServerAuthenticationHolder;
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
         try {
-            String serverToken = curServerCredentialHolder.get().getToken();
+            String serverToken = curServerAuthenticationHolder.get().getToken();
             if (StringUtils.hasText(serverToken)) {
                 requestTemplate.header(config.getHeaderName(), serverToken);
             }

@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 @RequiredArgsConstructor
 public class ServerPreAuthHandler implements IPreAuthHandler {
     private final ServerCredentialConfig serverCredentialConfig;
-    private final CurServerCredentialHolder curServerCredentialHolder;
+    private final CurServerAuthenticationHolder curServerAuthenticationHolder;
 
     @Override
     public boolean checkNeedAuth(Method method) {

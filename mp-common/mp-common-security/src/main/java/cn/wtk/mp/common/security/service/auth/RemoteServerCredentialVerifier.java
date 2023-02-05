@@ -1,6 +1,6 @@
 package cn.wtk.mp.common.security.service.auth;
 
-import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
+import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
 import cn.wtk.mp.common.security.service.auth.server.ServerCredentialCacheHandler;
 import lombok.RequiredArgsConstructor;
 
@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
  * @date 2022-10-08
  */
 @RequiredArgsConstructor
-public class RemoteServerCredentialVerifier implements ICredentialVerifier<ServerCredential> {
+public class RemoteServerCredentialVerifier implements ICredentialVerifier<ServerTokenCredential> {
 
     private final ServerCredentialCacheHandler credentialCacheHandler;
 
     @Override
-    public ServerCredential verify(String token){
+    public ServerTokenCredential verify(String token){
         return credentialCacheHandler.verifyAndGet(token);
     }
 }

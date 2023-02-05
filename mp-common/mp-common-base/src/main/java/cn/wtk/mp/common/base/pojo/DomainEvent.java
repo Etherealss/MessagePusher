@@ -3,7 +3,6 @@ package cn.wtk.mp.common.base.pojo;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -12,11 +11,9 @@ import java.util.UUID;
 @Getter
 public abstract class DomainEvent extends ApplicationEvent {
     private final UUID id;
-    private final LocalDateTime occurredOn;
 
-    public DomainEvent(Object source, Integer userId) {
+    public DomainEvent(Object source) {
         super(source);
-        occurredOn = LocalDateTime.now();
         id = UUID.randomUUID();
     }
 }

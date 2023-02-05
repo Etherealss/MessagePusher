@@ -1,11 +1,11 @@
-package cn.wtk.mp.auth.infrastructure.token;
+package cn.wtk.mp.auth.domain.auth.server.credential;
 
 
-import cn.wtk.mp.auth.application.ServerApplicationService;
+import cn.wtk.mp.auth.application.ServerAuthenticationAppService;
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.service.auth.server.IServerCredentialProvider;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
-import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
+import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
 import cn.wtk.mp.common.security.service.auth.server.ServerDigestGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +20,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LocalServerCredentialProvider implements IServerCredentialProvider {
     private final ServerCredentialConfig serverCredentialConfig;
-    private final ServerApplicationService serverApplicationService;
+    private final ServerAuthenticationAppService serverAuthenticationAppService;
     private final ServerDigestGenerator serverDigestGenerator;
 
     @Override
-    public ServerCredential create() {
+    public ServerTokenCredential create() {
         byte[] digest = serverDigestGenerator.generate(
                 serverCredentialConfig.getServerId(),
                 serverCredentialConfig.getServerName(),
@@ -32,6 +32,6 @@ public class LocalServerCredentialProvider implements IServerCredentialProvider 
         );
         ServerAuthCommand command = new ServerAuthCommand(serverCredentialConfig.getServerId(), digest);
         Long serverId = serverCredentialConfig.getServerId();
-        return serverApplicationService.createServerCredential(command);
+        return serverAuthenticationAppService.createServerCredential(command);
     }
 }

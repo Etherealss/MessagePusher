@@ -14,11 +14,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RemoteIServerCredentialProvider implements IServerCredentialProvider {
     private final ServerCredentialFeign serverCredentialFeign;
     private final ServerCredentialConfig config;
-    private final RedisTemplate<String, ServerCredential> redisTemplate;
+    private final RedisTemplate<String, ServerTokenCredential> redisTemplate;
     private final ServerDigestGenerator serverDigestGenerator;
 
     @Override
-    public ServerCredential create() {
+    public ServerTokenCredential create() {
         byte[] digest = serverDigestGenerator.generate(
                 config.getServerId(), config.getServerName(), config.getSecret()
         );

@@ -5,7 +5,7 @@ import cn.wtk.mp.common.base.interceptor.ConfigHandlerInterceptor;
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.exception.TokenException;
 import cn.wtk.mp.common.security.service.auth.ICredentialVerifier;
-import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
+import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
 import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class HeaderInterceptor implements ConfigHandlerInterceptor {
 
-    private final ICredentialVerifier<ServerCredential> tokenVerifier;
+    private final ICredentialVerifier<ServerTokenCredential> tokenVerifier;
     private final ServerCredentialConfig serverCredentialConfig;
 
     @Override
@@ -42,7 +42,7 @@ public class HeaderInterceptor implements ConfigHandlerInterceptor {
         String serverToken = request.getHeader(serverCredentialConfig.getHeaderName());
         if (StringUtils.hasText(serverToken)) {
             try {
-                ServerCredential credential = tokenVerifier.verify(serverToken);
+                ServerTokenCredential credential = tokenVerifier.verify(serverToken);
                 ServerSecurityContextHolder.set(credential);
             } catch (TokenException ignored) {}
         }

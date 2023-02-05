@@ -17,7 +17,7 @@ import java.util.Date;
 @Slf4j
 public abstract class CredentialCacheHandler {
 
-    private final RedisTemplate<String, Credential> redisTemplate;
+    private final RedisTemplate<String, TokenCredential> redisTemplate;
 
     /**
      * 获取在 Redis 上缓存 Credential 的 key
@@ -26,11 +26,11 @@ public abstract class CredentialCacheHandler {
      */
     protected abstract String getCacheKey(String token);
 
-    protected abstract Credential verifyAndGetCredential(String token);
+    protected abstract TokenCredential verifyAndGetCredential(String token);
 
-    public <T extends Credential> T verifyAndGet(String token) {
+    public <T extends TokenCredential> T verifyAndGet(String token) {
         String key = this.getCacheKey(token);
-        Credential credential = getByCache(key);
+        TokenCredential credential = getByCache(key);
         if (credential != null) {
             return (T) credential;
         }
@@ -38,18 +38,18 @@ public abstract class CredentialCacheHandler {
         return (T) credential;
     }
 
-    private <T extends Credential> Credential getByRemote(String token, String key) {
-        Credential credential = this.verifyAndGetCredential(token);
-        cacheCredential(key, credential, credential.getTokenExpireAt());
+    private <T extends TokenCredential> TokenCredential getByRemote(String token, String key) {
+        TokenCredential credential = this.verifyAndGetCredential(token);
+        cacheCredential(key, credential, credential.getExpireAt());
         return credential;
     }
 
-    private Credential getByCache(String key) {
-        Credential credential = redisTemplate.opsForValue().get(key);
+    private TokenCredential getByCache(String key) {
+        TokenCredential credential = redisTemplate.opsForValue().get(key);
         return credential;
     }
 
-    private void cacheCredential(String key, Credential value, Date expireAt) {
+    private void cacheCredential(String key, TokenCredential value, Date expireAt) {
         redisTemplate.opsForValue().set(key, value);
         redisTemplate.expireAt(key, expireAt);
     }

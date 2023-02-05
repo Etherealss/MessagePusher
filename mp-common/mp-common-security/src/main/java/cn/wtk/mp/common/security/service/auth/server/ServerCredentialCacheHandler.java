@@ -2,7 +2,7 @@ package cn.wtk.mp.common.security.service.auth.server;
 
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.feign.ServerCredentialFeign;
-import cn.wtk.mp.common.security.service.auth.Credential;
+import cn.wtk.mp.common.security.service.auth.TokenCredential;
 import cn.wtk.mp.common.security.service.auth.CredentialCacheHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,7 +20,7 @@ public class ServerCredentialCacheHandler extends CredentialCacheHandler {
     private final ServerCredentialConfig serverCredentialConfig;
     private final ServerCredentialFeign serverCredentialFeign;
 
-    public ServerCredentialCacheHandler(RedisTemplate<String, Credential> redisTemplate, ServerCredentialConfig serverCredentialConfig, ServerCredentialFeign serverCredentialFeign) {
+    public ServerCredentialCacheHandler(RedisTemplate<String, TokenCredential> redisTemplate, ServerCredentialConfig serverCredentialConfig, ServerCredentialFeign serverCredentialFeign) {
         super(redisTemplate);
         this.serverCredentialConfig = serverCredentialConfig;
         this.serverCredentialFeign = serverCredentialFeign;
@@ -32,7 +32,7 @@ public class ServerCredentialCacheHandler extends CredentialCacheHandler {
     }
 
     @Override
-    protected Credential verifyAndGetCredential(String token) {
-        return serverCredentialFeign.verify(token, new ServerTokenVerifyCommand(serverCredentialConfig.getServerId()));
+    protected TokenCredential verifyAndGetCredential(String token) {
+        return serverCredentialFeign.verify(token);
     }
 }

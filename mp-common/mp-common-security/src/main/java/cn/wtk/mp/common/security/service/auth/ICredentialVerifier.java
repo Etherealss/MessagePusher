@@ -12,6 +12,6 @@ import cn.wtk.mp.common.security.config.ServerCredentialConfiguration;
  * @author wtk
  * @date 2022-10-08
  */
-public interface ICredentialVerifier<T extends Credential> {
+public interface ICredentialVerifier<T extends TokenCredential> {
     T verify(String token);
 }

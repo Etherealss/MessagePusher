@@ -2,8 +2,7 @@ package cn.wtk.mp.common.security.feign;
 
 
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
-import cn.wtk.mp.common.security.service.auth.server.ServerCredential;
-import cn.wtk.mp.common.security.service.auth.server.ServerTokenVerifyCommand;
+import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +23,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface ServerCredentialFeign {
 
     @GetMapping("/credentials/{token}")
-    ServerCredential verify(@PathVariable String token, @RequestBody ServerTokenVerifyCommand command);
+    ServerTokenCredential verify(@PathVariable String token);
 
     /**
      * 获取token
      */
     @PostMapping("/credentials")
-    ServerCredential createCredential(@Validated @RequestBody ServerAuthCommand command);
+    ServerTokenCredential createCredential(@Validated @RequestBody ServerAuthCommand command);
 }

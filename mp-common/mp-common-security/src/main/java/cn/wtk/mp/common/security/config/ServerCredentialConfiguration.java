@@ -25,7 +25,7 @@ public class ServerCredentialConfiguration {
     public IServerCredentialProvider serverCredentialProvider(
             ServerCredentialFeign serverCredentialFeign,
             ServerCredentialConfig config,
-            RedisTemplate<String, ServerCredential> redisTemplate,
+            RedisTemplate<String, ServerTokenCredential> redisTemplate,
             ServerDigestGenerator serverDigestGenerator
     ) {
         log.info("非 auth 服务，使用 RemoteIServerCredentialProvider 生成 Token");

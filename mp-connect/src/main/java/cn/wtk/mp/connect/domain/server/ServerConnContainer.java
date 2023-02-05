@@ -5,12 +5,12 @@ import cn.wtk.mp.connect.domain.server.app.connector.ConnectorKey;
 import cn.wtk.mp.connect.domain.server.app.connector.connection.Connection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wtk
@@ -22,45 +22,33 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerConnContainer implements ConnContainer {
 
     private final Map<Long, AppConnContainer> apps = new ConcurrentHashMap<>();
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void addConn(Connection conn) {
         Long appId = conn.getConnectorKey().getAppId();
         AppConnContainer appConnContainer = apps.get(appId);
-        if (appConnContainer == null) {
-            appConnContainer = new AppConnContainer(appId);
-        }
-        appConnContainer.addConn(conn);
-        addOrMergeContainer(appConnContainer);
+        apps.compute(appId, (key, app) -> {
+            if (app == null) {
+                app = new AppConnContainer(appId);
+            }
+            app.addConn(conn);
+            return app;
+        });
     }
 
     @Override
     public Connection removeConn(ConnectorKey connectorKey, UUID connId) {
         Long appId = connectorKey.getAppId();
-        AppConnContainer container = apps.get(appId);
-        if (container == null) {
-            return null;
-        }
-        Connection conn = container.removeConn(connectorKey, connId);
-        if (container.getConnectorSize() == 0) {
-            container.getRwLock().writeLock().lock();
-            if (container.getConnectorSize() == 0 && apps.containsValue(container)) {
-                apps.remove(container);
+        AtomicReference<Connection> connRef = new AtomicReference<>();
+        apps.computeIfPresent(appId, (key, app) -> {
+            connRef.set(app.removeConn(connectorKey, connId));
+            if (app.getConnectorSize() == 0) {
+                return null;
+            } else {
+                return app;
             }
-            container.getRwLock().readLock().unlock();
-        }
-        return conn;
-    }
-
-    private void addOrMergeContainer(AppConnContainer container) {
-        Long appId = container.getAppId();
-        container.getRwLock().readLock().lock();
-        AppConnContainer preContainer = apps.put(appId, container);
-        if (preContainer != null) {
-            container.addAll(preContainer);
-        }
-        container.getRwLock().readLock().unlock();
+        });
+        return connRef.get();
     }
 
     @Override
