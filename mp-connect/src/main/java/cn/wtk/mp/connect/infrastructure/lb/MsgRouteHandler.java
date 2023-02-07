@@ -23,8 +23,9 @@ public class MsgRouteHandler {
     public static final String HEADER_NAME_MSG_ROUTE_IP = "x-msg-route-ip";
     public static final String HEADER_NAME_MSG_ROUTE_PORT = "x-msg-route-port";
 
-    public void setMsgRouteHeader() {
-
+    public void setMsgRouteHeader(@NonNull HttpHeaders headers, String ip, int port) {
+        headers.set(HEADER_NAME_MSG_ROUTE_IP, ip);
+        headers.set(HEADER_NAME_MSG_ROUTE_PORT, String.valueOf(port));
     }
 
     @Nullable

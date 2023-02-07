@@ -1,4 +1,5 @@
 @startuml
+skin rose
 'https://plantuml.com/class-diagram
 
 class ChannelInboundHandlerAdapter
@@ -115,7 +116,6 @@ class ServerConnManager implements ConnComposite {
     - void removeOnlineInfo(Connector)
     - ServerInfo serverRoute(Message, UUID connId)
 }
-
 class AppConnManager implements ConnComposite {
     - Long appId;
     - Map<ConnectorId, Connector> connectors;

@@ -1,4 +1,5 @@
 @startuml
+skin rose
 'https://plantuml.com/sequence-diagram
 
 autonumber

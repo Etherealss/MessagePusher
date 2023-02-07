@@ -22,12 +22,11 @@ import java.util.List;
  * @see RequestBasedStickySessionServiceInstanceListSupplier 写法参考该类
  */
 @Slf4j
-public class MsgRouteServiceInstanceLoadBalancer extends DelegatingServiceInstanceListSupplier {
-
+public class MsgRouteServiceInstanceSupplier extends DelegatingServiceInstanceListSupplier {
 
     private final MsgRouteHandler msgRouteHandler;
 
-    public MsgRouteServiceInstanceLoadBalancer(ServiceInstanceListSupplier delegate, MsgRouteHandler msgRouteHandler) {
+    public MsgRouteServiceInstanceSupplier(ServiceInstanceListSupplier delegate, MsgRouteHandler msgRouteHandler) {
         super(delegate);
         this.msgRouteHandler = msgRouteHandler;
     }
@@ -43,6 +42,7 @@ public class MsgRouteServiceInstanceLoadBalancer extends DelegatingServiceInstan
         if (context instanceof RequestDataContext) {
             RequestData clientRequest = ((RequestDataContext) context).getClientRequest();
             HttpHeaders headers = clientRequest.getHeaders();
+            // 如果 header 中有相关字段，则进行代理并选择指定服务器，否则调用 super#get
             MsgRouteAddress msgRouteAddress = msgRouteHandler.getMsgRouteAddress(headers);
             if (msgRouteAddress != null) {
                 return super.delegate.get(request).map(serviceInstances ->
