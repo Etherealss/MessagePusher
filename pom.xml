@@ -18,6 +18,7 @@
         <module>mp-common</module>
         <module>mp-uid</module>
         <module>mp-connect</module>
+        <module>mp-msg-acceptor</module>
     </modules>
 
     <properties>

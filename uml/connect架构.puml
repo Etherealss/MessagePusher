@@ -25,7 +25,29 @@ note top of NettyServerInitializer: 配置并初始化服务端处理客户端Ch
 
 class IdleTimeoutHandlerAdapter extends ChannelInboundHandlerAdapter {
     - IdleConfig idleConfig;
-}
+}@startuml
+
+ autonumber
+
+ actor "企业顾客" as customer
+ participant " 合同导出系统" as contract
+ participant "cstore"
+
+ activate customer
+ customer -> contract ++: 获取合同
+
+ contract -> DB ++: 根据企业信息查询合同
+ return 合同信息
+
+ alt 合同信息存在
+ 	contract -> cstroe ++: 根据合同编号获取 PDF 文件
+ 	return 合同 PDF
+ 	contract -> customer --: PDF
+ else 合同信息不存在
+ 	contract -> customer --: 合同不存在
+
+
+ @enduml
 
 NettyServerInitializer ..> IdleTimeoutHandlerAdapter : 心跳检测
 

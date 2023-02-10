@@ -17,7 +17,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Msg<T> implements Serializable {
+public class Result<T> implements Serializable {
 
     private boolean success;
 
@@ -30,25 +30,25 @@ public class Msg<T> implements Serializable {
     /** 响应的数据，可能为空 */
     private T data;
 
-    public static <T> Msg<T> ok() {
-        return new Msg<>(true, ApiInfo.OK);
+    public static <T> Result<T> ok() {
+        return new Result<>(true, ApiInfo.OK);
     }
 
-    public static <T> Msg<T> ok(T data) {
-        Msg<T> msg = new Msg<>(true, ApiInfo.OK);
-        msg.setData(data);
-        return msg;
+    public static <T> Result<T> ok(T data) {
+        Result<T> result = new Result<>(true, ApiInfo.OK);
+        result.setData(data);
+        return result;
     }
-    public static <T> Msg<T> ok(String message) {
-        return new Msg<>(true, ApiInfo.OK, message);
+    public static <T> Result<T> ok(String message) {
+        return new Result<>(true, ApiInfo.OK, message);
     }
 
-    public Msg(boolean success, ApiInfo apiInfo) {
+    public Result(boolean success, ApiInfo apiInfo) {
         this(success, apiInfo.getCode(), apiInfo.getMessage(), null);
     }
 
 
-    public Msg(boolean success, ApiInfo apiInfo, String description) {
+    public Result(boolean success, ApiInfo apiInfo, String description) {
         this(success, apiInfo.getCode(),
                 apiInfo.getMessage() + " " + description, null);
     }
@@ -57,7 +57,7 @@ public class Msg<T> implements Serializable {
      * 自定义异常的message包含了ApiInfo的说明和自定义描述
      * @param e
      */
-    public Msg(BaseException e) {
+    public Result(BaseException e) {
         this(false,  e.getCode(), e.getMessage(), null);
     }
 
@@ -66,7 +66,7 @@ public class Msg<T> implements Serializable {
      * 手动拼接ApiInfo的说明和自定义描述
      * @param throwable
      */
-    public Msg(Throwable throwable) {
+    public Result(Throwable throwable) {
         this.success = false;
         this.code = ApiInfo.SERVER_ERROR.getCode();
         String message = ApiInfo.SERVER_ERROR.getMessage();

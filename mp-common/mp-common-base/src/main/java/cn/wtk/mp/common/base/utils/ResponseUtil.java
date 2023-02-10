@@ -1,7 +1,7 @@
 package cn.wtk.mp.common.base.utils;
 
 
-import cn.wtk.mp.common.base.pojo.Msg;
+import cn.wtk.mp.common.base.pojo.Result;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,9 +13,9 @@ import java.io.PrintWriter;
  */
 public class ResponseUtil {
 
-    public static <T> void send(HttpServletResponse response, Msg<T> msg) throws IOException {
+    public static <T> void send(HttpServletResponse response, Result<T> result) throws IOException {
         //发送给客户端
-        send(response, JsonUtil.toJsonString(msg));
+        send(response, JsonUtil.toJsonString(result));
     }
 
     public static void send(HttpServletResponse response, String jsonString) throws IOException {

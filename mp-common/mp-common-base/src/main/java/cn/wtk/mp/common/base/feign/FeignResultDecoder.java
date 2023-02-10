@@ -2,7 +2,7 @@ package cn.wtk.mp.common.base.feign;
 
 
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
-import cn.wtk.mp.common.base.pojo.Msg;
+import cn.wtk.mp.common.base.pojo.Result;
 import feign.Response;
 import feign.Util;
 import feign.codec.DecodeException;
@@ -27,9 +27,9 @@ public class FeignResultDecoder implements Decoder {
         }
         //对结果进行转换
         String bodyStr = Util.toString(response.body().asReader(Util.UTF_8));
-        Msg<?> result;
+        Result<?> result;
         try {
-            result = JsonUtil.toObject(bodyStr, Msg.class);
+            result = JsonUtil.toObject(bodyStr, Result.class);
         } catch (Exception e) {
             throw new DecodeException(
                     response.status(),

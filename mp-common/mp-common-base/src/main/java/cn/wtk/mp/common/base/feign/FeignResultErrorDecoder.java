@@ -1,7 +1,7 @@
 package cn.wtk.mp.common.base.feign;
 
 
-import cn.wtk.mp.common.base.pojo.Msg;
+import cn.wtk.mp.common.base.pojo.Result;
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import feign.Response;
 import feign.Util;
@@ -28,7 +28,7 @@ public class FeignResultErrorDecoder implements ErrorDecoder {
             String bodyStr = Util.toString(response.body().asReader(Util.UTF_8));
             // hutool 会将空字段填充 JSONNull 对象，会与 Spring 默认的 jackson 冲突。导致异常
             // 解决办法是不用 Hutool，改用 jackson
-            Msg<?> result = JsonUtil.toObject(bodyStr, Msg.class);
+            Result<?> result = JsonUtil.toObject(bodyStr, Result.class);
             if (result.getCode() == 0) {
                 // bodyStr 读取出来的非 Msg 对象
                 return defaultDecoder.decode(methodKey, response);

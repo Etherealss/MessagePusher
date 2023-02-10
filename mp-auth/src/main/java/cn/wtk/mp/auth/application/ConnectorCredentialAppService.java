@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserConnectCredentialAppService {
+public class ConnectorCredentialAppService {
     private final ConnectorCredentialConfig credentialCacheConfig;
     private final TokenCredentialService tokenCredentialService;
     private final ConnectorCredentialConfig config;
@@ -34,7 +34,7 @@ public class UserConnectCredentialAppService {
     }
 
     public ConnectorCredential verifyAndGet(Long appId, Long connectorId, String token) {
-        ConnectorCredential connectorCredential = tokenCredentialService.verifyAndInvalidateToken(
+        ConnectorCredential connectorCredential = tokenCredentialService.verifyAndGet(
                 token, ConnectorCredential.class
         );
         if (!connectorId.equals((connectorCredential.getConnectorId()))) {

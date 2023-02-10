@@ -1,6 +1,6 @@
 package cn.wtk.mp.common.base.web;
 
-import cn.wtk.mp.common.base.pojo.Msg;
+import cn.wtk.mp.common.base.pojo.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -48,12 +48,12 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         if (o == null) {
-            return Msg.ok();
+            return Result.ok();
         }
-        if (o instanceof Msg) {
+        if (o instanceof Result) {
             return o;
         }
-        return Msg.ok(o);
+        return Result.ok(o);
     }
 
 

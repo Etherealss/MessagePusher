@@ -97,7 +97,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
             // authFeign.verify(connectorId, connectToken);
             return AuthResult.success(Long.valueOf(connectorIdStr), Long.valueOf(appIdStr));
         } catch (ServiceFiegnException e) {
-            log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getMsg());
+            log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getResult());
             return AuthResult.fail("token无效或appId错误");
         }
     }
