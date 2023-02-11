@@ -5,41 +5,21 @@ skin rose
 abstract class AbstractMsg {
     # Long msgId
     # String msgTopic
+    # Long senderId
+    # Long revrId
     # Boolean resend
     # Date sendTime
     # Object data
     + boolean isPersistentMsg()
-    + {abstract} boolean getMsgType()
 }
 
 abstract class PersistentMsg extends AbstractMsg {
-
     # Integer transferStatus // revd/sent/read
     # Date saveTime
     # Date recvTime
     + boolean isPersistentMsg()
-    + {abstract} boolean getMsgType()
 }
 
-abstract class ContentMsg extends PersistentMsg {
-    # Long senderId
-    + {abstract} boolean getMsgType()
-}
-
-class PersonalMsg extends ContentMsg {
-    msgType=Personal
-    ---
-    + boolean getMsgType() // PERSONAL
-}
-
-note left of PersonalMsg: 有多个接收方时，\n每个接收方单独发送一个PersonalMsg
-
-class GroupMsg extends ContentMsg {
-    msgType=Group
-    ---
-    # Long groupId
-    + boolean getMsgType() // GROUP
-}
 
 class AckMsg {
     # Long msgId
@@ -52,17 +32,6 @@ note left of AckMsg {
     revd/sent/read  用于修改消息状态
 }
 
-class NotifMsg extends PersistentMsg {
-    ---
-    # Long revrId
-    + boolean getMsgType() // Notif
-}
-note bottom of NotifMsg: 发送方为系统
-
-class EventMsg extends AbstractMsg {
-    ---
-    # Long revrId
-}
 
 enum MsgType {
     PersonalMsg
