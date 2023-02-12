@@ -33,9 +33,9 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
+public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static final String PARAM_NAME_CONNECT_TOKEN = "connectToken";
+    private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
     private static final String PARAM_NAME_APP_ID = "appId";
 
@@ -79,12 +79,12 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
      */
     public AuthResult doAuth(Map<String, String> urlParameters) {
         Objects.requireNonNull(urlParameters, "url参数Map不能为空");
-        String connectToken = urlParameters.get(PARAM_NAME_CONNECT_TOKEN);
+        String connectorToken = urlParameters.get(PARAM_NAME_CONNECTOR_TOKEN);
         String connectorIdStr = urlParameters.get(PARAM_NAME_CONNECTOR_ID);
         String appIdStr = urlParameters.get(PARAM_NAME_APP_ID);
-        if (!isNotBlack(connectToken, appIdStr, connectorIdStr)) {
-            log.info("缺少参数(connectToken, appId 或 connectorId)，不允许创建连接");
-            return AuthResult.fail("缺少参数(connectToken, appId 或 connectorId)，不允许创建连接");
+        if (!isNotBlack(connectorToken, appIdStr, connectorIdStr)) {
+            log.info("缺少参数(connectorToken, appId 或 connectorId)，不允许创建连接");
+            return AuthResult.fail("缺少参数(connectorToken, appId 或 connectorId)，不允许创建连接");
         }
         try {
             Long appId = Long.valueOf(appIdStr);
@@ -93,9 +93,10 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
         }
 
         try {
-            // TODO 设置 serverToken
-            // authFeign.verify(connectorId, connectToken);
-            return AuthResult.success(Long.valueOf(connectorIdStr), Long.valueOf(appIdStr));
+            // 验证 connectorToken
+            Long connectorId = Long.valueOf(connectorIdStr);
+            authFeign.verify(connectorId, connectorToken);
+            return AuthResult.success(connectorId, Long.valueOf(appIdStr));
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getResult());
             return AuthResult.fail("token无效或appId错误");

@@ -118,29 +118,17 @@ class ConnectorKey {
 }
 note bottom of ConnectorKey: 连接者需要用两个字段标识，是一个VO
 
-interface ConnComposite {
+class ServerConnManager {
+    - Map<Long, Connector> connectors;
+    - RedisTemplate<AppId+ConnectorId, Host+Port> redis;
     + void addConn(ConnectorKey, Connection)
     + void removeConn(ConnectorKey, connId)
     + Connection getConn(ConnectorKey, connId)
     + Map<ConnId, Connection> getConns(ConnectorKey)
     + boolean containsConn(Connector)
-    + Result sendMsg(Message)
-    + Result sendMsg(Message, UUID connId)
-}
-note right of ConnComposite : 组合模式
-
-ConnComposite --> Message : 传输消息
-
-class ServerConnManager implements ConnComposite {
-    - Map<AppId, AppConnManager> apps;
-    - RedisTemplate<AppId+ConnectorId, Host+Port> redis;
     - void addOnlineInfo(Connector)
     - void removeOnlineInfo(Connector)
     - ServerInfo serverRoute(Message, UUID connId)
-}
-class AppConnManager implements ConnComposite {
-    - Long appId;
-    - Map<ConnectorId, Connector> connectors;
 }
 
 class Connector {
@@ -156,8 +144,7 @@ class Connection {
 }
 
 ConnectionStateHandler ..> ServerConnManager: 保存Channel连接
-ServerConnManager o-- AppConnManager
-AppConnManager o-- Connector
+ServerConnManager o-- Connector
 Connector o-- Connection
 
 @enduml

@@ -3,9 +3,9 @@ package cn.wtk.mp.common.base.lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author wang tengkun
  * @date 2022/2/26
  */
-@Configuration
+@Component
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @Slf4j
 public class RedisLockHelper {

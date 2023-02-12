@@ -5,8 +5,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.io.Serializable;
-
 /**
  * @author wtk
  * @date 2023-01-09
@@ -16,7 +14,7 @@ import java.io.Serializable;
         path = "/auth"
 )
 public interface AuthFeign {
-    @GetMapping("/apps/consumables/{key}/credentials/{token}")
-    ConnectorCredential verify(@PathVariable Serializable key,
+    @GetMapping("/apps/connectors/{connectorId}/credentials/{token}")
+    ConnectorCredential verify(@PathVariable Long connectorId,
                                @PathVariable String token);
 }

@@ -1,0 +1,98 @@
+@startuml
+skin rose
+'https://plantuml.com/class-diagram
+
+abstract class AbstractMsg {
+    # Long msgId
+    # MsgType msgType
+    # String msgTopic
+    # Boolean resend
+    # Date sendTime
+    # boolean persistentMsg
+    # Object data
+    + boolean isPersistentMsg()
+    + {abstract} boolean getMsgType()
+}
+
+abstract class PersistentMsg extends AbstractMsg {
+    persistentMsg = true
+    ---
+
+    # Integer transferStatus // revd/sent/read
+    # Date saveTime
+    # Date recvTime
+    + boolean isPersistentMsg()
+    + {abstract} boolean getMsgType()
+}
+
+abstract class ContentMsg extends PersistentMsg {
+    # Serializable senderId
+    # Long senderAppId
+    # Object/byte[] data
+    # Long senderId
+    + {abstract} boolean getMsgType()
+}
+
+class PersonalMsg extends ContentMsg {
+    msgType=Personal
+    ---
+    # Long revrAppId
+    # Serializable revrId
+    # boolean hasRead
+    + boolean getMsgType() // PERSONAL
+}
+
+note left of PersonalMsg: 有多个接收方时，\n每个接收方单独发送一个PersonalMsg
+
+class GroupMsg extends ContentMsg {
+    msgType=Group
+    ---
+    # Long groupAppId
+    # Long groupId
+    + boolean getMsgType() // GROUP
+}
+
+class AckMsg {
+    # Long msgId
+    # Msg msgType=Ack
+    # Long ackMsgId
+    # Long revrAppId
+    # Serializable revrId
+    # Integer ackType // revd/sent/read
+    # Integer ackType
+}
+
+note right of AckMsg#ackType: 用于修改消息状态
+note left of AckMsg {
+    revd/sent/read  用于修改消息状态
+}
+
+class NotificationMsg extends AbstractMsg {
+    msgType = Notification
+    persistentMsg = false
+class NotifMsg extends PersistentMsg {
+    ---
+    # Long revrAppId
+    # Serializable revrId
+    # Object/byte[] data
+    # Long revrId
+    + boolean getMsgType() // Notif
+}
+note bottom of NotificationMsg: 发送方为系统
+note bottom of NotifMsg: 发送方为系统
+
+class EventMsg extends AbstractMsg {
+    msgType = Event
+    persistentMsg = false
+    ---
+    # Object data
+    # Long revrId
+}
+
+enum MsgType {
+    PersonalMsg
+    GroupMsg
+    Ack
+    System
+}
+@enduml

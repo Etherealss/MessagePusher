@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class NettyServerChannelInitializer extends ChannelInitializer<SocketChannel> {
     private final NettyServerConfig nettyServerConfig;
-    private final ConnectionAuthHandler connectionAuthHandler;
+    private final ConnectorAuthHandler connectorAuthHandler;
     private final ConnectionStateHandler connectionStateHandler;
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
     private final MsgPushHandler msgPushHandler;
@@ -58,7 +58,7 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
                 // WebSocket 协议配置
                 webSocketServerProtocolHandler,
                 msgReceiverHandler,
-                connectionAuthHandler,
+                connectorAuthHandler,
                 connectionStateHandler,
                 idleTimeoutHandlerAdapter,
                 msgPushHandler,

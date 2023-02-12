@@ -39,6 +39,11 @@
             </dependency>
             <dependency>
                 <groupId>cn.wtk</groupId>
+                <artifactId>mp-common-msg</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.wtk</groupId>
                 <artifactId>mp-common-database</artifactId>
                 <version>1.0</version>
             </dependency>

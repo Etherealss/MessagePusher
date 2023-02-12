@@ -22,5 +22,13 @@
             <groupId>cn.wtk</groupId>
             <artifactId>mp-common-base</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.wtk</groupId>
+            <artifactId>mp-common-msg</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.wtk</groupId>
+            <artifactId>mp-common-security</artifactId>
+        </dependency>
     </dependencies>
 </project>
