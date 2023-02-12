@@ -23,7 +23,8 @@ public class MsgAcceptor {
 
     public Result<Void> sendMsg(Msg msg, UUID tempMsgId) {
         if (msgResendHandler.handleMsgDuplicate(msg, tempMsgId)) {
-            return  new Result<>(true, ApiInfo.MSG_DUPILICATE);
+            return new Result<>(true, ApiInfo.MSG_DUPILICATE);
         }
+        return Result.ok();
     }
 }
