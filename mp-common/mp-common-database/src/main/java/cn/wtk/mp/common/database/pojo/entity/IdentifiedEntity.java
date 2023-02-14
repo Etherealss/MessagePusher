@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public abstract class IdentifiedEntity extends BaseEntity {
+public abstract class IdentifiedEntity extends BaseEntity implements IdentifierGetter {
     @MongoId(FieldType.INT64)
     protected Long id;
 }

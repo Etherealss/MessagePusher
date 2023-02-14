@@ -11,4 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RemoveSubRelationCommand {
+    Long connectorId;
+    Long subscriberId;
+    String relationTopic;
 }

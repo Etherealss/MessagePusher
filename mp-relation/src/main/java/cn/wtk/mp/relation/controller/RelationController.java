@@ -16,4 +16,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @ResponseAdvice
 public class RelationController {
+
 }
