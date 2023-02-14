@@ -19,6 +19,7 @@
         <module>mp-uid</module>
         <module>mp-connect</module>
         <module>mp-msg-acceptor</module>
+        <module>mp-relation</module>
     </modules>
 
     <properties>
