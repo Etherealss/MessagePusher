@@ -1,0 +1,90 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+namespace adapter {
+    class UserController {
+        - UserService userService
+        + Result<UserLoginResponse> login(UserLoginRequest)
+    }
+}
+
+namespace client {
+    namespace client.dto {
+        namespace client.dto.request {
+            class UserLoginRequest
+        }
+        namespace client.dto.response {
+            class UserLoginResponse
+        }
+        namespace client.dto.criteria {
+             class UserCriteria
+        }
+    }
+    namespace client.service {
+        interface UserService {
+            + Result<UserLoginResponse> login(UserLoginRequest)
+        }
+    }
+}
+
+namespace app {
+    namespace app.service {
+        class UserServiceImpl implements UserService {
+            - UserLoginCommand command
+            + Result<UserLoginResponse> login(UserLoginRequest)
+        }
+    }
+    namespace app.command {
+        class UserLoginCommand {
+            + UserLoginResponse execute(UserLoginRequest req)
+        }
+    }
+}
+note bottom of app.command.UserLoginCommand: 通过聚合根的静态方法进行转换、处理、响应
+
+namespace infrastructure {
+    namespace infrastructure.adapter {
+        namespace infrastructure.database {
+            interface UserAdapter extends IService
+            namespace infrastructure.database.mapper {
+                interface UserMapper extends BaseMapper
+            }
+        }
+    }
+    namespace infrastructure.converter {
+        interface UserConverter {
+            + User toUser(UserLoginRequest req)
+        }
+    }
+    namespace infrastructure.gateway {
+        interface UserGateway {
+            - UserConverter converter;
+            - UserAdapter adapter;
+            + {static} User init(Long userId)
+            + {static} User login()
+            + {static} UserLoginResponse toUserLoginResponse()
+        }
+    }
+}
+namespace domain {
+    namespace domain.user {
+        class User {
+            - Long userId;
+            - String username;
+            - String pwd;
+            ---
+            - {static} UserGateway gateway
+            + {static} User init(Long userId)
+            + {static} User login()
+            + {static} UserLoginResponse toUserLoginResponse()
+        }
+        namespace domain.gateway {
+            interface UserGateway {
+                + {static} User init(Long userId)
+                + {static} User login()
+                + {static} UserLoginResponse toUserLoginResponse()
+            }
+        }
+    }
+}
+@enduml

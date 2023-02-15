@@ -30,6 +30,7 @@
         <spring-cloud-alibaba.version>2021.0.1.0</spring-cloud-alibaba.version>
         <jasypt.version>3.0.4</jasypt.version>
         <hutool.version>5.8.11</hutool.version>
+        <mapstruct.version>1.4.2.Final</mapstruct.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -83,13 +84,18 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- 配置文件加密 -->
-            <dependency>
-                <groupId>com.github.ulisesbocchio</groupId>
-                <artifactId>jasypt-spring-boot-starter</artifactId>
-                <version>${jasypt.version}</version>
-            </dependency>
+<!--            &lt;!&ndash; 配置文件加密 &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>com.github.ulisesbocchio</groupId>-->
+<!--                <artifactId>jasypt-spring-boot-starter</artifactId>-->
+<!--                <version>${jasypt.version}</version>-->
+<!--            </dependency>-->
 
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
             <!--异步日志依赖-->
             <dependency>
                 <groupId>com.lmax</groupId>

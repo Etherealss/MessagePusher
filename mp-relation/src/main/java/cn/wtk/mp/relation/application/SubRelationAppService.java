@@ -1,7 +1,7 @@
 package cn.wtk.mp.relation.application;
 
-import cn.wtk.mp.relation.application.command.CreateSubRelationCommand;
-import cn.wtk.mp.relation.application.command.RemoveSubRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.command.CreateSubRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.command.RemoveSubRelationCommand;
 import cn.wtk.mp.relation.domain.relation.sub.SubRelationService;
 import cn.wtk.mp.relation.domain.relation.sub.SubRelationVO;
 import lombok.RequiredArgsConstructor;
@@ -23,15 +23,11 @@ public class SubRelationAppService {
 
     @Transactional(rollbackFor = Exception.class)
     public void createSubRelation(CreateSubRelationCommand command) {
-        SubRelationVO subRelationVO = new SubRelationVO();
-        BeanUtils.copyProperties(command, subRelationVO);
-        subRelationService.createSubRelation(subRelationVO);
+        subRelationService.upsertSubRelation(command);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void removeSubRelation(RemoveSubRelationCommand command) {
-        SubRelationVO subRelationVO = new SubRelationVO();
-        BeanUtils.copyProperties(command, subRelationVO);
-        subRelationService.createSubRelation(subRelationVO);
+        subRelationService.upsertSubRelation(command);
     }
 }

@@ -6,6 +6,7 @@ import cn.wtk.mp.common.database.pojo.entity.IdentifierGetter;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -26,12 +27,17 @@ public class SubRelationEntity extends BaseEntity implements IdentifierGetter {
     /**
      * connector ID
      */
+    @Field(CONNECTOR_ID)
     Long connectorId;
 
     /**
      * 所有订阅该 connector 的人，可以类比于"所有粉丝"
      */
-    List<SubRelationItem> subscribers;
+    @Field(RELATION)
+    List<SubRelationItem> relations;
+
+    public static final String CONNECTOR_ID = "connectorId";
+    public static final String RELATION = "relations";
 
     @Override
     public Long getId() {

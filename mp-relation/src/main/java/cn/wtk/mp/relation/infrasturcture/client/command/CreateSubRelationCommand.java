@@ -1,4 +1,4 @@
-package cn.wtk.mp.relation.application.command;
+package cn.wtk.mp.relation.infrasturcture.client.command;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -10,5 +10,8 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateGroupRelationCommand {
+public class CreateSubRelationCommand {
+    Long connectorId;
+    Long subrId;
+    String relationTopic;
 }
