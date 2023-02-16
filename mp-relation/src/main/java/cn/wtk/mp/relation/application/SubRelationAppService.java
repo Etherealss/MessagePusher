@@ -28,6 +28,6 @@ public class SubRelationAppService {
 
     @Transactional(rollbackFor = Exception.class)
     public void removeSubRelation(RemoveSubRelationCommand command) {
-        subRelationService.upsertSubRelation(command);
+        subRelationService.removeSubRelation(command);
     }
 }

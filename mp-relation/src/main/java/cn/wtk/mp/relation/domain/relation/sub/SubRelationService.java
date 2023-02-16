@@ -1,6 +1,7 @@
 package cn.wtk.mp.relation.domain.relation.sub;
 
 import cn.wtk.mp.relation.infrasturcture.client.command.CreateSubRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.command.RemoveSubRelationCommand;
 import cn.wtk.mp.relation.infrasturcture.client.converter.SubRelationConverter;
 import cn.wtk.mp.relation.infrasturcture.client.dto.SubRelationAggOutput;
 import lombok.RequiredArgsConstructor;
@@ -35,22 +36,32 @@ public class SubRelationService {
 
     @Transactional(rollbackFor = Exception.class)
     public void upsertSubRelation(CreateSubRelationCommand command) {
-        Query query = Query.query(Criteria.where(SubRelationEntity.CONNECTOR_ID).is(command.getConnectorId()));
+        Query query = Query.query(Criteria
+                .where(SubRelationEntity.CONNECTOR_ID).is(command.getConnectorId())
+                .and(SubRelationEntity.RELATION + "." + SubRelationItem.SUBR_ID).is(command.getSubrId())
+                .and(SubRelationEntity.RELATION + "." + SubRelationItem.RELATION_TOPIC).ne(command.getRelationTopic())
+        );
 
         SubRelationItem subRelationItem = new SubRelationItem(
                 command.getSubrId(), command.getRelationTopic(), new Date()
         );
-        Update update = new Update().addToSet(SubRelationEntity.RELATION, subRelationItem);
+        Update update = new Update().push(SubRelationEntity.RELATION, subRelationItem);
 
         mongoTemplate.upsert(query, update, SubRelationEntity.class);
+        SubRelationEntity one = mongoTemplate.findOne(query, SubRelationEntity.class);
+        if (one != null && !CollectionUtils.isEmpty(one.getRelations())) {
+            for (SubRelationItem relation : one.getRelations()) {
+                log.info("{}", relation);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void removeSubRelation(SubRelationVO subRelationVO) {
-        Query query = Query.query(Criteria.where(SubRelationEntity.CONNECTOR_ID).is(subRelationVO.getConnectorId()));
+    public void removeSubRelation(RemoveSubRelationCommand command) {
+        Query query = Query.query(Criteria.where(SubRelationEntity.CONNECTOR_ID).is(command.getConnectorId()));
         Document fields = new Document()
-                .append(SubRelationItem.SUBR_ID, subRelationVO.getSubrId())
-                .append(SubRelationItem.RELATION_TOPIC, subRelationVO.getRelationTopic());
+                .append(SubRelationItem.SUBR_ID, command.getSubrId())
+                .append(SubRelationItem.RELATION_TOPIC, command.getRelationTopic());
         Update update = new Update().pull(SubRelationEntity.RELATION, fields);
         mongoTemplate.upsert(query, update, SubRelationEntity.class);
     }

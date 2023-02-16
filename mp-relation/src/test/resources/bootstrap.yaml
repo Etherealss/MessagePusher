@@ -1,0 +1,25 @@
+# 服务配置
+server:
+  port: 8084
+spring:
+  profiles:
+    active: dev
+  # 项目配置
+  application:
+    name: mp-relation
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+        namespace: mp
+        # 共享配置
+        shared-configs:
+          - mp-default-database-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - mp-default-redis-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - mp-default-web-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - mp-default-log-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - mp-default-cloud-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - mp-default-app-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}

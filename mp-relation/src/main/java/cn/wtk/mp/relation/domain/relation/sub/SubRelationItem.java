@@ -11,8 +11,7 @@ import java.util.Date;
  * @date 2023/2/14
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubRelationItem {
