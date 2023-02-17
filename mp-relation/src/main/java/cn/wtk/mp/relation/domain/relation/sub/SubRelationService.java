@@ -1,7 +1,7 @@
 package cn.wtk.mp.relation.domain.relation.sub;
 
-import cn.wtk.mp.relation.infrasturcture.client.command.CreateSubRelationCommand;
-import cn.wtk.mp.relation.infrasturcture.client.command.RemoveSubRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.CreateSubRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.RemoveSubRelationCommand;
 import cn.wtk.mp.relation.infrasturcture.client.converter.SubRelationConverter;
 import cn.wtk.mp.relation.infrasturcture.client.dto.SubRelationAggOutput;
 import lombok.RequiredArgsConstructor;

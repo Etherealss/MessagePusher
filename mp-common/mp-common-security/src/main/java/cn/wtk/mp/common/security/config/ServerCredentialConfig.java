@@ -3,6 +3,7 @@ package cn.wtk.mp.common.security.config;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 @Getter
 @Setter
+@Slf4j
 @ToString
 public class ServerCredentialConfig {
     /**
@@ -58,6 +60,6 @@ public class ServerCredentialConfig {
 
     @PostConstruct
     public void init() {
-        System.out.println(this.toString());
+        log.info("ServerCredentialConfig 配置：{}", this.toString());
     }
 }

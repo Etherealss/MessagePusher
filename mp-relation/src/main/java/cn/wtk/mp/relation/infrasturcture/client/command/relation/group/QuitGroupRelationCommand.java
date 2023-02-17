@@ -1,10 +1,12 @@
-package cn.wtk.mp.relation.infrasturcture.client.command;
+package cn.wtk.mp.relation.infrasturcture.client.command.relation.group;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author wtk
@@ -14,8 +16,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RemoveSubRelationCommand {
-    Long connectorId;
-    Long subrId;
-    String relationTopic;
+public class QuitGroupRelationCommand {
+    @NotNull
+    Long groupId;
+
+    /**
+     * 要退出的群成员ID
+     */
+    @NotNull
+    Long quitterId;
 }

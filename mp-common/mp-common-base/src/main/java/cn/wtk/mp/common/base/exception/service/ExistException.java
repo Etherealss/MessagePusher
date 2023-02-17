@@ -9,7 +9,7 @@ import cn.wtk.mp.common.base.enums.ApiInfo;
  * @date 2021-08-12
  */
 public class ExistException extends SimpleServiceException {
-    public ExistException(Class<?> clazz, String message) {
+    public ExistException(String message) {
         super(ApiInfo.EXIST, message);
     }
 

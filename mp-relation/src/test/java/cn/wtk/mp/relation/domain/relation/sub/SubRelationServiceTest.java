@@ -1,7 +1,8 @@
 package cn.wtk.mp.relation.domain.relation.sub;
 
-import cn.wtk.mp.relation.infrasturcture.client.command.CreateSubRelationCommand;
-import cn.wtk.mp.relation.infrasturcture.client.command.RemoveSubRelationCommand;
+import cn.wtk.mp.RelationApplication;
+import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.CreateSubRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.RemoveSubRelationCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,14 @@ import java.util.List;
 
 @Slf4j(topic = "test")
 @DisplayName("SubRelationServiceTest测试")
-@SpringBootTest
+@SpringBootTest(classes = {RelationApplication.class})
+@Rollback(false)
 class SubRelationServiceTest {
 
     @Autowired
     private SubRelationService service;
 
     @Test
-    @Rollback(false)
     void testUpsertSubRelation() {
         service.upsertSubRelation(new CreateSubRelationCommand(
                 1L,
@@ -29,7 +30,6 @@ class SubRelationServiceTest {
         ));
     }
     @Test
-    @Rollback(false)
     void testUpsertSubRelation2() {
         service.upsertSubRelation(new CreateSubRelationCommand(
                 1L,
@@ -72,9 +72,9 @@ class SubRelationServiceTest {
 
     @Test
     void testCheckSubRelation() {
-        boolean friend = service.checkSubRelation(1L, 2L, "friend");
+        boolean friend = service.checkSubRelation(1L, 2L, "famliy");
         boolean noRelation = service.checkSubRelation(1L, 2L, "famil1231313y");
-        log.info("friend: {}", friend);
+        log.info("famliy: {}", friend);
         log.info("noRelation: {}", noRelation);
     }
 }

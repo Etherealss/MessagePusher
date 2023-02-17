@@ -13,7 +13,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @EnableFeignClients(basePackages = "cn.wtk.mp")
 @EnableDiscoveryClient // nacos 服务注册与发现
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.wtk.mp")
 public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);

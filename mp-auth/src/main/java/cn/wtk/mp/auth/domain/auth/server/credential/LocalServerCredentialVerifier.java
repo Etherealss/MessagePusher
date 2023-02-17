@@ -2,7 +2,7 @@ package cn.wtk.mp.auth.domain.auth.server.credential;
 
 
 import cn.wtk.mp.auth.domain.credential.TokenCredentialService;
-import cn.wtk.mp.auth.infrastructure.config.ServerCredentialConfig;
+import cn.wtk.mp.auth.infrastructure.config.ServerCredentialAuthConfig;
 import cn.wtk.mp.common.security.service.auth.ICredentialVerifier;
 import cn.wtk.mp.common.security.service.auth.RemoteServerCredentialVerifier;
 import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocalServerCredentialVerifier implements ICredentialVerifier<ServerTokenCredential> {
     private final TokenCredentialService tokenCredentialService;
-    private final ServerCredentialConfig serverCredentialConfig;
+    private final ServerCredentialAuthConfig serverCredentialAuthConfig;
 
     @Override
     public ServerTokenCredential verify(String token) {

@@ -1,7 +1,7 @@
 package cn.wtk.mp.common.database.uid.config;
 
-import cn.wtk.mp.common.database.uid.UidGenerator;
 import cn.wtk.mp.common.database.uid.SnowFlakeUidGenerator;
+import cn.wtk.mp.common.database.uid.UidGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +18,7 @@ public class UidAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public UidGenerator uidGenerator(UidServerConfig uidServerConfig) {
+        log.info("默认 UID 生成器：雪花算法");
         return new SnowFlakeUidGenerator(
                 uidServerConfig.getDataCenterId(),
                 uidServerConfig.getMachineId()

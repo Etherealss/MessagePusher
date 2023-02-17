@@ -10,20 +10,20 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * 认证服务创建的 serverToken 的缓存相关配置
+ * 认证服务创建的 userToken 的缓存相关配置
  * @author wtk
  * @date 2022-08-30
  */
 @Configuration
-@ConfigurationProperties(prefix = "mp.auth.token.server")
+@ConfigurationProperties(prefix = "mp.auth.token.connector")
 @Validated
 @Getter
 @Setter
-public class ServerCredentialConfig {
-
+public class ConnectorCredentialAuthConfig {
     @NotNull
     private Long expireMs;
 
     @NotBlank
     private String tokenTopic;
+
 }

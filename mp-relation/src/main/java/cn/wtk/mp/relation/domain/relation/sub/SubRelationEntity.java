@@ -2,11 +2,12 @@ package cn.wtk.mp.relation.domain.relation.sub;
 
 
 import cn.wtk.mp.common.database.pojo.entity.BaseEntity;
-import cn.wtk.mp.common.database.pojo.entity.IdentifierGetter;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
 
@@ -23,10 +24,11 @@ import java.util.List;
 @ToString(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubRelationEntity extends BaseEntity implements IdentifierGetter {
+public class SubRelationEntity extends BaseEntity  {
     /**
      * connector ID
      */
+    @MongoId(FieldType.INT64)
     @Field(CONNECTOR_ID)
     Long connectorId;
 
@@ -36,11 +38,11 @@ public class SubRelationEntity extends BaseEntity implements IdentifierGetter {
     @Field(RELATIONS)
     List<SubRelationItem> relations;
 
-    public static final String CONNECTOR_ID = "connectorId";
+    public static final String CONNECTOR_ID = "_id";
     public static final String RELATIONS = "relations";
 
-    @Override
     public Long getId() {
         return connectorId;
     }
+
 }

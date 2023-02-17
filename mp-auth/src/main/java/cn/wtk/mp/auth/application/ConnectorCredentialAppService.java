@@ -2,7 +2,7 @@ package cn.wtk.mp.auth.application;
 
 import cn.wtk.mp.auth.domain.credential.TokenCredentialService;
 import cn.wtk.mp.auth.domain.credential.TokenCredentialSpec;
-import cn.wtk.mp.auth.infrastructure.config.ConnectorCredentialConfig;
+import cn.wtk.mp.auth.infrastructure.config.ConnectorCredentialAuthConfig;
 import cn.wtk.mp.common.base.exception.rest.ParamErrorException;
 import cn.wtk.mp.common.security.service.auth.connector.ConnectorCredential;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +17,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ConnectorCredentialAppService {
-    private final ConnectorCredentialConfig credentialCacheConfig;
+    private final ConnectorCredentialAuthConfig credentialCacheConfig;
     private final TokenCredentialService tokenCredentialService;
-    private final ConnectorCredentialConfig config;
+    private final ConnectorCredentialAuthConfig config;
 
     public ConnectorCredential create(Long appId, Long connectorId) {
         ConnectorCredential connectorCredential = new ConnectorCredential();

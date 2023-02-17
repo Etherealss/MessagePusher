@@ -4,7 +4,7 @@ import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoEntity;
 import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoService;
 import cn.wtk.mp.auth.domain.credential.TokenCredentialService;
 import cn.wtk.mp.auth.domain.credential.TokenCredentialSpec;
-import cn.wtk.mp.auth.infrastructure.config.ServerCredentialConfig;
+import cn.wtk.mp.auth.infrastructure.config.ServerCredentialAuthConfig;
 import cn.wtk.mp.common.base.exception.rest.ParamErrorException;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
 import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
@@ -23,7 +23,7 @@ public class ServerAuthenticationAppService {
 
     private final ServerInfoService serviceInfoService;
     private final TokenCredentialService tokenCredentialService;
-    private final ServerCredentialConfig serverCredentialConfig;
+    private final ServerCredentialAuthConfig serverCredentialAuthConfig;
 
     public ServerTokenCredential createServerCredential(ServerAuthCommand command) {
         // 通过密钥获取 serverInfo，再拿去创建 token
@@ -31,8 +31,8 @@ public class ServerAuthenticationAppService {
                 command
         );
         TokenCredentialSpec tokenCredentialSpec = new TokenCredentialSpec(
-                serverCredentialConfig.getTokenTopic(),
-                serverCredentialConfig.getExpireMs()
+                serverCredentialAuthConfig.getTokenTopic(),
+                serverCredentialAuthConfig.getExpireMs()
         );
         ServerTokenCredential credential = new ServerTokenCredential();
         credential.setServerId(serverInfoEntity.getId());
@@ -43,7 +43,7 @@ public class ServerAuthenticationAppService {
 
     public ServerTokenCredential verifyAndGetToken(String token) {
         ServerTokenCredential tokenCredential = tokenCredentialService.verifyAndGet(token, ServerTokenCredential.class);
-        if (!serverCredentialConfig.getTokenTopic().equals(tokenCredential.getTokenTopic())) {
+        if (!serverCredentialAuthConfig.getTokenTopic().equals(tokenCredential.getTokenTopic())) {
             throw new ParamErrorException("token topic 不匹配");
         }
         return tokenCredential;
