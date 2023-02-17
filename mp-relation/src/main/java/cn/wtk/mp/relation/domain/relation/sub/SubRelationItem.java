@@ -1,10 +1,11 @@
 package cn.wtk.mp.relation.domain.relation.sub;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.util.Date;
 
 /**
  * @author wtk
@@ -27,13 +28,6 @@ public class SubRelationItem {
     @Field(RELATION_TOPIC)
     String relationTopic;
 
-    /**
-     * 创建时间
-     */
-    @Field(CREATE_TIME)
-    Date createTime;
-
     public static final String SUBR_ID = "subrId";
     public static final String RELATION_TOPIC = "relationTopic";
-    public static final String CREATE_TIME = "createTime";
 }

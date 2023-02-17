@@ -1,12 +1,13 @@
 package cn.wtk.mp.relation.infrasturcture.client.dto;
 
+import cn.wtk.mp.relation.domain.relation.sub.SubRelationEntity;
+import cn.wtk.mp.relation.domain.relation.sub.SubRelationItem;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * @author wtk
@@ -17,5 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubRelationAggOutput {
-    List<String> relations;
+    @Field(SubRelationEntity.RELATIONS)
+    SubRelationItem relations;
+
 }

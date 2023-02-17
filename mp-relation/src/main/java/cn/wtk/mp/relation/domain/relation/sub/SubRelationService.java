@@ -15,11 +15,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author wtk
@@ -38,22 +36,14 @@ public class SubRelationService {
     public void upsertSubRelation(CreateSubRelationCommand command) {
         Query query = Query.query(Criteria
                 .where(SubRelationEntity.CONNECTOR_ID).is(command.getConnectorId())
-                .and(SubRelationEntity.RELATION + "." + SubRelationItem.SUBR_ID).is(command.getSubrId())
-                .and(SubRelationEntity.RELATION + "." + SubRelationItem.RELATION_TOPIC).ne(command.getRelationTopic())
         );
 
         SubRelationItem subRelationItem = new SubRelationItem(
-                command.getSubrId(), command.getRelationTopic(), new Date()
+                command.getSubrId(), command.getRelationTopic()
         );
-        Update update = new Update().push(SubRelationEntity.RELATION, subRelationItem);
+        Update update = new Update().addToSet(SubRelationEntity.RELATIONS, subRelationItem);
 
         mongoTemplate.upsert(query, update, SubRelationEntity.class);
-        SubRelationEntity one = mongoTemplate.findOne(query, SubRelationEntity.class);
-        if (one != null && !CollectionUtils.isEmpty(one.getRelations())) {
-            for (SubRelationItem relation : one.getRelations()) {
-                log.info("{}", relation);
-            }
-        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -62,37 +52,38 @@ public class SubRelationService {
         Document fields = new Document()
                 .append(SubRelationItem.SUBR_ID, command.getSubrId())
                 .append(SubRelationItem.RELATION_TOPIC, command.getRelationTopic());
-        Update update = new Update().pull(SubRelationEntity.RELATION, fields);
+        Update update = new Update().pull(SubRelationEntity.RELATIONS, fields);
         mongoTemplate.upsert(query, update, SubRelationEntity.class);
     }
 
     public List<String> getSubRelations(Long connectorId, Long subrId) {
         Aggregation agg = Aggregation.newAggregation(
-                Aggregation.unwind(SubRelationEntity.RELATION),
+                Aggregation.unwind(SubRelationEntity.RELATIONS),
                 Aggregation.match(Criteria
                         .where(SubRelationEntity.CONNECTOR_ID).is(connectorId)
-                        .and(SubRelationEntity.RELATION + "." + SubRelationItem.SUBR_ID).is(subrId)
+                        .and(SubRelationEntity.RELATIONS + "." + SubRelationItem.SUBR_ID).is(subrId)
                 ),
-                Aggregation.project(SubRelationEntity.RELATION)
+                Aggregation.project(SubRelationEntity.RELATIONS)
         );
         AggregationResults<SubRelationAggOutput> groupResults =
                 mongoTemplate.aggregate(agg, SubRelationEntity.class, SubRelationAggOutput.class);
         List<SubRelationAggOutput> subRelationAggOutputs = groupResults.getMappedResults();
-        if (CollectionUtils.isEmpty(subRelationAggOutputs)) {
-            return Collections.emptyList();
-        } else {
-            SubRelationAggOutput subRelationAggOutput = subRelationAggOutputs.get(0);
-            return subRelationAggOutput.getRelations();
-        }
+        List<String> topics = subRelationAggOutputs.stream()
+                .map(output -> output.getRelations().getRelationTopic())
+                .collect(Collectors.toList());
+        log.debug("{}", topics);
+        return topics;
     }
 
     public boolean checkSubRelation(Long connectorId, Long subrId, String relationTopic) {
         Query query = Query.query(Criteria
                 .where(SubRelationEntity.CONNECTOR_ID).is(connectorId)
-                .and(SubRelationEntity.RELATION + "." + SubRelationItem.SUBR_ID).is(subrId)
-                .and(SubRelationEntity.RELATION + "." + SubRelationItem.RELATION_TOPIC).is(relationTopic)
+                .and(SubRelationEntity.RELATIONS + "." + SubRelationItem.SUBR_ID).is(subrId)
+                .and(SubRelationEntity.RELATIONS + "." + SubRelationItem.RELATION_TOPIC).is(relationTopic)
         );
-        Object value = mongoTemplate.findOne(query, SubRelationEntity.class, SubRelationEntity.CONNECTOR_ID);
+        // 判断是否存在时，只查一个字段，提高性能
+        query.fields().include(SubRelationEntity.CONNECTOR_ID);
+        Object value = mongoTemplate.findOne(query, SubRelationEntity.class);
         return value != null;
     }
 }

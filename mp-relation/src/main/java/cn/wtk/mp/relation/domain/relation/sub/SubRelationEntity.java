@@ -33,11 +33,11 @@ public class SubRelationEntity extends BaseEntity implements IdentifierGetter {
     /**
      * 所有订阅该 connector 的人，可以类比于"所有粉丝"
      */
-    @Field(RELATION)
+    @Field(RELATIONS)
     List<SubRelationItem> relations;
 
     public static final String CONNECTOR_ID = "connectorId";
-    public static final String RELATION = "relations";
+    public static final String RELATIONS = "relations";
 
     @Override
     public Long getId() {

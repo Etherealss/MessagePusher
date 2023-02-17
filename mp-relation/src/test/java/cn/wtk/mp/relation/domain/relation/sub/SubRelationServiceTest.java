@@ -63,11 +63,18 @@ class SubRelationServiceTest {
         log.info("relations: {}", subRelations);
     }
 
+
+    @Test
+    void testGetSubRelations2() {
+        List<String> subRelations = service.getSubRelations(1L, 524234L);
+        log.info("relations: {}", subRelations);
+    }
+
     @Test
     void testCheckSubRelation() {
         boolean friend = service.checkSubRelation(1L, 2L, "friend");
-        boolean family = service.checkSubRelation(1L, 2L, "family");
+        boolean noRelation = service.checkSubRelation(1L, 2L, "famil1231313y");
         log.info("friend: {}", friend);
-        log.info("family: {}", family);
+        log.info("noRelation: {}", noRelation);
     }
 }
