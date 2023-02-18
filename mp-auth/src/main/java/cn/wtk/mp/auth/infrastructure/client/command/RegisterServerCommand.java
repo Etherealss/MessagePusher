@@ -1,4 +1,4 @@
-package cn.wtk.mp.auth.domain.auth.server.info;
+package cn.wtk.mp.auth.infrastructure.client.command;
 
 import lombok.AccessLevel;
 import lombok.Data;

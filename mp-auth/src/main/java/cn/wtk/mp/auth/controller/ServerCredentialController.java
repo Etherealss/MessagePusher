@@ -2,7 +2,7 @@ package cn.wtk.mp.auth.controller;
 
 
 import cn.wtk.mp.auth.application.ServerAuthenticationAppService;
-import cn.wtk.mp.auth.domain.auth.server.info.RegisterServerCommand;
+import cn.wtk.mp.auth.infrastructure.client.command.RegisterServerCommand;
 import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoService;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
 import cn.wtk.mp.common.security.annotation.InternalAuth;

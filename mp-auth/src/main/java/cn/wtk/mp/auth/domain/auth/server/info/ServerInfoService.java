@@ -1,6 +1,7 @@
 package cn.wtk.mp.auth.domain.auth.server.info;
 
 
+import cn.wtk.mp.auth.infrastructure.client.command.RegisterServerCommand;
 import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.service.AuthenticationException;
 import cn.wtk.mp.common.base.exception.service.NotFoundException;

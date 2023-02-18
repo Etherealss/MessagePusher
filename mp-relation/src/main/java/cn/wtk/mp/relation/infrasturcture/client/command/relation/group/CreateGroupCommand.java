@@ -18,7 +18,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateGroupCommand {
-
     /**
      * 群组归属的 APP ID
      */
