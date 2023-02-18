@@ -1,4 +1,4 @@
-package cn.wtk.mp.relation.infrasturcture.client.command.relation.group;
+package cn.wtk.mp.relation.infrasturcture.client.command.relation.sub;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,24 +15,15 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
 @NoArgsConstructor
-public class CreateGroupCommand {
-
+@AllArgsConstructor
+public class SubRelationCommand {
     /**
-     * 群组归属的 APP ID
+     * 通过url获取
      */
-    Long appId;
-
-    /**
-     * 群组的业务标识符
-     */
-    @NotBlank
-    String groupTopic;
-
-    /**
-     * 群主，创建者
-     */
+    Long connectorId;
     @NotNull
-    Long creatorId;
+    Long subrId;
+    @NotBlank
+    String relationTopic;
 }

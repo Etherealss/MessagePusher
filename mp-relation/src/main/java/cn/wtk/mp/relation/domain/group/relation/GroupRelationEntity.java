@@ -1,4 +1,4 @@
-package cn.wtk.mp.relation.domain.relation.group;
+package cn.wtk.mp.relation.domain.group.relation;
 
 import cn.wtk.mp.common.database.pojo.entity.BaseEntity;
 import lombok.*;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document("mp_relation_group")
+@Document("mp_group")
 @Getter
 @Setter
 @ToString(callSuper = true)

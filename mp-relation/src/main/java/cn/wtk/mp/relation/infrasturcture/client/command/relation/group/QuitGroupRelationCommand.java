@@ -17,7 +17,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuitGroupRelationCommand {
-    @NotNull
+    /**
+     * 通过url获取
+     */
     Long groupId;
 
     /**

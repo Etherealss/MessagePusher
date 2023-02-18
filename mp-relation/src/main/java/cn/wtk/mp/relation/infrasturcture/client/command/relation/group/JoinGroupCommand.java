@@ -17,7 +17,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JoinGroupCommand {
-    @NotNull
+    /**
+     * 群组ID通过url获取
+     */
     Long groupId;
 
     /**

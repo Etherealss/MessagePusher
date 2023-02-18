@@ -1,4 +1,4 @@
-package cn.wtk.mp.relation.domain.relation.sub;
+package cn.wtk.mp.relation.domain.connector.relation;
 
 
 import cn.wtk.mp.common.database.pojo.entity.BaseEntity;

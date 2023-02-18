@@ -1,4 +1,4 @@
-package cn.wtk.mp.relation.domain.relation.sub;
+package cn.wtk.mp.relation.domain.connector.relation;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

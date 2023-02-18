@@ -1,7 +1,7 @@
 package cn.wtk.mp.relation.infrasturcture.client.converter;
 
 import cn.wtk.mp.common.base.enums.MapperComponentModel;
-import cn.wtk.mp.relation.domain.relation.group.GroupRelationEntity;
+import cn.wtk.mp.relation.domain.group.relation.GroupRelationEntity;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import org.mapstruct.Mapper;
 

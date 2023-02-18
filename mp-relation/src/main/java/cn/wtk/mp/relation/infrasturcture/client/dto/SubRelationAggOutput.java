@@ -1,7 +1,7 @@
 package cn.wtk.mp.relation.infrasturcture.client.dto;
 
-import cn.wtk.mp.relation.domain.relation.sub.SubRelationEntity;
-import cn.wtk.mp.relation.domain.relation.sub.SubRelationItem;
+import cn.wtk.mp.relation.domain.connector.relation.SubRelationEntity;
+import cn.wtk.mp.relation.domain.connector.relation.SubRelationItem;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

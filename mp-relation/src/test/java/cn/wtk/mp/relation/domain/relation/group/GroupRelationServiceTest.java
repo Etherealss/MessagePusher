@@ -2,6 +2,7 @@ package cn.wtk.mp.relation.domain.relation.group;
 
 import cn.wtk.mp.RelationApplication;
 import cn.wtk.mp.common.base.exception.service.ExistException;
+import cn.wtk.mp.relation.domain.group.relation.GroupRelationService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.JoinGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.QuitGroupRelationCommand;

@@ -1,6 +1,7 @@
 package cn.wtk.mp.relation.domain.relation.sub;
 
 import cn.wtk.mp.RelationApplication;
+import cn.wtk.mp.relation.domain.connector.relation.SubRelationService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.CreateSubRelationCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.RemoveSubRelationCommand;
 import lombok.extern.slf4j.Slf4j;

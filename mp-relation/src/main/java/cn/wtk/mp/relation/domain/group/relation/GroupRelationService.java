@@ -1,9 +1,7 @@
-package cn.wtk.mp.relation.domain.relation.group;
+package cn.wtk.mp.relation.domain.group.relation;
 
 import cn.wtk.mp.common.base.exception.service.ExistException;
 import cn.wtk.mp.common.base.exception.service.NotFoundException;
-import cn.wtk.mp.common.database.uid.UidGenerator;
-import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.JoinGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.QuitGroupRelationCommand;
 import cn.wtk.mp.relation.infrasturcture.client.converter.GroupRelationConverter;
@@ -33,17 +31,6 @@ public class GroupRelationService {
     private final GroupRelationRepository groupRelationRepository;
     private final MongoTemplate mongoTemplate;
     private final GroupRelationConverter converter;
-    private final UidGenerator uidGenerator;
-
-    @Transactional(rollbackFor = Exception.class)
-    public Long createGroup(CreateGroupCommand command) {
-        GroupRelationEntity entity = converter.toEntity(command);
-        long groupId = uidGenerator.nextId();
-        entity.setGroupId(groupId);
-        entity.setMemberIds(Collections.emptyList());
-        groupRelationRepository.save(entity);
-        return groupId;
-    }
 
     @Transactional(rollbackFor = Exception.class)
     public void createGroupRelation(JoinGroupCommand command) {
@@ -82,9 +69,9 @@ public class GroupRelationService {
         }
     }
 
-    public boolean checkGroupRelation(Long groupId, Long memeberId) {
+    public boolean checkGroupRelation(Long groupId, Long memberId) {
         Query query = Query.query(Criteria
-                .where(GroupRelationEntity.MEMBER_IDS).is(memeberId)
+                .where(GroupRelationEntity.MEMBER_IDS).is(memberId)
         );
         // 判断是否存在时，只查一个字段，提高性能
         query.fields().include(GroupRelationEntity.GROUP_ID);

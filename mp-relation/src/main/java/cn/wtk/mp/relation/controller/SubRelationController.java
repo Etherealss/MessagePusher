@@ -6,6 +6,7 @@ import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.CreateSubRe
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.RemoveSubRelationCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,28 +17,33 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/relation/sub")
+@RequestMapping("connectors/{connectorId}/relations")
 @RequiredArgsConstructor
 @ResponseAdvice
 public class SubRelationController {
     private final SubRelationAppService subRelationAppService;
 
     @PostMapping
-    public void createSubRelation(CreateSubRelationCommand command) {
+    public void createSubRelation(@PathVariable Long connectorId,
+                                  @RequestBody @Validated CreateSubRelationCommand command) {
+        command.setConnectorId(connectorId);
         subRelationAppService.createSubRelation(command);
     }
 
     @DeleteMapping
-    public void removeSubRelation(RemoveSubRelationCommand command) {
+    public void removeSubRelation(@PathVariable Long connectorId,
+                                  @RequestBody @Validated RemoveSubRelationCommand command) {
+        command.setConnectorId(connectorId);
         subRelationAppService.removeSubRelation(command);
     }
 
-    @GetMapping("/{connectorId}/{subrId}")
-    public List<String> getSubRelations(@PathVariable Long connectorId, @PathVariable Long subrId) {
+    @GetMapping("/{subrId}")
+    public List<String> getSubRelations(@PathVariable Long connectorId,
+                                        @PathVariable Long subrId) {
         return subRelationAppService.getSubRelations(connectorId, subrId);
     }
 
-    @GetMapping("/{connectorId}/{subrId}/{relationTopic}")
+    @GetMapping("/{subrId}/{relationTopic}")
     public Boolean checkSubRelation(@PathVariable Long connectorId,
                                     @PathVariable Long subrId,
                                     @PathVariable String relationTopic) {
