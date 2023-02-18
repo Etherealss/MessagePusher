@@ -2,6 +2,7 @@ package cn.wtk.mp.relation.domain.relation.group;
 
 import cn.wtk.mp.RelationApplication;
 import cn.wtk.mp.common.base.exception.service.ExistException;
+import cn.wtk.mp.relation.domain.group.GroupService;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.JoinGroupCommand;
@@ -22,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = {RelationApplication.class})
 @Rollback(false)
 class GroupRelationServiceTest {
-
+    @Autowired
+    private GroupService groupService;
     @Autowired
     private GroupRelationService groupRelationService;
 
@@ -31,7 +33,7 @@ class GroupRelationServiceTest {
     @Test
     void testCreateGroup() {
         assertDoesNotThrow(() -> {
-            Long groupId = groupRelationService.createGroup(new CreateGroupCommand(
+            Long groupId = groupService.createGroup(new CreateGroupCommand(
                     1L,
                     "/test",
                     1L
