@@ -1,4 +1,4 @@
-package cn.wtk.mp.msg.acceptor.application.command;
+package cn.wtk.mp.msg.acceptor.infrasturcture.command;
 
 import lombok.AccessLevel;
 import lombok.Data;

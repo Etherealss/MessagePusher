@@ -20,6 +20,7 @@
         <module>mp-connect</module>
         <module>mp-msg-acceptor</module>
         <module>mp-relation</module>
+        <module>mp-msg-manager</module>
     </modules>
 
     <properties>
@@ -58,6 +59,11 @@
             <dependency>
                 <groupId>cn.wtk</groupId>
                 <artifactId>mp-auth</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.wtk</groupId>
+                <artifactId>mp-msg-manager</artifactId>
                 <version>1.0</version>
             </dependency>
             <!-- hutool 工具包-->

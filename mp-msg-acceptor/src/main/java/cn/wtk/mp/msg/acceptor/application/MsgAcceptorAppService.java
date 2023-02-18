@@ -2,7 +2,7 @@ package cn.wtk.mp.msg.acceptor.application;
 
 import cn.wtk.mp.common.base.pojo.Result;
 import cn.wtk.mp.common.msg.entity.PersonalMsg;
-import cn.wtk.mp.msg.acceptor.application.command.SendPersonalMsgCommand;
+import cn.wtk.mp.msg.acceptor.infrasturcture.command.SendPersonalMsgCommand;
 import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgAcceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

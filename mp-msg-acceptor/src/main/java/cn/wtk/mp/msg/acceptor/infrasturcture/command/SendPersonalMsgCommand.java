@@ -1,9 +1,11 @@
-package cn.wtk.mp.msg.acceptor.application.command;
+package cn.wtk.mp.msg.acceptor.infrasturcture.command;
 
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author wtk
@@ -12,6 +14,12 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SendNotifMsgCommand extends SendMsgCommand {
+public class SendPersonalMsgCommand extends SendMsgCommand {
+    @NotNull
+    Long senderId;
+
+    @NotNull
     Long revrId;
+
+    String relationTopic;
 }
