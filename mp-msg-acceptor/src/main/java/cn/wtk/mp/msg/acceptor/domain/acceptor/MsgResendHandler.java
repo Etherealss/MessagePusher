@@ -1,4 +1,4 @@
-package cn.wtk.mp.msg.acceptor.domain.acceptor.resend;
+package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
 import cn.wtk.mp.common.msg.entity.AbstractMsg;
 import cn.wtk.mp.msg.acceptor.infrasturcture.config.ResendConfig;

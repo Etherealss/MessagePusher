@@ -34,11 +34,11 @@ public class GroupAppService {
         groupRelationService.removeGroupRelation(command);
     }
 
-    public List<Long> getGroupRelations(Long groupId) {
+    public List<Long> getGroupMembers(Long groupId) {
         return groupRelationService.getGroupRelations(groupId);
     }
 
-    public boolean checkGroupRelation(Long groupId, Long memberId) {
+    public boolean checkMember(Long groupId, Long memberId) {
         return groupRelationService.checkGroupRelation(groupId, memberId);
     }
 }

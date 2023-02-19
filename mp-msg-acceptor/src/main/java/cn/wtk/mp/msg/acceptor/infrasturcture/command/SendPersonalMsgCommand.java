@@ -1,8 +1,6 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.command;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotNull;

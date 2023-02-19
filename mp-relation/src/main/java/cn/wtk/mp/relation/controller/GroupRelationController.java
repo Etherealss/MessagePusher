@@ -43,14 +43,14 @@ public class GroupRelationController {
 
     @GetMapping
     @InternalAuth
-    public List<Long> getSubRelations(@PathVariable Long groupId) {
-        return groupAppService.getGroupRelations(groupId);
+    public List<Long> getGroupMembers(@PathVariable Long groupId) {
+        return groupAppService.getGroupMembers(groupId);
     }
 
     @GetMapping("/{memberId}")
     @InternalAuth
-    public Boolean getSubRelations(@PathVariable Long groupId,
-                                   @PathVariable Long memberId) {
-        return groupAppService.checkGroupRelation(groupId, memberId);
+    public Boolean checkMember(@PathVariable Long groupId,
+                               @PathVariable Long memberId) {
+        return groupAppService.checkMember(groupId, memberId);
     }
 }

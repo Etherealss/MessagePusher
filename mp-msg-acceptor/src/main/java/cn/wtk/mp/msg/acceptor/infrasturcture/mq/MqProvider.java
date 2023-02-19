@@ -1,5 +1,6 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.mq;
 
+import cn.wtk.mp.common.msg.entity.GroupMsg;
 import cn.wtk.mp.common.msg.entity.PersonalMsg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class MqMessageProvider {
+public class MqProvider {
     private final StreamBridge streamBridge;
 
     public void sendPersonal(PersonalMsg msg) {
         streamBridge.send(StreamBindingName.PERSONAL_MSG, msg);
     }
+
+    public void sendPersonal(GroupMsg msg) {
+        streamBridge.send(StreamBindingName.GROUP_MSG, msg);
+    }
+
 }
