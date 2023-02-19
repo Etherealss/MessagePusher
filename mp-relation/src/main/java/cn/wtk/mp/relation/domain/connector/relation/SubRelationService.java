@@ -1,9 +1,11 @@
 package cn.wtk.mp.relation.domain.connector.relation;
 
+import cn.wtk.mp.common.base.exception.service.NotFoundException;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.CreateSubRelationCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.sub.RemoveSubRelationCommand;
 import cn.wtk.mp.relation.infrasturcture.client.converter.SubRelationConverter;
 import cn.wtk.mp.relation.infrasturcture.client.dto.SubRelationAggOutput;
+import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -53,7 +55,18 @@ public class SubRelationService {
                 .append(SubRelationItem.SUBR_ID, command.getSubrId())
                 .append(SubRelationItem.RELATION_TOPIC, command.getRelationTopic());
         Update update = new Update().pull(SubRelationEntity.RELATIONS, fields);
-        mongoTemplate.upsert(query, update, SubRelationEntity.class);
+        UpdateResult result = mongoTemplate.updateFirst(query, update, SubRelationEntity.class);
+        if (result.getMatchedCount() == 0) {
+            String info = String.format("要取消关系的 connector: '%d' 不存在",
+                    command.getConnectorId()
+            );
+            throw new NotFoundException(info);
+        } else if (result.getModifiedCount() == 0) {
+            String info = String.format("subr: '%d' 没有与 connector: '%d' 创建relationTopic: '%s'",
+                    command.getSubrId(), command.getConnectorId(), command.getRelationTopic()
+            );
+            throw new NotFoundException(info);
+        }
     }
 
     public List<String> getSubRelations(Long connectorId, Long subrId) {

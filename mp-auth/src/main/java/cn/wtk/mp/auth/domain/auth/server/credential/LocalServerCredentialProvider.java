@@ -5,8 +5,8 @@ import cn.wtk.mp.auth.application.ServerAuthenticationAppService;
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.service.auth.server.IServerCredentialProvider;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
-import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
 import cn.wtk.mp.common.security.service.auth.server.ServerDigestGenerator;
+import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,9 @@ public class LocalServerCredentialProvider implements IServerCredentialProvider 
                 serverCredentialConfig.getServerName(),
                 serverCredentialConfig.getSecret()
         );
-        ServerAuthCommand command = new ServerAuthCommand(serverCredentialConfig.getServerId(), digest);
+        ServerAuthCommand command = new ServerAuthCommand(
+                serverCredentialConfig.getServerId(), new String(digest)
+        );
         Long serverId = serverCredentialConfig.getServerId();
         return serverAuthenticationAppService.createServerCredential(command);
     }

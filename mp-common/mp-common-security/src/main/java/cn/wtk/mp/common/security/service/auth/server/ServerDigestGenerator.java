@@ -1,7 +1,6 @@
 package cn.wtk.mp.common.security.service.auth.server;
 
 import cn.wtk.mp.common.base.exception.internal.BugException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -15,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 @Component
 public class ServerDigestGenerator {
 
-    public static final String ALGORITHM = "sha-1";
+    public static final String ALGORITHM = "SHA-1";
 
     private final MessageDigest messageDigest;
 

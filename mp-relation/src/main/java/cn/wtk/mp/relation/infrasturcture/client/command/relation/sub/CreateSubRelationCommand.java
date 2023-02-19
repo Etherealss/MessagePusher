@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-@AllArgsConstructor
 public class CreateSubRelationCommand extends SubRelationCommand {
     public CreateSubRelationCommand(Long connectorId, @NotNull Long subrId, @NotBlank String relationTopic) {
         super(connectorId, subrId, relationTopic);

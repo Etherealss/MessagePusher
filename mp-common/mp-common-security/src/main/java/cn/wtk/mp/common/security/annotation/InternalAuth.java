@@ -3,7 +3,7 @@ package cn.wtk.mp.common.security.annotation;
 import java.lang.annotation.*;
 
 /**
- * 认证是否为系统内部的请求
+ * 请求认证
  * @author wtk
  */
 @Target(ElementType.METHOD)
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface InternalAuth {
     /**
-     * 是否校验用户信息
+     * 是否校验 serverToken
      */
-    boolean isUser() default false;
+    boolean serv() default true;
 }

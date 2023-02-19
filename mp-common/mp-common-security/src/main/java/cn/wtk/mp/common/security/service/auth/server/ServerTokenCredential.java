@@ -2,16 +2,14 @@ package cn.wtk.mp.common.security.service.auth.server;
 
 
 import cn.wtk.mp.common.security.service.auth.TokenCredential;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 /**
  * @author wtk
  * @date 2022-08-30
  */
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
 @NoArgsConstructor

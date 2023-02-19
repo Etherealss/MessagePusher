@@ -1,6 +1,7 @@
 package cn.wtk.mp.relation.controller;
 
 import cn.wtk.mp.common.base.web.ResponseAdvice;
+import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.relation.application.GroupAppService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
@@ -25,8 +26,9 @@ public class GroupController {
     private final GroupAppService groupAppService;
 
     @PostMapping
-    public void createGroup(@RequestBody @Validated CreateGroupCommand command) {
+    @InternalAuth
+    public Long createGroup(@RequestBody @Validated CreateGroupCommand command) {
         command.setAppId(ServerSecurityContextHolder.require().getServerId());
-        groupAppService.createGroup(command);
+        return groupAppService.createGroup(command);
     }
 }

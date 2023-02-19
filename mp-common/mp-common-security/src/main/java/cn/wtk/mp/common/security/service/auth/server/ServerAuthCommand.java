@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -16,6 +16,6 @@ import javax.validation.constraints.NotNull;
 public class ServerAuthCommand {
     @NotNull
     Long serverId;
-    @NotEmpty
-    byte[] userInputDigest;
+    @NotBlank
+    String userInputDigest;
 }

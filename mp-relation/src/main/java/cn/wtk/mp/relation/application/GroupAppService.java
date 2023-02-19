@@ -1,5 +1,6 @@
 package cn.wtk.mp.relation.application;
 
+import cn.wtk.mp.relation.domain.group.GroupService;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.JoinGroupCommand;
@@ -19,10 +20,10 @@ import java.util.List;
 @Slf4j
 public class GroupAppService {
     private final GroupRelationService groupRelationService;
-    private final GroupAppService groupAppService;
+    private final GroupService groupService;
 
     public Long createGroup(CreateGroupCommand command) {
-        return groupAppService.createGroup(command);
+        return groupService.createGroup(command);
     }
 
     public void joinGroup(JoinGroupCommand command) {

@@ -1,6 +1,7 @@
 package cn.wtk.mp.relation.controller;
 
 import cn.wtk.mp.common.base.web.ResponseAdvice;
+import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.relation.application.GroupAppService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.JoinGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.QuitGroupRelationCommand;
@@ -24,6 +25,7 @@ public class GroupRelationController {
     private final GroupAppService groupAppService;
 
     @PostMapping
+    @InternalAuth
     public void joinGroup(@RequestBody @Validated JoinGroupCommand command,
                           @PathVariable Long groupId) {
         command.setGroupId(groupId);
@@ -31,6 +33,7 @@ public class GroupRelationController {
     }
 
     @DeleteMapping
+    @InternalAuth
     public void quitGroup(@RequestBody @Validated QuitGroupRelationCommand command,
                           @PathVariable Long groupId) {
         command.setGroupId(groupId);
@@ -39,11 +42,13 @@ public class GroupRelationController {
 
 
     @GetMapping
+    @InternalAuth
     public List<Long> getSubRelations(@PathVariable Long groupId) {
         return groupAppService.getGroupRelations(groupId);
     }
 
     @GetMapping("/{memberId}")
+    @InternalAuth
     public Boolean getSubRelations(@PathVariable Long groupId,
                                    @PathVariable Long memberId) {
         return groupAppService.checkGroupRelation(groupId, memberId);

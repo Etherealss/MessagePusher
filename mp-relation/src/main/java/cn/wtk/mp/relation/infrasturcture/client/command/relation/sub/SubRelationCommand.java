@@ -22,8 +22,10 @@ public class SubRelationCommand {
      * 通过url获取
      */
     Long connectorId;
+
     @NotNull
     Long subrId;
+
     @NotBlank
     String relationTopic;
 }

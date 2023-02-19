@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
 @NoArgsConstructor
 public class RemoveSubRelationCommand extends SubRelationCommand {
     public RemoveSubRelationCommand(Long connectorId, @NotNull Long subrId, @NotBlank String relationTopic) {

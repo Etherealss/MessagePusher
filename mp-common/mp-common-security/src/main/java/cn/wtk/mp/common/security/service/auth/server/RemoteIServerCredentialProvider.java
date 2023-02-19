@@ -22,7 +22,7 @@ public class RemoteIServerCredentialProvider implements IServerCredentialProvide
         byte[] digest = serverDigestGenerator.generate(
                 config.getServerId(), config.getServerName(), config.getSecret()
         );
-        ServerAuthCommand command = new ServerAuthCommand(config.getServerId(), digest);
+        ServerAuthCommand command = new ServerAuthCommand(config.getServerId(), new String(digest));
         return serverCredentialFeign.createCredential(command);
     }
 }

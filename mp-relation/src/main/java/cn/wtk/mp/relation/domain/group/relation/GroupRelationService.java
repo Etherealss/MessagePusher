@@ -34,23 +34,32 @@ public class GroupRelationService {
 
     @Transactional(rollbackFor = Exception.class)
     public void createGroupRelation(JoinGroupCommand command) {
+        Long groupId = command.getGroupId();
         Query query = Query.query(Criteria
-                .where(GroupRelationEntity.GROUP_ID).is(command.getGroupId())
+                .where(GroupRelationEntity.GROUP_ID).is(groupId)
         );
         Update update = new Update().addToSet(GroupRelationEntity.MEMBER_IDS, command.getJoinerId());
-        UpdateResult result = mongoTemplate.upsert(query, update, GroupRelationEntity.class);
-        if (result.getModifiedCount() == 0) {
-            throw new ExistException("连接者：'" + command.getJoinerId() + "' 已加入群：'" + command.getGroupId() + "'");
+        UpdateResult result = mongoTemplate.updateFirst(query, update, GroupRelationEntity.class);
+        if (result.getMatchedCount() == 0) {
+            throw new NotFoundException(GroupRelationEntity.class, groupId.toString());
+        } else if (result.getModifiedCount() == 0) {
+            throw new ExistException("连接者：'" + command.getJoinerId() + "' 已加入群：'" + groupId + "'");
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void removeGroupRelation(QuitGroupRelationCommand command) {
+        Long groupId = command.getGroupId();
         Query query = Query.query(Criteria
-                .where(GroupRelationEntity.GROUP_ID).is(command.getGroupId())
+                .where(GroupRelationEntity.GROUP_ID).is(groupId)
         );
         Update update = new Update().pull(GroupRelationEntity.MEMBER_IDS, command.getQuitterId());
-        mongoTemplate.upsert(query, update, GroupRelationEntity.class);
+        UpdateResult result = mongoTemplate.upsert(query, update, GroupRelationEntity.class);
+        if (result.getMatchedCount() == 0) {
+            throw new NotFoundException(GroupRelationEntity.class, groupId.toString());
+        } else if (result.getModifiedCount() == 0) {
+            throw new ExistException("连接者：'" + command.getQuitterId() + "' 尚未加入群：'" + groupId + "'");
+        }
     }
 
     public List<Long> getGroupRelations(Long groupId) {
