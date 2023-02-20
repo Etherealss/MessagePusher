@@ -4,6 +4,7 @@ import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.BaseException;
 import cn.wtk.mp.common.base.pojo.Result;
 import cn.wtk.mp.common.msg.entity.Msg;
+import cn.wtk.mp.msg.acceptor.infrasturcture.mq.MqProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class MsgAcceptor {
 
     private final MsgResendHandler msgResendHandler;
     private final MsgRelationVerifier msgRelationVerifier;
+    private final MqProducer mqProducer;
 
     public Result<Void> sendMsg(Msg msg, UUID tempMsgId) {
         if (msgResendHandler.handleMsgDuplicate(msg, tempMsgId)) {

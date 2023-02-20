@@ -1,6 +1,6 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.mq;
 
-import cn.wtk.mp.common.msg.entity.PersonalMsg;
+import cn.wtk.mp.common.msg.entity.GroupMsg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,10 +12,10 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class PersonalMqComsumer implements Consumer<PersonalMsg> {
+public class GroupMqConsumer implements Consumer<GroupMsg> {
 
     @Override
-    public void accept(PersonalMsg personalMsg) {
-        log.info("消费到 MQ 消息：{}", personalMsg);
+    public void accept(GroupMsg groupMsg) {
+        log.info("消费到 MQ 消息：{}", groupMsg);
     }
 }

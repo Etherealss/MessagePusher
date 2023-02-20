@@ -30,7 +30,7 @@ public class ServerInfoService {
         ServerInfoEntity serverInfoEntity = serverInfoRepository.findById(serverId)
                 .orElseThrow(() -> new NotFoundException("服务：" + serverId + "不存在"));
         if (!serverDigestValidator.validate(command.getUserInputDigest(), serverInfoEntity)) {
-            throw new AuthenticationException(ApiInfo.PASSWORD_ERROR, "服务秘钥错误");
+            throw new AuthenticationException(ApiInfo.PASSWORD_ERROR, "服务摘要不匹配，请检查serverId, serverName, digest");
         }
         return serverInfoEntity;
     }

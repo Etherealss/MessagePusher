@@ -6,7 +6,7 @@ spring:
     active: dev
   # 项目配置
   application:
-    name: mp-msg-acceptor
+    name: mp-msgacceptor
   cloud:
     nacos:
       discovery:

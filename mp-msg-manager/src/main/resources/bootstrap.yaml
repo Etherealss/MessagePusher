@@ -6,7 +6,7 @@ spring:
     active: dev
   # 项目配置
   application:
-    name: mp-msg-manager
+    name: mp-msgmanager
   cloud:
     nacos:
       discovery:

@@ -1,7 +1,7 @@
 package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
 import cn.wtk.mp.common.msg.entity.AbstractMsg;
-import cn.wtk.mp.msg.acceptor.infrasturcture.config.ResendConfig;
+import cn.wtk.mp.msg.acceptor.infrasturcture.config.ResendProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,14 +20,14 @@ import java.util.UUID;
 public class MsgResendHandler {
 
     private RedisTemplate<String, String> redisTemplate;
-    private final ResendConfig resendConfig;
+    private final ResendProperties resendProperties;
 
     public boolean handleMsgDuplicate(AbstractMsg msg, UUID tempMsgId) {
         if (msg.getResend()) {
-            String key = resendConfig.getCacheKey() + ":" + tempMsgId.toString();
+            String key = resendProperties.getCacheKey() + ":" + tempMsgId.toString();
             Boolean absent = redisTemplate.opsForValue().setIfAbsent(key, "1");
             if (Boolean.TRUE.equals(absent)) {
-                redisTemplate.expire(key, Duration.ofMillis(resendConfig.getExpireMs()));
+                redisTemplate.expire(key, Duration.ofMillis(resendProperties.getExpireMs()));
                 return false;
             } else {
                 // 如果之前在redis上不存在该消息，则说明是第一次传输，返回 false

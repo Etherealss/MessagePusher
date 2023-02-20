@@ -2,13 +2,14 @@ package cn.wtk.mp.msg.acceptor.infrasturcture.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.annotation.PostConstruct;
 
 /**
  * @author wtk
@@ -17,11 +18,19 @@ import javax.validation.constraints.NotNull;
 @Configuration
 @ConfigurationProperties("mp.acceptor.resend")
 @Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
-public class ResendConfig {
-    @NotEmpty
+@Slf4j
+public class ResendProperties {
+//    @NotEmpty
     String cacheKey;
-    @NotNull
+//    @NotNull
     Long expireMs;
+
+    @PostConstruct
+    public void init() {
+        log.info("ResendConfig.cacheKey: {}", cacheKey);
+        log.info("ResendConfig.expireMs: {}", expireMs);
+    }
 }

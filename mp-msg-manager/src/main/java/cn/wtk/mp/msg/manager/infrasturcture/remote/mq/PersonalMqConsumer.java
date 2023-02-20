@@ -1,9 +1,8 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.mq;
 
-import cn.wtk.mp.common.msg.entity.GroupMsg;
+import cn.wtk.mp.common.msg.entity.PersonalMsg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
@@ -13,11 +12,10 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Component
-public class GroupMqComsumer implements Consumer<GroupMsg> {
+public class PersonalMqConsumer implements Consumer<PersonalMsg> {
 
     @Override
-    public void accept(GroupMsg groupMsg) {
-        log.info("消费到 MQ 消息：{}", groupMsg);
+    public void accept(PersonalMsg personalMsg) {
+        log.info("消费到 MQ 消息：{}", personalMsg);
     }
 }
