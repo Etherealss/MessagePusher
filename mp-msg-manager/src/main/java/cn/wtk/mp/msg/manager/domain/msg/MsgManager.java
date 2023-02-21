@@ -1,7 +1,10 @@
 package cn.wtk.mp.msg.manager.domain.msg;
 
+import cn.wtk.mp.common.msg.entity.Msg;
+import cn.wtk.mp.msg.manager.infrasturcture.client.event.ConsumeNewMsgEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,8 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MsgManager {
 
-    public void recvPersonalMsg() {
-
+    @EventListener(value = ConsumeNewMsgEvent.class)
+    public void recvNewMsg(ConsumeNewMsgEvent event) {
+        Msg msg = event.getMsg();
     }
 
 }

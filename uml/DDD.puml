@@ -8,7 +8,14 @@ namespace adapter {
     }
 }
 
+adapter --> client: 返回值类型
+
 namespace client {
+    namespace client.service {
+        interface UserService {
+            + Result<UserLoginResponse> login(UserLoginRequest)
+        }
+    }
     namespace client.dto {
         namespace client.dto.request {
             class UserLoginRequest
@@ -20,34 +27,26 @@ namespace client {
              class UserCriteria
         }
     }
-    namespace client.service {
-        interface UserService {
-            + Result<UserLoginResponse> login(UserLoginRequest)
-        }
-    }
 }
 
 namespace app {
     namespace app.service {
-        class UserServiceImpl implements UserService {
-            - UserLoginCommand command
+        class UserServiceImpl implements client.service.UserService {
             + Result<UserLoginResponse> login(UserLoginRequest)
         }
     }
-    namespace app.command {
-        class UserLoginCommand {
-            + UserLoginResponse execute(UserLoginRequest req)
-        }
-    }
 }
-note bottom of app.command.UserLoginCommand: 通过聚合根的静态方法进行转换、处理、响应
+
+client.service --> client.dto: DTO依赖
 
 namespace infrastructure {
     namespace infrastructure.adapter {
-        namespace infrastructure.database {
-            interface UserAdapter extends IService
-            namespace infrastructure.database.mapper {
-                interface UserMapper extends BaseMapper
+        namespace infrastructure.adapter.database {
+            interface UserAdapter {
+                - UserMapper userMapper;
+            }
+            namespace infrastructure.adapter.database.mapper {
+                interface UserMapper
             }
         }
     }
@@ -57,7 +56,7 @@ namespace infrastructure {
         }
     }
     namespace infrastructure.gateway {
-        interface UserGateway {
+        class UserGatewayImpl {
             - UserConverter converter;
             - UserAdapter adapter;
             + {static} User init(Long userId)
@@ -66,6 +65,10 @@ namespace infrastructure {
         }
     }
 }
+infrastructure.gateway.UserGatewayImpl -up-> infrastructure.converter.UserConverter: 类型转换
+infrastructure.gateway.UserGatewayImpl -up-> infrastructure.adapter.database.UserAdapter: 操作数据库
+infrastructure.adapter.database.UserAdapter -> infrastructure.adapter.database.mapper.UserMapper: 操作数据库
+
 namespace domain {
     namespace domain.user {
         class User {
@@ -80,11 +83,17 @@ namespace domain {
         }
         namespace domain.gateway {
             interface UserGateway {
-                + {static} User init(Long userId)
-                + {static} User login()
-                + {static} UserLoginResponse toUserLoginResponse()
+                + User init(Long userId)
+                + User login()
+                + UserLoginResponse toUserLoginResponse()
             }
         }
     }
 }
+domain.user.User -> domain.gateway.UserGateway: 网关路由
+
+app.service.UserServiceImpl -down-> domain.user.User: 通过聚合根的静态方法进行转换、处理、响应
+
+infrastructure.gateway.UserGatewayImpl -down-|> domain.gateway.UserGateway: 实现
+
 @enduml

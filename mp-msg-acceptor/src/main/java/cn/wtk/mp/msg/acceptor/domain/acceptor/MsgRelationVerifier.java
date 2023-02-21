@@ -23,6 +23,7 @@ public class MsgRelationVerifier {
 
     public boolean doVerify(Msg msg) {
         try {
+            // TODO 责任链模式
             if (msg instanceof PersonalMsg) {
                 return checkSubRelation((PersonalMsg) msg);
             } else if (msg instanceof GroupMsg) {

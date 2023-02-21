@@ -3,6 +3,7 @@ package cn.wtk.mp.msg.acceptor.domain.acceptor;
 import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.BaseException;
 import cn.wtk.mp.common.base.pojo.Result;
+import cn.wtk.mp.common.database.uid.UidGenerator;
 import cn.wtk.mp.common.msg.entity.Msg;
 import cn.wtk.mp.msg.acceptor.infrasturcture.config.MsgMqTopic;
 import cn.wtk.mp.msg.acceptor.infrasturcture.mq.MqProducer;
@@ -28,8 +29,10 @@ public class MsgAcceptor {
     private final MsgRelationVerifier msgRelationVerifier;
     private final MqProducer mqProducer;
     private final MsgMqTopic msgMqTopic;
+    private final UidGenerator uidGenerator;
 
     public Result<Void> sendMsg(Msg msg, UUID tempMsgId) {
+        // TODO 异步并发操作，线程池限流操作，责任链流水线
         if (msgResendHandler.handleMsgDuplicate(msg, tempMsgId)) {
             return new Result<>(true, ApiInfo.MSG_DUPILICATE);
         }
@@ -38,6 +41,7 @@ public class MsgAcceptor {
                     "发送方与接收方关系不匹配，无法发送。"
             );
         }
+        msg.setMsgId(uidGenerator.nextId());
         try {
             SendResult<Long, Msg> result = mqProducer.send(msgMqTopic.getPersonalMsg(), msg.getRcvrId(), msg);
             // 入参是 Nullable，需要判断

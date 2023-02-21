@@ -3,10 +3,12 @@ package cn.wtk.mp.msg.acceptor.controller;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
 import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.msg.acceptor.application.MsgAcceptorAppService;
-import cn.wtk.mp.msg.acceptor.infrasturcture.command.SendPersonalMsgCommand;
+import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendGroupMsgCommand;
+import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendPersonalMsgCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +26,15 @@ public class MsgController {
 
     private final MsgAcceptorAppService msgAcceptorAppService;
 
+    @PostMapping("/personal")
     public void sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command) {
         Long appId = ServerSecurityContextHolder.require().getServerId();
-        msgAcceptorAppService.sendPersonalMsg(command, appId);
+        msgAcceptorAppService.sendMsg(command, appId);
+    }
+
+    @PostMapping("/group")
+    public void sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command) {
+        Long appId = ServerSecurityContextHolder.require().getServerId();
+        msgAcceptorAppService.sendMsg(command, appId);
     }
 }

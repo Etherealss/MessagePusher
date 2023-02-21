@@ -1,4 +1,4 @@
-package cn.wtk.mp.msg.manager.infrasturcture.remote.mq;
+package cn.wtk.mp.msg.manager.infrasturcture.remote.mq.msg;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
