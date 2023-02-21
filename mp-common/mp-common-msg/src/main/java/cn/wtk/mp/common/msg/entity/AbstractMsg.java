@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PROTECTED)
-public class AbstractMsg {
+public abstract class AbstractMsg {
     Long msgId;
     Long appId;
     MsgType msgType;

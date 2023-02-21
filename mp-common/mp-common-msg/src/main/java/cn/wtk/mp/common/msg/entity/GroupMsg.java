@@ -13,11 +13,16 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GroupMsg extends Msg {
+public class GroupMsg extends PersistentMsg {
     Long senderId;
     Long groupId;
 
     public GroupMsg() {
         super.msgType = MsgType.GROUP;
+    }
+
+    @Override
+    public Long getRcvrId() {
+        return groupId;
     }
 }

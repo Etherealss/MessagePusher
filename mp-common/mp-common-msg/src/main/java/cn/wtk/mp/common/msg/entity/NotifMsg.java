@@ -14,9 +14,14 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotifMsg extends Msg {
-    Long revrId;
+    Long rcvrId;
 
     public NotifMsg() {
         super.msgType = MsgType.NOTIF;
+    }
+
+    @Override
+    public Long getRcvrId() {
+        return rcvrId;
     }
 }

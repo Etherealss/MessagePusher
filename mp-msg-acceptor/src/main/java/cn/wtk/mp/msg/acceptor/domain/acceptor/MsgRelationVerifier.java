@@ -42,7 +42,7 @@ public class MsgRelationVerifier {
     private boolean checkSubRelation(PersonalMsg msg) {
         // A给 B 发消息，那么 A 要先订阅 B，则现在要检查：B 的订阅列表里有没有 A
         return relationFeign.checkSubRelation(
-                msg.getRecrId(),
+                msg.getRcvrId(),
                 msg.getSenderId(),
                 msg.getRelationTopic()
         );

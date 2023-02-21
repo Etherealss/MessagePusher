@@ -13,12 +13,17 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PersonalMsg extends Msg {
+public class PersonalMsg extends PersistentMsg {
     Long senderId;
-    Long recrId;
+    Long rcvrId;
     String relationTopic;
 
     public PersonalMsg() {
         super.msgType = MsgType.PERSONAL;
+    }
+
+    @Override
+    public Long getRcvrId() {
+        return rcvrId;
     }
 }

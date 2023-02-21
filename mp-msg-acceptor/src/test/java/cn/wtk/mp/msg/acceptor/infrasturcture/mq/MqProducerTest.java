@@ -21,8 +21,8 @@ class MqProducerTest {
     void testSendPersonal() {
         PersonalMsg msg = new PersonalMsg();
         msg.setMsgId(12313L);
-        msg.setRecrId(40L);
-        msg.setRecrId(39L);
+        msg.setRcvrId(40L);
+        msg.setRcvrId(39L);
         msg.setData("msg data");
         msg.setMsgTopic("/test");
         msg.setRelationTopic("/frends/qq");

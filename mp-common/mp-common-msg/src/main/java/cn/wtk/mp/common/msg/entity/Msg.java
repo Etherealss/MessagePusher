@@ -15,4 +15,6 @@ import lombok.experimental.FieldDefaults;
 public abstract class Msg extends AbstractMsg {
     String msgTopic;
     Object data;
+
+    public abstract Long getRcvrId();
 }

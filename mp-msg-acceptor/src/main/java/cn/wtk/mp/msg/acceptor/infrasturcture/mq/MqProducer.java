@@ -1,12 +1,13 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.mq;
 
-import cn.wtk.mp.common.msg.entity.AbstractMsg;
+import cn.wtk.mp.common.msg.entity.Msg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author wtk
@@ -17,17 +18,10 @@ import org.springframework.util.concurrent.ListenableFuture;
 @RequiredArgsConstructor
 public class MqProducer {
 
-    private final KafkaTemplate<Long, AbstractMsg> kafkaTemplate;
+    private final KafkaTemplate<Long, Msg> kafkaTemplate;
 
-    public void send(String topic, Long key, AbstractMsg msg) {
-        ListenableFuture<SendResult<Long, AbstractMsg>> future = kafkaTemplate.send(topic, key, msg);
-        future.addCallback(
-                result -> log.debug(
-                        "生产者成功发送消息到topic:{} partition:{}的消息",
-                        result.getRecordMetadata().topic(),
-                        result.getRecordMetadata().partition()
-                ),
-                ex -> log.warn("生产者发送消失败：{}", ex.getMessage())
-        );
+    public SendResult<Long, Msg> send(String topic, Long key, Msg msg) throws ExecutionException, InterruptedException {
+        // MQ 在发送失败时会自动重试，重试次数由配置文件指定。此处不必做无意义的重试
+        return kafkaTemplate.send(topic, key, msg).get();
     }
 }

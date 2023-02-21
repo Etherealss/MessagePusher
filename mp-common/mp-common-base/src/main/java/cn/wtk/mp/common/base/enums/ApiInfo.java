@@ -38,6 +38,7 @@ public enum ApiInfo {
     // ------------------- 04 消息发送 ------------------------
     MSG_DUPILICATE(HttpStatus.OK, 2000401, "[消息发送-消息重复]"),
     MSG_REALTION_MISMATCH(4000402, "[消息发送-关系不匹配]"),
+    MSG_SEND_FAIL(5000403, "[消息发送-发送失败]"),
     ;
 
     final HttpStatus httpStatus;
