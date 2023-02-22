@@ -1,5 +1,6 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.config;
 
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,22 +11,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
+ * @see MsgHandlerSpec#getTempId()
+ * @see MsgHandlerSpec#getPreMsgTempId() ()
  * @author wtk
  * @date 2023-02-12
  */
 @Configuration
-@ConfigurationProperties("mp.acceptor.resend")
+@ConfigurationProperties("mp.acceptor.temp-id")
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 @Slf4j
-public class ResendProperties {
-//    @NotEmpty
+public class TempIdProperties {
+    @NotEmpty
     String cacheKey;
-//    @NotNull
+    @NotNull
     Long expireMs;
 
     @PostConstruct

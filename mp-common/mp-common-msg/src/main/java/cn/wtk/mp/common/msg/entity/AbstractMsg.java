@@ -17,7 +17,6 @@ public abstract class AbstractMsg {
     Long msgId;
     Long appId;
     MsgType msgType;
-    Boolean resend;
     Date sendTime;
 
     public boolean isPersistentMsg() {

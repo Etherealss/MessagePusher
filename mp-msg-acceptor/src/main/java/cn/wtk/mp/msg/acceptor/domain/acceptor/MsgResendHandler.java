@@ -1,13 +1,11 @@
 package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
-import cn.wtk.mp.common.msg.entity.AbstractMsg;
-import cn.wtk.mp.msg.acceptor.infrasturcture.config.ResendProperties;
+import cn.wtk.mp.msg.acceptor.infrasturcture.remote.redis.MsgTempIdRedisHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.UUID;
 
 /**
@@ -20,22 +18,17 @@ import java.util.UUID;
 public class MsgResendHandler {
 
     private RedisTemplate<String, String> redisTemplate;
-    private final ResendProperties resendProperties;
+    private final MsgTempIdRedisHandler msgTempIdRedisHandler;
 
-    public boolean handleMsgDuplicate(AbstractMsg msg, UUID tempMsgId) {
-        if (msg.getResend()) {
-            String key = resendProperties.getCacheKey() + ":" + tempMsgId.toString();
-            Boolean absent = redisTemplate.opsForValue().setIfAbsent(key, "1");
-            if (Boolean.TRUE.equals(absent)) {
-                redisTemplate.expire(key, Duration.ofMillis(resendProperties.getExpireMs()));
-                return false;
-            } else {
-                // 如果之前在redis上不存在该消息，则说明是第一次传输，返回 false
-                // 如果abent==false，说明已收到过该消息，则当前消息为重复消息，返回true
-                return true;
-            }
-        }
-        // msg 不是重传的，直接返回 false
-        return false;
+    /**
+     * 检查消息是否重复
+     * @param tempMsgId 消息临时 ID，用于标识客户端发送的消息，可用于去重
+     * @return 重复消息返回 true，首次接受到的消息返回 false
+     */
+    public boolean isMsgDuplicate(UUID tempMsgId) {
+        // 添加成功返回 true，也就是说，返回 true 说明是第一次传输，redis 没有重复记录
+        // 如果 addSuccessful==false，说明已收到过该消息，则当前消息为重复消息，返回 true
+        boolean addSuccessful = msgTempIdRedisHandler.add(tempMsgId);
+        return !addSuccessful;
     }
 }

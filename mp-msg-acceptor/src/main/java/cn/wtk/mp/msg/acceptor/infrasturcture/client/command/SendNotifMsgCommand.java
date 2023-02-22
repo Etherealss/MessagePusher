@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author wtk
  * @date 2023-02-12
@@ -13,5 +15,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SendNotifMsgCommand extends SendMsgCommand {
+    @NotNull
     Long revrId;
 }

@@ -1,11 +1,13 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.remote.redis;
 
+import cn.wtk.mp.msg.acceptor.infrasturcture.config.TempIdProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.UUID;
 
 /**
  * @author wtk
@@ -16,15 +18,23 @@ import java.time.Duration;
 @Component
 public class MsgTempIdRedisHandler {
 
-    private RedisTemplate<String, String> redisTemplate;
-    public static final String DEFAULT_VALUE = "1";
+    private static final String DEFAULT_VALUE = "1";
 
-    public void set(String tempIdKey, Duration timeout) {
-        redisTemplate.opsForValue().setIfAbsent(tempIdKey, DEFAULT_VALUE, timeout);
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TempIdProperties tempIdProperties;
+    private final MsgTempIdRedisHandler msgTempIdRedisHandler;
+
+    public boolean add(UUID tempId) {
+        String key = tempIdProperties.getCacheKey() + ":" + tempId.toString();
+        Duration timeout = Duration.ofMillis(tempIdProperties.getExpireMs());
+        // setIfAbsent 如果为空就set值，并返回1；如果存在(不为空)则不进行操作
+        Boolean addSuccessful = redisTemplate.opsForValue().setIfAbsent(key, DEFAULT_VALUE, timeout);
+        return Boolean.TRUE.equals(addSuccessful);
     }
 
-    public boolean checkExist(String tempIdKey, String tempId) {
-        return redisTemplate.opsForValue().get(tempIdKey) != null;
+    public boolean checkExist(UUID tempId) {
+        String key = tempIdProperties.getCacheKey() + ":" + tempId.toString();
+        return redisTemplate.opsForValue().get(key) != null;
     }
 
     public void remove(String tempIdKey) {

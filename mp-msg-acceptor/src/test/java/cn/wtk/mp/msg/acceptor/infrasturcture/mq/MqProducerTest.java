@@ -30,7 +30,6 @@ class MqProducerTest {
         msg.setData("msg data");
         msg.setMsgTopic("/test");
         msg.setRelationTopic("/frends/qq");
-        msg.setResend(false);
         msg.setSendTime(new Date());
         msg.setAppId(1L);
         try {

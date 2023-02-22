@@ -13,7 +13,6 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -27,13 +26,14 @@ public class MsgAcceptor {
 
     private final MsgResendHandler msgResendHandler;
     private final MsgRelationVerifier msgRelationVerifier;
+    private final MsgSeqHandler msgSeqHandler;
     private final MqProducer mqProducer;
     private final MsgMqTopic msgMqTopic;
     private final UidGenerator uidGenerator;
 
-    public Result<Void> sendMsg(Msg msg, UUID tempMsgId) {
+    public Result<Long> sendMsg(Msg msg, MsgHandlerSpec spec) {
         // TODO 异步并发操作，线程池限流操作，责任链流水线
-        if (msgResendHandler.handleMsgDuplicate(msg, tempMsgId)) {
+        if (msgResendHandler.isMsgDuplicate(spec.getTempId())) {
             return new Result<>(true, ApiInfo.MSG_DUPILICATE);
         }
         if (!msgRelationVerifier.doVerify(msg)) {
@@ -41,7 +41,9 @@ public class MsgAcceptor {
                     "发送方与接收方关系不匹配，无法发送。"
             );
         }
-        msg.setMsgId(uidGenerator.nextId());
+        msgSeqHandler.handlerMsgSeq(spec);
+        long msgId = uidGenerator.nextId();
+        msg.setMsgId(msgId);
         try {
             SendResult<Long, Msg> result = mqProducer.send(msgMqTopic.getPersonalMsg(), msg.getRcvrId(), msg);
             // 入参是 Nullable，需要判断
@@ -53,7 +55,7 @@ public class MsgAcceptor {
                         recordMetadata.partition()
                 );
             }
-            return Result.ok();
+            return Result.ok(msgId);
         } catch (ExecutionException | InterruptedException e) {
             log.warn("消息发送至 MQ 失败：{}", e.getMessage());
             return new Result<>(

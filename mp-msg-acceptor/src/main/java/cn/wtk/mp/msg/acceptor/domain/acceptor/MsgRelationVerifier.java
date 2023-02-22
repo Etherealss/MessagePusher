@@ -10,6 +10,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * @author wtk
@@ -25,7 +26,7 @@ public class MsgRelationVerifier {
         try {
             // TODO 责任链模式
             if (msg instanceof PersonalMsg) {
-                return checkSubRelation((PersonalMsg) msg);
+                return verifySubRelation((PersonalMsg) msg);
             } else if (msg instanceof GroupMsg) {
                 return checkGroupRelation((GroupMsg)msg);
             }
@@ -40,13 +41,21 @@ public class MsgRelationVerifier {
         return true;
     }
 
-    private boolean checkSubRelation(PersonalMsg msg) {
-        // A给 B 发消息，那么 A 要先订阅 B，则现在要检查：B 的订阅列表里有没有 A
-        return relationFeign.checkSubRelation(
-                msg.getRcvrId(),
-                msg.getSenderId(),
-                msg.getRelationTopic()
-        );
+    private boolean verifySubRelation(PersonalMsg msg) {
+        if (needVerifySubRelation(msg)) {
+            // A给 B 发消息，那么 A 要先订阅 B，则现在要检查：B 的订阅列表里有没有 A
+            return relationFeign.checkSubRelation(
+                    msg.getRcvrId(),
+                    msg.getSenderId(),
+                    msg.getRelationTopic()
+            );
+        }
+        // 如果不需要验证关系，那就直接返回 true，认为关系验证通过
+        return true;
+    }
+
+    private boolean needVerifySubRelation(PersonalMsg msg) {
+        return StringUtils.hasText(msg.getRelationTopic());
     }
 
     private boolean checkGroupRelation(GroupMsg msg) {
