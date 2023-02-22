@@ -1,6 +1,6 @@
 package cn.wtk.mp.relation.domain.group;
 
-import cn.wtk.mp.common.database.uid.UidGenerator;
+import cn.wtk.mp.common.base.uid.UidGenerator;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationEntity;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationRepository;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;

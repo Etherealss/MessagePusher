@@ -11,9 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Getter
 public class MsgMqTopic {
-    @Value("${mp.mq.producer.msg.personal.topic}")
-    private String personalMsg;
-
-    @Value("${mp.mq.producer.msg.group.topic}")
-    private String groupMsg;
+    @Value("${mp.acceptor.mq.producer.msg.topic}")
+    private String msgTopic;
 }

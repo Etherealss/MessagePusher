@@ -54,12 +54,13 @@ public class MsgSeqHandler {
                     throw new MsgSeqRetryException();
                 }
             }, retryContext -> {
-                log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId");
+                log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId。当前的 MsgHandlerSpec: {}", spec);
                 return false;
             });
             return Boolean.TRUE.equals(result);
-        } catch (MsgSeqRetryException ignored) {
-            log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId");
+        } catch (MsgSeqRetryException e) {
+            log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId。当前的 MsgHandlerSpec: {}。异常信息：{}",
+                    spec, e.getMessage());
         }
         return false;
     }

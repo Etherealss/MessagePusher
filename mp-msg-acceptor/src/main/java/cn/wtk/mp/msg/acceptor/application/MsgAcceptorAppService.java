@@ -35,6 +35,7 @@ public class MsgAcceptorAppService {
 
     public Result<?> sendMsg(SendGroupMsgCommand command, Long appId) {
         GroupMsg msg = msgConverter.toMsg(command);
+        MsgHandlerSpec spec = msgConverter.toMsgHandlerSpec(command);
         msg.setAppId(appId);
         msg.setMsgType(MsgType.GROUP);
         return msgAcceptor.sendMsg(msg, spec);

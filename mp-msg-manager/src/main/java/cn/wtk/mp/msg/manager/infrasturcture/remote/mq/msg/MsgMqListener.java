@@ -21,8 +21,8 @@ public class MsgMqListener {
     private final ApplicationEventPublisher eventPublisher;
 
     @KafkaListener(
-            topics = {"${mp.mq.consumer.msg.topic}"},
-            groupId = "${mp.mq.consumer.msg.group}"
+            topics = {"${mp.manager.mq.consumer.msg.topic}"},
+            groupId = "${mp.manager.mq.consumer.msg.group}"
     )
     public void consumeMsg(ConsumerRecord<String, Msg> record) {
         log.info("消费者消费 Msg -> {}", record.value());

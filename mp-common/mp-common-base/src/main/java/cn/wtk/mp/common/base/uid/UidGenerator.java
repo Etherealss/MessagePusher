@@ -1,4 +1,4 @@
-package cn.wtk.mp.common.database.uid;
+package cn.wtk.mp.common.base.uid;
 
 /**
  * @author wtk

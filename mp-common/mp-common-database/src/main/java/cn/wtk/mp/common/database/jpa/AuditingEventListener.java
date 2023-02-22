@@ -1,7 +1,7 @@
 package cn.wtk.mp.common.database.jpa;
 
 import cn.wtk.mp.common.database.pojo.entity.BaseEntity;
-import cn.wtk.mp.common.database.uid.UidGenerator;
+import cn.wtk.mp.common.base.uid.UidGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.CreatedDate;

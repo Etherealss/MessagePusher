@@ -3,7 +3,7 @@ package cn.wtk.mp.msg.acceptor.domain.acceptor;
 import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.BaseException;
 import cn.wtk.mp.common.base.pojo.Result;
-import cn.wtk.mp.common.database.uid.UidGenerator;
+import cn.wtk.mp.common.base.uid.UidGenerator;
 import cn.wtk.mp.common.msg.entity.Msg;
 import cn.wtk.mp.msg.acceptor.infrasturcture.config.MsgMqTopic;
 import cn.wtk.mp.msg.acceptor.infrasturcture.mq.MqProducer;
@@ -33,19 +33,21 @@ public class MsgAcceptor {
 
     public Result<Long> sendMsg(Msg msg, MsgHandlerSpec spec) {
         // TODO 异步并发操作，线程池限流操作，责任链流水线
+        // TODO 潜在耦合：msgResendHandler 包含 tempId 的 redis#set 操作，而 msgSeqHandler 依赖 redis 上的 tempId
         if (msgResendHandler.isMsgDuplicate(spec.getTempId())) {
             return new Result<>(true, ApiInfo.MSG_DUPILICATE);
         }
+        msgSeqHandler.handlerMsgSeq(spec);
+
         if (!msgRelationVerifier.doVerify(msg)) {
             throw new BaseException(ApiInfo.MSG_REALTION_MISMATCH,
                     "发送方与接收方关系不匹配，无法发送。"
             );
         }
-        msgSeqHandler.handlerMsgSeq(spec);
         long msgId = uidGenerator.nextId();
         msg.setMsgId(msgId);
         try {
-            SendResult<Long, Msg> result = mqProducer.send(msgMqTopic.getPersonalMsg(), msg.getRcvrId(), msg);
+            SendResult<Long, Msg> result = mqProducer.send(msgMqTopic.getMsgTopic(), msg.getRcvrId(), msg);
             // 入参是 Nullable，需要判断
             if (log.isInfoEnabled() && result != null) {
                 RecordMetadata recordMetadata = result.getRecordMetadata();

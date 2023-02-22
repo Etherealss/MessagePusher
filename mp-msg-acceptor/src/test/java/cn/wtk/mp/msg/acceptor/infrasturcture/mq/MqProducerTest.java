@@ -33,7 +33,7 @@ class MqProducerTest {
         msg.setSendTime(new Date());
         msg.setAppId(1L);
         try {
-            provider.send(msgMqTopic.getPersonalMsg(), msg.getRcvrId(), msg);
+            provider.send(msgMqTopic.getMsgTopic(), msg.getRcvrId(), msg);
         } catch (ExecutionException | InterruptedException e) {
             log.warn("{}", e.getMessage());
         }

@@ -26,7 +26,6 @@ public class ConnectorManager {
     private final NettyServerConfig config;
     @Value("${mp.redis-key.connector.server-mapping}")
     private final String mappingKeyPrefix;
-    private final String address = config.getIp() + ":" + config.getPort();
 
     @EventListener(ConnectorCreatedEvent.class)
     public void handleConnectorCreated(ConnectorCreatedEvent event) {
@@ -34,6 +33,7 @@ public class ConnectorManager {
         Long appId = connector.getAppId();
         Serializable connectorId = connector.getConnectorId();
         String redisKey = mappingKeyPrefix + ":" + appId + ":" + connectorId;
+        String address = config.getIp() + ":" + config.getPort();
         redisTemplate.opsForValue().set(redisKey, address);
     }
 

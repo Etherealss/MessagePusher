@@ -1,4 +1,4 @@
-package cn.wtk.mp.common.database.uid.config;
+package cn.wtk.mp.common.base.uid.config;
 
 import lombok.Getter;
 import lombok.Setter;

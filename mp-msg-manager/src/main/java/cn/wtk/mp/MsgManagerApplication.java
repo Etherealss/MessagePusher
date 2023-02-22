@@ -12,7 +12,7 @@ import org.springframework.retry.annotation.EnableRetry;
  */
 @EnableFeignClients(basePackages = "cn.wtk.mp")
 @EnableDiscoveryClient // nacos 服务注册与发现
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.wtk.mp")
 @EnableRetry
 public class MsgManagerApplication {
     public static void main(String[] args) {

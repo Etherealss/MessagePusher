@@ -22,7 +22,6 @@ public class MsgTempIdRedisHandler {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final TempIdProperties tempIdProperties;
-    private final MsgTempIdRedisHandler msgTempIdRedisHandler;
 
     public boolean add(UUID tempId) {
         String key = tempIdProperties.getCacheKey() + ":" + tempId.toString();

@@ -1,4 +1,4 @@
-package cn.wtk.mp.msg.acceptor;
+package cn.wtk.mp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +11,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @EnableFeignClients(basePackages = "cn.wtk.mp")
 @EnableDiscoveryClient // nacos 服务注册与发现
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.wtk.mp")
 public class MsgAcceptorApplication {
     public static void main(String[] args) {
         SpringApplication.run(MsgAcceptorApplication.class, args);
