@@ -21,15 +21,17 @@ import javax.validation.constraints.NotNull;
  * @date 2023-02-12
  */
 @Configuration
-@ConfigurationProperties("mp.acceptor.temp-id")
+@ConfigurationProperties("mp.acceptor.resend")
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 @Slf4j
-public class TempIdProperties {
+public class MsgResendProperties {
+    
     @NotEmpty
     String cacheKey;
+
     @NotNull
     Long expireMs;
 

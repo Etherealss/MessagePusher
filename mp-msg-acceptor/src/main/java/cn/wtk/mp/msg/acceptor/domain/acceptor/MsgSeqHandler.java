@@ -3,12 +3,13 @@ package cn.wtk.mp.msg.acceptor.domain.acceptor;
 import cn.wtk.mp.msg.acceptor.infrasturcture.config.MsgSeqProperties;
 import cn.wtk.mp.msg.acceptor.infrasturcture.config.MsgSeqRetryConfiguration;
 import cn.wtk.mp.msg.acceptor.infrasturcture.exception.MsgSeqRetryException;
-import cn.wtk.mp.msg.acceptor.infrasturcture.remote.redis.MsgTempIdRedisHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -23,15 +24,16 @@ import java.util.Date;
 @Slf4j
 @Component
 public class MsgSeqHandler {
+    private static final String DEFAULT_VALUE = "1";
 
-    private final MsgTempIdRedisHandler msgTempIdRedisHandler;
+    private final RedisTemplate<String, String> redisTemplate;
     private final MsgSeqProperties msgSeqProperties;
     private final RetryTemplate msgSeqRetryTemplate;
 
-    public MsgSeqHandler(MsgTempIdRedisHandler msgTempIdRedisHandler,
+    public MsgSeqHandler(RedisTemplate<String, String> redisTemplate,
                          MsgSeqProperties msgSeqProperties,
                          @Qualifier(MsgSeqRetryConfiguration.BEAN_NAME) RetryTemplate msgSeqRetryTemplate) {
-        this.msgTempIdRedisHandler = msgTempIdRedisHandler;
+        this.redisTemplate = redisTemplate;
         this.msgSeqProperties = msgSeqProperties;
         this.msgSeqRetryTemplate = msgSeqRetryTemplate;
     }
@@ -42,12 +44,24 @@ public class MsgSeqHandler {
      * @return 可保证前一条 msg 已送达时返回 true。无法保证前一条消息已送达时返回 false。
      */
     public boolean handlerMsgSeq(MsgHandlerSpec spec) {
+        boolean preMsgAccepted = checkPreMsgAccepted(spec);
+        /*
+        先等待前一条消息送达，如果确认已送达或超时，则会来到这里。
+        此时设置当前消息的 tempId，后面的消息就可以与当前消息保证有序性
+        TODO 问题：存在传递等待问题
+         */
+        setCurMsgTempId4Seq(spec);
+        return preMsgAccepted;
+    }
+
+    private boolean checkPreMsgAccepted(MsgHandlerSpec spec) {
         if (isTimeLimitExceeded(spec.getPreMsgSendTime())) {
             return false;
         }
         try {
             Boolean result = msgSeqRetryTemplate.execute(retryContext -> {
-                boolean exist = msgTempIdRedisHandler.checkExist(spec.getPreMsgTempId());
+                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + spec.getTempId().toString();
+                boolean exist = redisTemplate.opsForValue().get(tempIdKey) != null;
                 if (exist) {
                     return true;
                 } else {
@@ -63,6 +77,12 @@ public class MsgSeqHandler {
                     spec, e.getMessage());
         }
         return false;
+    }
+
+
+    private void setCurMsgTempId4Seq(MsgHandlerSpec spec) {
+        String tempIdKey = msgSeqProperties.getCacheKey() + ":" + spec.getTempId().toString();
+        redisTemplate.opsForValue().set(tempIdKey, DEFAULT_VALUE, Duration.ofMillis(msgSeqProperties.getExpireMs()));
     }
 
     /**

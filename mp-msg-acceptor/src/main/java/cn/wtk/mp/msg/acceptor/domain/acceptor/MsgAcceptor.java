@@ -33,8 +33,7 @@ public class MsgAcceptor {
 
     public Result<Long> sendMsg(Msg msg, MsgHandlerSpec spec) {
         // TODO 异步并发操作，线程池限流操作，责任链流水线
-        // TODO 潜在耦合：msgResendHandler 包含 tempId 的 redis#set 操作，而 msgSeqHandler 依赖 redis 上的 tempId
-        if (msgResendHandler.isMsgDuplicate(spec.getTempId())) {
+        if (msgResendHandler.isDuplicateMsg(spec.getTempId())) {
             return new Result<>(true, ApiInfo.MSG_DUPILICATE);
         }
         msgSeqHandler.handlerMsgSeq(spec);
