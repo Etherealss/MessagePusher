@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PROTECTED)
-public abstract class AbstractMsg {
+public abstract class AbstractMsg implements Serializable {
     Long msgId;
     Long appId;
     MsgType msgType;
