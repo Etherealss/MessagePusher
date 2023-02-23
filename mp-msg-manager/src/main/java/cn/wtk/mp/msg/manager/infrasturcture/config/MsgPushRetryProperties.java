@@ -23,9 +23,6 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class MsgPushRetryProperties {
     @NotNull
-    Long timeLimit;
-
-    @NotNull
     Integer retryTimes;
 
     @NotNull

@@ -1,7 +1,7 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.feign;
 
 import cn.wtk.mp.msg.manager.infrasturcture.client.dto.MsgPushDTO;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.lb.MsgRouteHandler;
+import cn.wtk.mp.msg.manager.infrasturcture.config.lb.MsgRouteHandler;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestHeader;
 

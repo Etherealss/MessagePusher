@@ -1,4 +1,4 @@
-package cn.wtk.mp.msg.manager.infrasturcture.remote.feign.lb;
+package cn.wtk.mp.msg.manager.infrasturcture.config.lb;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
