@@ -1,6 +1,9 @@
-package cn.wtk.mp.msg.manager.domain.msg.notif;
+package cn.wtk.mp.msg.manager.domain.msg.store.notif;
 
 import cn.wtk.mp.common.msg.entity.NotifMsg;
+import cn.wtk.mp.common.msg.enums.MsgType;
+import cn.wtk.mp.msg.manager.domain.msg.store.IMsgService;
+import cn.wtk.mp.msg.manager.domain.msg.store.group.GroupMsgService;
 import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +17,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class NotifMsgService {
+public class NotifMsgService implements IMsgService<NotifMsg> {
+
+    private static final MsgType SUPPORT = MsgType.NOTIF;
 
     private final MongoTemplate mongoTemplate;
     private final MsgConverter msgConverter;
 
-    public void consume(NotifMsg msg) {
+    @Override
+    public MsgType getSupport() {
+        return NotifMsgService.SUPPORT;
+    }
+
+    @Override
+    public void insert(NotifMsg msg) {
         NotifMsgEntity entity = msgConverter.toEntity(msg);
         mongoTemplate.insert(entity);
     }

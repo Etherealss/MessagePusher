@@ -1,9 +1,7 @@
 package cn.wtk.mp.common.msg.entity;
 
 import cn.wtk.mp.common.msg.enums.MsgTransferStatus;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
@@ -14,15 +12,11 @@ import java.util.Date;
  * @date 2023-02-11
  */
 @EqualsAndHashCode(callSuper = true)
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PROTECTED)
 public abstract class PersistentMsg extends Msg {
     MsgTransferStatus transferStatus;
     Date saveTime;
     Date recvTime;
-
-    @Override
-    public boolean isPersistentMsg() {
-        return true;
-    }
 }

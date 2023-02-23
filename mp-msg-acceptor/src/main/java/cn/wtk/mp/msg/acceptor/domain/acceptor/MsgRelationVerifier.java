@@ -28,7 +28,7 @@ public class MsgRelationVerifier {
             if (msg instanceof PersonalMsg) {
                 return verifySubRelation((PersonalMsg) msg);
             } else if (msg instanceof GroupMsg) {
-                return checkGroupRelation((GroupMsg)msg);
+                return verifyGroupRelation((GroupMsg)msg);
             }
         } catch (FeignException feignException) {
             Throwable cause = feignException.getCause();
@@ -58,7 +58,7 @@ public class MsgRelationVerifier {
         return StringUtils.hasText(msg.getRelationTopic());
     }
 
-    private boolean checkGroupRelation(GroupMsg msg) {
+    private boolean verifyGroupRelation(GroupMsg msg) {
         return relationFeign.checkMember(msg.getGroupId(), msg.getSenderId());
     }
 }

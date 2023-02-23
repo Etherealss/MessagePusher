@@ -24,7 +24,7 @@ public class MsgMqListener {
             topics = {"${mp.manager.mq.consumer.msg.topic}"},
             groupId = "${mp.manager.mq.consumer.msg.group}"
     )
-    public void consumeMsg(ConsumerRecord<String, Msg> record, final Acknowledgment ack) {
+    public void consumeMsg(ConsumerRecord<Long, Msg> record, final Acknowledgment ack) {
         log.info("消费者消费 Msg -> {}", record.value());
 //        eventPublisher.publishEvent(new ConsumeNewMsgEvent(record.value(), ack));
     }

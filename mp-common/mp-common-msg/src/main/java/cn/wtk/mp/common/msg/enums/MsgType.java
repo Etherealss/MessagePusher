@@ -11,11 +11,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum MsgType implements BaseEnum {
-    PERSONAL(0, "私信"),
-    GROUP(1, "群消息"),
-    NOTIF(2, "通知"),
-    EVENT(4, "事件"),
-    ACK(5, "ack"),
+    ACK(0, "ack"),
+    PERSONAL(1, "私信"),
+    GROUP(2, "群消息"),
+    NOTIF(3, "通知"),
     ;
     private final int code;
     private final String name;

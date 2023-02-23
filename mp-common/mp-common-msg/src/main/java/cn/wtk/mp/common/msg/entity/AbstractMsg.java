@@ -2,7 +2,8 @@ package cn.wtk.mp.common.msg.entity;
 
 import cn.wtk.mp.common.msg.enums.MsgType;
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
@@ -12,15 +13,21 @@ import java.util.Date;
  * @author wtk
  * @date 2023/2/10
  */
-@Data
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PROTECTED)
 public abstract class AbstractMsg implements Serializable {
+
     Long msgId;
+
     Long appId;
+
     MsgType msgType;
+
     Date sendTime;
 
-    public boolean isPersistentMsg() {
-        return false;
-    }
+    /**
+     * 是否需要持久化
+     */
+    Boolean persistent;
 }

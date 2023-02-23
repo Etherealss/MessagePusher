@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NotifMsg extends Msg {
+public class NotifMsg extends PersistentMsg {
     Long rcvrId;
 
     public NotifMsg() {

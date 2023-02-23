@@ -1,8 +1,6 @@
 package cn.wtk.mp.common.msg.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -10,8 +8,9 @@ import lombok.experimental.FieldDefaults;
  * @date 2023/2/10
  */
 @EqualsAndHashCode(callSuper = true)
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PROTECTED)
 public abstract class Msg extends AbstractMsg {
     String msgTopic;
     Object data;

@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.lb;
+package cn.wtk.mp.msg.manager.infrasturcture.remote.feign.lb;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,18 +20,18 @@ import java.util.List;
 @Slf4j
 public class MsgRouteHandler {
 
-    public static final String HEADER_NAME_MSG_ROUTE_IP = "x-msg-route-ip";
-    public static final String HEADER_NAME_MSG_ROUTE_PORT = "x-msg-route-port";
+    public static final String MSG_ROUTE_IP = "x-msg-route-ip";
+    public static final String MSG_ROUTE_PORT = "x-msg-route-port";
 
     public void setMsgRouteHeader(@NonNull HttpHeaders headers, String ip, int port) {
-        headers.set(HEADER_NAME_MSG_ROUTE_IP, ip);
-        headers.set(HEADER_NAME_MSG_ROUTE_PORT, String.valueOf(port));
+        headers.set(MSG_ROUTE_IP, ip);
+        headers.set(MSG_ROUTE_PORT, String.valueOf(port));
     }
 
     @Nullable
     public MsgRouteAddress getMsgRouteAddress(@NonNull HttpHeaders headers) {
-        List<String> serverIp = headers.get(HEADER_NAME_MSG_ROUTE_IP);
-        List<String> serverPort = headers.get(HEADER_NAME_MSG_ROUTE_PORT);
+        List<String> serverIp = headers.get(MSG_ROUTE_IP);
+        List<String> serverPort = headers.get(MSG_ROUTE_PORT);
         if (serverIp == null && serverPort == null) {
             return null;
         }

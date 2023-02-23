@@ -41,4 +41,7 @@ public class SendMsgCommand {
 
     @NotNull
     Object data;
+
+    @NotNull
+    Boolean persistent;
 }

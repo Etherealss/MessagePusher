@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.lb;
+package cn.wtk.mp.msg.manager.infrasturcture.remote.feign.lb;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
