@@ -13,6 +13,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.websocketx.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,15 +23,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * @author wtk
- * @date 2023-01-14
- */
 @ChannelHandler.Sharable
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
+public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
@@ -42,8 +39,38 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
     private final NettyServerConfig nettyServerConfig;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("客户端连接：{}", ctx.channel().id());
+        super.channelActive(ctx);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("客户端断开连接：{}", ctx.channel().id());
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.channel().flush();
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
+        if (frame instanceof PingWebSocketFrame) {
+            pingWebSocketFrameHandler(ctx, (PingWebSocketFrame) frame);
+        } else if (frame instanceof TextWebSocketFrame) {
+            textWebSocketFrameHandler(ctx, (TextWebSocketFrame) frame);
+        } else if (frame instanceof CloseWebSocketFrame) {
+            closeWebSocketFrameHandler(ctx, (CloseWebSocketFrame) frame);
+        }
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        log.info("数据类型：{}", msg.getClass());
         if (this.isAuthenticated(ctx.channel())) {
+            super.channelRead(ctx, msg);
             return;
         }
         if (msg instanceof FullHttpRequest) {
@@ -66,8 +93,58 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
             messageSender.send(ctx.channel(), "连接尚未认证");
             ctx.close();
         }
+        super.channelRead(ctx, msg);
     }
 
+    /**
+     * 处理连接请求，客户端WebSocket发送握手包时会执行这一次请求
+     *
+     * @param ctx
+     * @param request
+     */
+    private void fullHttpRequestHandler(ChannelHandlerContext ctx, FullHttpRequest request) {
+        String uri = request.uri();
+        log.debug("接收到客户端的握手包：{}", ctx.channel().id());
+        log.debug("客户端uri：{}", uri);
+        if (uri.startsWith(nettyServerConfig.getPath()))
+            request.setUri(nettyServerConfig.getPath());
+        else
+            ctx.close();
+    }
+
+    /**
+     * 客户端发送断开请求处理
+     *
+     * @param ctx
+     * @param frame
+     */
+    private void closeWebSocketFrameHandler(ChannelHandlerContext ctx, CloseWebSocketFrame frame) {
+        log.debug("接收到主动断开请求：{}", ctx.channel().id());
+        ctx.close();
+    }
+
+    /**
+     * 创建连接之后，客户端发送的消息都会在这里处理
+     *
+     * @param ctx
+     * @param frame
+     */
+    private void textWebSocketFrameHandler(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
+        String text = frame.text();
+        log.debug("接收到客户端的消息：{}", text);
+        // 将客户端消息回送给客户端
+        ctx.channel().writeAndFlush(new TextWebSocketFrame("你发送的内容是：" + text));
+    }
+
+    /**
+     * 处理客户端心跳包
+     *
+     * @param ctx
+     * @param frame
+     */
+    private void pingWebSocketFrameHandler(ChannelHandlerContext ctx, PingWebSocketFrame frame) {
+        ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
+    }
 
     /**
      * 新建连接时的验证逻辑
@@ -75,7 +152,7 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
      * @return
      */
     public AuthResult doAuth(Map<String, String> urlParameters) {
-        log.trace("进行创建连接的登录验证");
+        log.debug("进行创建连接的登录验证");
         Objects.requireNonNull(urlParameters, "url参数Map不能为空");
         String connectorToken = urlParameters.get(PARAM_NAME_CONNECTOR_TOKEN);
         String connectorIdStr = urlParameters.get(PARAM_NAME_CONNECTOR_ID);
@@ -129,9 +206,5 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
     private boolean isAuthenticated(Channel channel) {
         return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
     }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
-    }
 }
+

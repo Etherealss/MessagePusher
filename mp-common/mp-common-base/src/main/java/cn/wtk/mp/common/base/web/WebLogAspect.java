@@ -1,10 +1,11 @@
 package cn.wtk.mp.common.base.web;
 
 
-import cn.wtk.mp.common.base.config.WebLogAspectConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -16,12 +17,13 @@ import java.util.Date;
 /**
  * AOP https://blog.csdn.net/lmb55/article/details/82470388
  * 打印Web请求
- * @see WebLogAspectConfiguration
  * @author wtk
  * @date 2021-10-27
  */
 @Slf4j
 @Aspect
+@Component
+@ConditionalOnProperty(prefix = "mp.common", name = "web-log", havingValue = "true")
 public class WebLogAspect {
     /**
      * 声明切点，我这里启动Controller层下的所有类下的方法就可以打印，

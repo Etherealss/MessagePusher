@@ -14,6 +14,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -42,6 +43,7 @@ public class NettyServer implements ApplicationRunner, ApplicationListener<Conte
      */
     private EventLoopGroup workerGroup;
 
+    @Async
     @Override
     public void run(ApplicationArguments args) throws Exception {
         bossGroup = new NioEventLoopGroup();

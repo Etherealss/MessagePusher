@@ -45,20 +45,18 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
     }
 
     private void removeConn(ChannelHandlerContext ctx) {
-        Long connectorId = ctx.channel().attr(ChannelAttrKey.CONNECTOR).get();
-        UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).get();
-        serverConnContainer.removeConn(connectorId, connId);
+        Long connectorId = ctx.channel().attr(ChannelAttrKey.CONNECTOR).getAndSet(null);
+        UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).getAndSet(null);
+        log.debug("移除连接：connectorId: {}, connId: {}", connectorId, connId);
+        if (connectorId != null && connId != null) {
+            serverConnContainer.removeConn(connectorId, connId);
+        }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("channelInactive");
         removeConn(ctx);
         super.channelInactive(ctx);
-    }
-
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        removeConn(ctx);
-        super.channelUnregistered(ctx);
     }
 }

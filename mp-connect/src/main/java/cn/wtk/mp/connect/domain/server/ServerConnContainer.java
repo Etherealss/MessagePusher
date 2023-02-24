@@ -4,6 +4,7 @@ import cn.wtk.mp.connect.domain.server.connector.Connector;
 import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
+import com.mongodb.lang.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,8 +28,9 @@ public class ServerConnContainer {
     private final Map<Long, Connector> connectors = new ConcurrentHashMap<>();
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void addConn(Connection conn) {
+    public void addConn(@NonNull Connection conn) {
         Long connectorId = conn.getConnectorId();
+        log.debug("新增连接者：{}", connectorId);
         AtomicBoolean create = new AtomicBoolean(false);
         connectors.compute(connectorId, (k, connectorValue) -> {
             if (connectorValue == null) {
@@ -39,15 +41,16 @@ public class ServerConnContainer {
             return connectorValue;
         });
         if (create.get()) {
-            // 新建的的 connector
+            // 新建的 connector
             applicationEventPublisher.publishEvent(new ConnectorCreatedEvent(connectorId));
         }
     }
 
-    public Connection removeConn(Long connectorId, UUID connId) {
+    public Connection removeConn(@NonNull Long connectorId,@NonNull UUID connId) {
         // 要获取lambda表达式里的变量需要使用Atomic对象
         AtomicReference<Connection> connRef = new AtomicReference<>();
         AtomicBoolean connectorRemoved = new AtomicBoolean(false);
+        log.debug("移除连接者：{}", connectorId);
         connectors.computeIfPresent(connectorId, (connectorIdKey, connectorValue) -> {
             Connection connection = connectorValue.removeConn(connId);
             connRef.set(connection);
@@ -65,7 +68,7 @@ public class ServerConnContainer {
         return connRef.get();
     }
 
-    public Connection getConn(Long connectorId, UUID connId) {
+    public Connection getConn(@NonNull Long connectorId,@NonNull UUID connId) {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
             return null;
@@ -73,7 +76,7 @@ public class ServerConnContainer {
         return connector.getConn(connId);
     }
 
-    public Connector getConnector(Long connectorId) {
+    public Connector getConnector(@NonNull Long connectorId) {
         Connector connector = connectors.get(connectorId);
         return connector;
     }

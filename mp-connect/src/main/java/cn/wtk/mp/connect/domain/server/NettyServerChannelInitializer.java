@@ -10,12 +10,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 配置netty的各种Channel及其次序
@@ -32,6 +29,8 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
     private final MsgPushHandler msgPushHandler;
     private final MsgReceiverHandler msgReceiverHandler;
+    private final ChannelActiveHandler channelActiveHandler;
+    private final WebSocketMessageHandler webSocketMessageHandler;
 
     @Override
     protected void initChannel(SocketChannel socketChannel) {
@@ -44,8 +43,6 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
         WebSocketServerProtocolHandler webSocketServerProtocolHandler =
                 new WebSocketServerProtocolHandler(webSocketConfig);
         ChannelHandler[] handlers = {
-//                // Channel空闲监听
-                new IdleStateHandler(0, 0, nettyServerConfig.getIdleSeconds(), TimeUnit.SECONDS),
                 // HTTP请求的解码和编码，用于ws握手
                 new HttpServerCodec(),
                 // 处理大数据流
@@ -55,13 +52,9 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
                 new HttpObjectAggregator(65536),
 //                // 处理 WebSocket 数据压缩
                 new WebSocketServerCompressionHandler(),
+                webSocketMessageHandler,
                 // WebSocket 协议配置
                 webSocketServerProtocolHandler,
-                msgReceiverHandler,
-                connectorAuthHandler,
-                connectionStateHandler,
-                idleTimeoutHandlerAdapter,
-                msgPushHandler,
         };
         // 按序添加Handler
         socketChannel.pipeline().addLast(handlers);

@@ -2,6 +2,9 @@ package cn.wtk.mp.common.base.web;
 
 
 import cn.wtk.mp.common.base.interceptor.ConfigHandlerInterceptor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +33,17 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        setHttpMessageConverterToFirst(converters);
+        MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = setHttpMessageConverterToFirst(converters);
+        ObjectMapper objectMapper = new ObjectMapper();
+        /*
+         * 序列换成json时,将所有的long变成string
+         * 因为js中得数字类型不能包含所有的java long值
+         */
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
+        simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+        objectMapper.registerModule(simpleModule);
+        jackson2HttpMessageConverter.setObjectMapper(objectMapper);
     }
 
     /**
@@ -40,15 +53,21 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      * 此处将MappingJackson2HttpMessageConverter处理器提至最前，先于StringHttpMessageConverter处理
      * @param converters
      */
-    private void setHttpMessageConverterToFirst(List<HttpMessageConverter<?>> converters) {
+    private MappingJackson2HttpMessageConverter setHttpMessageConverterToFirst(List<HttpMessageConverter<?>> converters) {
+        MappingJackson2HttpMessageConverter jacksonConverter = null;
         int i = 0;
         for (; i < converters.size(); i++) {
-            if (converters.get(i) instanceof MappingJackson2HttpMessageConverter) {
+            HttpMessageConverter<?> httpMessageConverter = converters.get(i);
+            if (httpMessageConverter instanceof MappingJackson2HttpMessageConverter) {
+                jacksonConverter = (MappingJackson2HttpMessageConverter) httpMessageConverter;
                 break;
             }
         }
-        HttpMessageConverter<?> httpMessageConverter = converters.remove(i);
-        converters.add(0, httpMessageConverter);
+        if (jacksonConverter != null) {
+            HttpMessageConverter<?> httpMessageConverter = converters.remove(i);
+            converters.add(0, httpMessageConverter);
+        }
+        return jacksonConverter;
     }
 
     @Override
