@@ -1,7 +1,6 @@
 package cn.wtk.mp.connect.infrastructure.event;
 
 import cn.wtk.mp.common.base.pojo.DomainEvent;
-import cn.wtk.mp.connect.domain.server.connector.Connector;
 import lombok.Getter;
 
 /**
@@ -10,9 +9,9 @@ import lombok.Getter;
  */
 @Getter
 public class ConnectorCreatedEvent extends DomainEvent {
-    Connector connector;
-    public ConnectorCreatedEvent(Connector connector) {
-        super(connector);
-        this.connector = connector;
+    Long connectorId;
+    public ConnectorCreatedEvent(Long connectorId) {
+        super(connectorId);
+        this.connectorId = connectorId;
     }
 }

@@ -13,8 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.Serializable;
-
 /**
  * 与其他连接服务交互
  * @author wtk
@@ -31,10 +29,8 @@ public class RouteAddressManager {
 
     @EventListener(ConnectorCreatedEvent.class)
     public void handleConnectorCreated(ConnectorCreatedEvent event) {
-        Connector connector = event.getConnector();
-        Long appId = connector.getAppId();
-        Serializable connectorId = connector.getConnectorId();
-        String redisKey = mappingKeyPrefix + ":"  + connectorId;
+        Long connectorId = event.getConnectorId();
+        String redisKey = mappingKeyPrefix + ":"  + connectorId.toString();
         String address = config.getIp() + ":" + config.getPort();
         redisTemplate.opsForValue().set(redisKey, address);
     }
@@ -53,11 +49,9 @@ public class RouteAddressManager {
     }
 
     @EventListener(ConnectorRemovedEvent.class)
-    public void handleConnectorCreated(ConnectorRemovedEvent event) {
-        Connector connector = event.getConnector();
-        Long appId = connector.getAppId();
-        Serializable connectorId = connector.getConnectorId();
-        String redisKey = mappingKeyPrefix + ":" + connectorId;
+    public void handleConnectorRemove(ConnectorRemovedEvent event) {
+        Long connectorId = event.getConnectorId();
+        String redisKey = mappingKeyPrefix + ":" + connectorId.toString();
         redisTemplate.opsForValue().getAndDelete(redisKey);
         // TODO MQ 消息关闭，清内存
     }
