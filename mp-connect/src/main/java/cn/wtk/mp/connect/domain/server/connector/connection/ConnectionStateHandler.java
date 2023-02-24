@@ -1,11 +1,11 @@
-package cn.wtk.mp.connect.domain.server;
+package cn.wtk.mp.connect.domain.server.connector.connection;
 
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
+import cn.wtk.mp.connect.infrastructure.event.ConnClosedEvent;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,39 +24,44 @@ import java.util.UUID;
 @Slf4j
 public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
-    private final ServerConnContainer serverConnContainer;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
-        log.info("收到消息：{}", msg);
-        if (msg instanceof TextWebSocketFrame) {
-            TextWebSocketFrame textWebSocketFrame = (TextWebSocketFrame) msg;
+    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
+        log.debug("收到消息：{}", frame);
+        if (frame instanceof TextWebSocketFrame) {
+            TextWebSocketFrame textWebSocketFrame = (TextWebSocketFrame) frame;
             String text = textWebSocketFrame.text();
             ctx.channel().writeAndFlush(new TextWebSocketFrame("ack:" + text));
+        } else if (frame instanceof PingWebSocketFrame) {
+            ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
+        } else if (frame instanceof CloseWebSocketFrame) {
+            log.debug("客户端关闭连接");
+            publishConnClosedEvent(ctx);
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        removeConn(ctx);
-        ctx.close();
         log.warn("服务器发生了异常:", cause);
-    }
-
-    private void removeConn(ChannelHandlerContext ctx) {
-        Long connectorId = ctx.channel().attr(ChannelAttrKey.CONNECTOR).getAndSet(null);
-        UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).getAndSet(null);
-        log.debug("移除连接：connectorId: {}, connId: {}", connectorId, connId);
-        if (connectorId != null && connId != null) {
-            serverConnContainer.removeConn(connectorId, connId);
-        }
+        ctx.close();
+        publishConnClosedEvent(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         log.debug("channelInactive");
-        removeConn(ctx);
+        publishConnClosedEvent(ctx);
         super.channelInactive(ctx);
     }
+
+    private void publishConnClosedEvent(ChannelHandlerContext ctx) {
+        Long connectorId = ctx.channel().attr(ChannelAttrKey.CONNECTOR).getAndSet(null);
+        UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).getAndSet(null);
+        log.debug("移除连接：connectorId: {}, connId: {}", connectorId, connId);
+        if (connectorId != null && connId != null) {
+            applicationEventPublisher.publishEvent(new ConnClosedEvent(connectorId, connId));
+        }
+    }
+
 }

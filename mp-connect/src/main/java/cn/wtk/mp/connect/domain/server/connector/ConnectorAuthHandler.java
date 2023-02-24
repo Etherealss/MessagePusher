@@ -1,8 +1,10 @@
-package cn.wtk.mp.connect.domain.server;
+package cn.wtk.mp.connect.domain.server.connector;
 
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import cn.wtk.mp.common.base.utils.UUIDUtil;
 import cn.wtk.mp.common.base.utils.UrlUtil;
+import cn.wtk.mp.connect.domain.server.AuthResult;
+import cn.wtk.mp.connect.domain.server.ServerConnContainer;
 import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
 import cn.wtk.mp.connect.domain.server.connector.connection.MessageSender;
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
@@ -23,15 +25,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * @author wtk
+ * @date 2023-01-14
+ */
 @ChannelHandler.Sharable
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class ConnectorAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
     private static final String PARAM_NAME_APP_ID = "appId";
+    private static final String HEADER_ORIGIN = "Origin";
 
     private final AuthFeign authFeign;
     private final MessageSender messageSender;
@@ -39,70 +46,20 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
     private final NettyServerConfig nettyServerConfig;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
-        if (frame instanceof PingWebSocketFrame) {
-            pingWebSocketFrameHandler(ctx, (PingWebSocketFrame) frame);
-        } else if (frame instanceof TextWebSocketFrame) {
-            textWebSocketFrameHandler(ctx, (TextWebSocketFrame) frame);
-        } else if (frame instanceof CloseWebSocketFrame) {
-            closeWebSocketFrameHandler(ctx, (CloseWebSocketFrame) frame);
-        }
-    }
-
-
-    /**
-     * 客户端发送断开请求处理
-     * @param ctx
-     * @param frame
-     */
-    private void closeWebSocketFrameHandler(ChannelHandlerContext ctx, CloseWebSocketFrame frame) {
-        log.debug("接收到主动断开请求：{}", ctx.channel().id());
-        ctx.close();
-    }
-
-    /**
-     * 创建连接之后，客户端发送的消息都会在这里处理
-     * @param ctx
-     * @param frame
-     */
-    private void textWebSocketFrameHandler(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
-        String text = frame.text();
-        log.debug("接收到客户端的消息：{}", text);
-        // 将客户端消息回送给客户端
-        ctx.channel().writeAndFlush(new TextWebSocketFrame("你发送的内容是：" + text));
-    }
-
-    /**
-     * 处理客户端心跳包
-     * @param ctx
-     * @param frame
-     */
-    private void pingWebSocketFrameHandler(ChannelHandlerContext ctx, PingWebSocketFrame frame) {
-        ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
-    }
-
-    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.info("数据类型：{}", msg.getClass());
         if (this.isAuthenticated(ctx.channel())) {
-            super.channelRead(ctx, msg);
+            /*
+            这个方法只能在 channelRead 方法里调用，如果在 channelRead0 里调用会报错
+            它的作用是将当前消息传给下一个 ChannelInboundHandler
+            如果不调用的话，当 ChannelInboundHandler 匹配到合适的消息（比如当前，匹配到 WebSocketFrame）
+            它就不会继续往后面传了
+             */
+            ctx.fireChannelRead(msg);
             return;
         }
         if (msg instanceof FullHttpRequest) {
-            FullHttpRequest request = (FullHttpRequest) msg;
-            String uri = request.uri();
-            String origin = request.headers().get("Origin");
-            Map<String, String> urlParameters = UrlUtil.getUrlParameters(uri);
-            AuthResult authResult = this.doAuth(urlParameters);
-            if (authResult.isSuccess()) {
-                addToManager(ctx, authResult);
-                // TODO WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对，如果URI一致，才会通过握手建立WebSocket连接
-                request.setUri(nettyServerConfig.getPath());
-            } else {
-                // TODO 发送给客户端的数据结构
-                messageSender.send(ctx.channel(), authResult.getErrorMsg());
-                ctx.close();
-            }
+            httpRequestAuth(ctx, (FullHttpRequest) msg);
         } else {
             log.info("连接尚未认证，关闭连接");
             messageSender.send(ctx.channel(), "连接尚未认证");
@@ -111,6 +68,22 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
         super.channelRead(ctx, msg);
     }
 
+    private void httpRequestAuth(ChannelHandlerContext ctx, FullHttpRequest request) {
+        String uri = request.uri();
+        String origin = request.headers().get(HEADER_ORIGIN);
+        Map<String, String> urlParameters = UrlUtil.getUrlParameters(uri);
+        AuthResult authResult = this.doAuth(urlParameters);
+        if (authResult.isSuccess()) {
+            addToManager(ctx, authResult);
+            // WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对，
+            // 如果URI一致，才会通过握手建立WebSocket连接
+            request.setUri(nettyServerConfig.getPath());
+        } else {
+            // TODO 发送给客户端的数据结构
+            messageSender.send(ctx.channel(), authResult.getErrorMsg());
+            ctx.close();
+        }
+    }
 
     /**
      * 新建连接时的验证逻辑
@@ -173,23 +146,8 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
         return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
     }
 
-
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.debug("客户端连接：{}", ctx.channel().id());
-        super.channelActive(ctx);
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.debug("客户端断开连接：{}", ctx.channel().id());
-        super.channelInactive(ctx);
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.channel().flush();
+    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
     }
 
 }
-

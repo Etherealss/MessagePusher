@@ -15,14 +15,14 @@ import java.net.InetSocketAddress;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class ChannelActiveHandler extends ChannelInboundHandlerAdapter {
+public class ChannelLogHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         String clientPort = String.valueOf(insocket.getPort());
-        log.debug("新的连接：" + clientIP + ":" + clientPort);
+        log.debug("新的 Channel 激活：" + clientIP + ":" + clientPort);
     }
 
     @Override

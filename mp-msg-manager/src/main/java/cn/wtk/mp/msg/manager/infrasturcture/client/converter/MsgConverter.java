@@ -7,7 +7,7 @@ import cn.wtk.mp.common.msg.entity.PersonalMsg;
 import cn.wtk.mp.msg.manager.domain.msg.store.group.GroupMsgEntity;
 import cn.wtk.mp.msg.manager.domain.msg.store.notif.NotifMsgEntity;
 import cn.wtk.mp.msg.manager.domain.msg.store.personal.PersonalMsgEntity;
-import cn.wtk.mp.msg.manager.infrasturcture.client.dto.MsgPushDTO;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MsgPushCommand;
 import org.mapstruct.Mapper;
 
 /**
@@ -19,7 +19,8 @@ public interface MsgConverter {
     GroupMsgEntity toEntity(GroupMsg groupMsg);
     PersonalMsgEntity toEntity(PersonalMsg personalMsg);
     NotifMsgEntity toEntity(NotifMsg notifMsg);
-    MsgPushDTO toPushDTO(PersonalMsg msg);
-    MsgPushDTO toPushDTO(GroupMsg msg);
-    MsgPushDTO toPushDTO(NotifMsg msg);
+
+    MsgPushCommand toPushDTO(PersonalMsg msg);
+    MsgPushCommand toPushDTO(GroupMsg msg);
+    MsgPushCommand toPushDTO(NotifMsg msg);
 }

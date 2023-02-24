@@ -1,5 +1,7 @@
 package cn.wtk.mp.connect.domain.server;
 
+import cn.wtk.mp.connect.domain.server.connector.ConnectorAuthHandler;
+import cn.wtk.mp.connect.domain.server.connector.connection.ConnectionStateHandler;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
@@ -26,12 +28,10 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
     private final NettyServerConfig nettyServerConfig;
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
     private final MsgPushHandler msgPushHandler;
-    private final MsgReceiverHandler msgReceiverHandler;
-    private final ChannelActiveHandler channelActiveHandler;
+    private final ChannelLogHandler channelLogHandler;
 
     private final ConnectorAuthHandler connectorAuthHandler;
     private final ConnectionStateHandler connectionStateHandler;
-    private final WebSocketMessageHandler webSocketMessageHandler;
 
     @Override
     protected void initChannel(SocketChannel socketChannel) {
@@ -44,6 +44,7 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
         WebSocketServerProtocolHandler webSocketServerProtocolHandler =
                 new WebSocketServerProtocolHandler(webSocketConfig);
         ChannelHandler[] handlers = {
+                channelLogHandler,
                 // HTTP请求的解码和编码，用于ws握手
                 new HttpServerCodec(),
                 // 处理大数据流
@@ -53,9 +54,10 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
                 new HttpObjectAggregator(65536),
 //                // 处理 WebSocket 数据压缩
                 new WebSocketServerCompressionHandler(),
-//                webSocketMessageHandler,
                 connectorAuthHandler,
-                // WebSocket 协议配置
+                connectionStateHandler,
+                // WebSocket 协议配置，一定要放在 connectorAuthHandler 之后
+                // Auth 会对请求进行处理，处理后才能进过 ProtocolHandler 成功握手
                 webSocketServerProtocolHandler,
         };
         // 按序添加Handler

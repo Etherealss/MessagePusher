@@ -1,12 +1,11 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.feign;
 
-import cn.wtk.mp.msg.manager.infrasturcture.client.dto.MsgPushDTO;
 import cn.wtk.mp.msg.manager.infrasturcture.config.lb.MsgRouteHandler;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author wtk
@@ -18,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 )
 public interface ConnectFiegn {
 
-    void pushMsg(MsgPushDTO msg,
+    @PostMapping("/msg/action/push")
+    void pushMsg(@RequestBody @Validated MultiMsgPushCommand msg,
                  @RequestHeader(MsgRouteHandler.MSG_ROUTE_IP) String ip,
                  @RequestHeader(MsgRouteHandler.MSG_ROUTE_PORT) Integer rcvrPort
     );
