@@ -24,12 +24,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NettyServerChannelInitializer extends ChannelInitializer<SocketChannel> {
     private final NettyServerConfig nettyServerConfig;
-    private final ConnectorAuthHandler connectorAuthHandler;
-    private final ConnectionStateHandler connectionStateHandler;
     private final IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter;
     private final MsgPushHandler msgPushHandler;
     private final MsgReceiverHandler msgReceiverHandler;
     private final ChannelActiveHandler channelActiveHandler;
+
+    private final ConnectorAuthHandler connectorAuthHandler;
+    private final ConnectionStateHandler connectionStateHandler;
     private final WebSocketMessageHandler webSocketMessageHandler;
 
     @Override
@@ -52,7 +53,8 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
                 new HttpObjectAggregator(65536),
 //                // 处理 WebSocket 数据压缩
                 new WebSocketServerCompressionHandler(),
-                webSocketMessageHandler,
+//                webSocketMessageHandler,
+                connectorAuthHandler,
                 // WebSocket 协议配置
                 webSocketServerProtocolHandler,
         };

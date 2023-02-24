@@ -13,6 +13,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.websocketx.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
+public class ConnectorAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
@@ -42,8 +43,10 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
     private final NettyServerConfig nettyServerConfig;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        log.info("数据类型：{}", msg.getClass());
         if (this.isAuthenticated(ctx.channel())) {
+            super.channelRead(ctx, msg);
             return;
         }
         if (msg instanceof FullHttpRequest) {
@@ -66,6 +69,7 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
             messageSender.send(ctx.channel(), "连接尚未认证");
             ctx.close();
         }
+        super.channelRead(ctx, msg);
     }
 
 
@@ -75,7 +79,7 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
      * @return
      */
     public AuthResult doAuth(Map<String, String> urlParameters) {
-        log.trace("进行创建连接的登录验证");
+        log.debug("进行创建连接的登录验证");
         Objects.requireNonNull(urlParameters, "url参数Map不能为空");
         String connectorToken = urlParameters.get(PARAM_NAME_CONNECTOR_TOKEN);
         String connectorIdStr = urlParameters.get(PARAM_NAME_CONNECTOR_ID);
@@ -131,7 +135,12 @@ public class ConnectorAuthHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.channel().flush();
     }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
+    }
+
 }

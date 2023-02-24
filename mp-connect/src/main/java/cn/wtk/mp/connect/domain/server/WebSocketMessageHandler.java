@@ -39,23 +39,6 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
     private final NettyServerConfig nettyServerConfig;
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.debug("客户端连接：{}", ctx.channel().id());
-        super.channelActive(ctx);
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.debug("客户端断开连接：{}", ctx.channel().id());
-        super.channelInactive(ctx);
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.channel().flush();
-    }
-
-    @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
         if (frame instanceof PingWebSocketFrame) {
             pingWebSocketFrameHandler(ctx, (PingWebSocketFrame) frame);
@@ -64,6 +47,38 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
         } else if (frame instanceof CloseWebSocketFrame) {
             closeWebSocketFrameHandler(ctx, (CloseWebSocketFrame) frame);
         }
+    }
+
+
+    /**
+     * 客户端发送断开请求处理
+     * @param ctx
+     * @param frame
+     */
+    private void closeWebSocketFrameHandler(ChannelHandlerContext ctx, CloseWebSocketFrame frame) {
+        log.debug("接收到主动断开请求：{}", ctx.channel().id());
+        ctx.close();
+    }
+
+    /**
+     * 创建连接之后，客户端发送的消息都会在这里处理
+     * @param ctx
+     * @param frame
+     */
+    private void textWebSocketFrameHandler(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
+        String text = frame.text();
+        log.debug("接收到客户端的消息：{}", text);
+        // 将客户端消息回送给客户端
+        ctx.channel().writeAndFlush(new TextWebSocketFrame("你发送的内容是：" + text));
+    }
+
+    /**
+     * 处理客户端心跳包
+     * @param ctx
+     * @param frame
+     */
+    private void pingWebSocketFrameHandler(ChannelHandlerContext ctx, PingWebSocketFrame frame) {
+        ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
     }
 
     @Override
@@ -96,55 +111,6 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
         super.channelRead(ctx, msg);
     }
 
-    /**
-     * 处理连接请求，客户端WebSocket发送握手包时会执行这一次请求
-     *
-     * @param ctx
-     * @param request
-     */
-    private void fullHttpRequestHandler(ChannelHandlerContext ctx, FullHttpRequest request) {
-        String uri = request.uri();
-        log.debug("接收到客户端的握手包：{}", ctx.channel().id());
-        log.debug("客户端uri：{}", uri);
-        if (uri.startsWith(nettyServerConfig.getPath()))
-            request.setUri(nettyServerConfig.getPath());
-        else
-            ctx.close();
-    }
-
-    /**
-     * 客户端发送断开请求处理
-     *
-     * @param ctx
-     * @param frame
-     */
-    private void closeWebSocketFrameHandler(ChannelHandlerContext ctx, CloseWebSocketFrame frame) {
-        log.debug("接收到主动断开请求：{}", ctx.channel().id());
-        ctx.close();
-    }
-
-    /**
-     * 创建连接之后，客户端发送的消息都会在这里处理
-     *
-     * @param ctx
-     * @param frame
-     */
-    private void textWebSocketFrameHandler(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
-        String text = frame.text();
-        log.debug("接收到客户端的消息：{}", text);
-        // 将客户端消息回送给客户端
-        ctx.channel().writeAndFlush(new TextWebSocketFrame("你发送的内容是：" + text));
-    }
-
-    /**
-     * 处理客户端心跳包
-     *
-     * @param ctx
-     * @param frame
-     */
-    private void pingWebSocketFrameHandler(ChannelHandlerContext ctx, PingWebSocketFrame frame) {
-        ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
-    }
 
     /**
      * 新建连接时的验证逻辑
@@ -206,5 +172,24 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
     private boolean isAuthenticated(Channel channel) {
         return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
     }
+
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("客户端连接：{}", ctx.channel().id());
+        super.channelActive(ctx);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("客户端断开连接：{}", ctx.channel().id());
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.channel().flush();
+    }
+
 }
 
