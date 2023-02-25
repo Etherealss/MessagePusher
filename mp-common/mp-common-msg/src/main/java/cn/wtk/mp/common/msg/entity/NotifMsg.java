@@ -17,7 +17,7 @@ public class NotifMsg extends PersistentMsg {
     Long rcvrId;
 
     public NotifMsg() {
-        super.msgType = MsgType.NOTIF;
+        super.msgType = MsgType.DEVICE;
     }
 
     @Override
