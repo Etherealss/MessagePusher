@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.application;
+package cn.wtk.mp.connect.application.connector;
 
 import cn.wtk.mp.connect.domain.server.connector.RouteAddressManager;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;

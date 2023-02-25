@@ -1,11 +1,10 @@
 package cn.wtk.mp.connect.domain.server;
 
-import cn.wtk.mp.common.base.utils.UUIDUtil;
-import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
+import cn.wtk.mp.common.base.uid.UidGenerator;
+import cn.wtk.mp.connect.domain.server.connector.device.DeviceConnection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -20,14 +19,15 @@ public class MyRunnable1 implements Runnable {
     private final ServerConnContainer container;
     private final CyclicBarrier barrier;
     private final int no;
-    private final BlockingQueue<UUID> queue;
+    private final BlockingQueue<Long> queue;
+    private final UidGenerator uidGenerator;
 
     @Override
     public void run() {
-        UUID connId = UUIDUtil.get();
+        Long connId = uidGenerator.nextId();
         queue.offer(connId);
-        Connection connection = new Connection(connId, 1L, 1L, null);
-        container.addConn(connection);
+        DeviceConnection deviceConnection = new DeviceConnection(connId, 1L, 1L, null);
+        container.addConn(deviceConnection);
         System.out.println(no + "\t完成");
         try {
             barrier.await();

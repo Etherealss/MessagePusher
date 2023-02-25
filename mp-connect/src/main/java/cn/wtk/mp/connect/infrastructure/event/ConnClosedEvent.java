@@ -1,10 +1,9 @@
 package cn.wtk.mp.connect.infrastructure.event;
 
 import cn.wtk.mp.common.base.pojo.DomainEvent;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-
-import java.util.UUID;
 
 /**
  * @author wtk
@@ -14,11 +13,11 @@ import java.util.UUID;
 @Getter
 public class ConnClosedEvent extends DomainEvent {
     Long connectorId;
-    UUID connId;
+    Long connId;
 
-    public ConnClosedEvent(Long connectorId, UUID connId) {
-        super(connId);
+    public ConnClosedEvent(Long connectorId, Long deviceId) {
+        super(deviceId);
         this.connectorId = connectorId;
-        this.connId = connId;
+        this.connId = deviceId;
     }
 }

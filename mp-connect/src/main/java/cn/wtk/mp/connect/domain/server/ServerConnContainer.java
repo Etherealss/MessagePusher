@@ -1,7 +1,7 @@
 package cn.wtk.mp.connect.domain.server;
 
 import cn.wtk.mp.connect.domain.server.connector.Connector;
-import cn.wtk.mp.connect.domain.server.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.server.connector.device.DeviceConnection;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
 import com.mongodb.lang.NonNull;
@@ -11,7 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,7 +27,7 @@ public class ServerConnContainer {
     private final Map<Long, Connector> connectors = new ConcurrentHashMap<>();
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void addConn(@NonNull Connection conn) {
+    public void addConn(@NonNull DeviceConnection conn) {
         Long connectorId = conn.getConnectorId();
         log.debug("新增连接者：{}", connectorId);
         AtomicBoolean create = new AtomicBoolean(false);
@@ -46,14 +45,14 @@ public class ServerConnContainer {
         }
     }
 
-    public Connection removeConn(@NonNull Long connectorId,@NonNull UUID connId) {
+    public DeviceConnection removeConn(@NonNull Long connectorId, @NonNull Long deviceId) {
         // 要获取lambda表达式里的变量需要使用Atomic对象
-        AtomicReference<Connection> connRef = new AtomicReference<>();
+        AtomicReference<DeviceConnection> connRef = new AtomicReference<>();
         AtomicBoolean connectorRemoved = new AtomicBoolean(false);
         log.debug("移除连接者：{}", connectorId);
         connectors.computeIfPresent(connectorId, (connectorIdKey, connectorValue) -> {
-            Connection connection = connectorValue.removeConn(connId);
-            connRef.set(connection);
+            DeviceConnection deviceConnection = connectorValue.removeConn(deviceId);
+            connRef.set(deviceConnection);
             // 如果connector的连接数为0，则return null使其从map中移出
             if (connectorValue.getConnSize() == 0) {
                 connectorRemoved.set(true);
@@ -68,12 +67,12 @@ public class ServerConnContainer {
         return connRef.get();
     }
 
-    public Connection getConn(@NonNull Long connectorId,@NonNull UUID connId) {
+    public DeviceConnection getConn(@NonNull Long connectorId, @NonNull Long deviceId) {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
             return null;
         }
-        return connector.getConn(connId);
+        return connector.getConn(deviceId);
     }
 
     public Connector getConnector(@NonNull Long connectorId) {

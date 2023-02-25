@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.domain.server.connector.connection;
+package cn.wtk.mp.connect.domain.server.connector.device;
 
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
 import cn.wtk.mp.connect.infrastructure.event.ConnClosedEvent;
@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 /**
  * 实现对客户端 Channel 建立连接、断开连接、异常时的处理。
@@ -57,10 +55,10 @@ public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocke
 
     private void publishConnClosedEvent(ChannelHandlerContext ctx) {
         Long connectorId = ctx.channel().attr(ChannelAttrKey.CONNECTOR).getAndSet(null);
-        UUID connId = ctx.channel().attr(ChannelAttrKey.CONN_ID).getAndSet(null);
-        log.debug("移除连接：connectorId: {}, connId: {}", connectorId, connId);
-        if (connectorId != null && connId != null) {
-            applicationEventPublisher.publishEvent(new ConnClosedEvent(connectorId, connId));
+        Long deviceId = ctx.channel().attr(ChannelAttrKey.DEVICE_ID).getAndSet(null);
+        log.debug("移除连接：connectorId: {}, deviceId: {}", connectorId, deviceId);
+        if (connectorId != null && deviceId != null) {
+            applicationEventPublisher.publishEvent(new ConnClosedEvent(connectorId, deviceId));
         }
     }
 
