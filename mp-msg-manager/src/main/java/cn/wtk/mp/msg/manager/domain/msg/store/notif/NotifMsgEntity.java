@@ -23,7 +23,7 @@ public class NotifMsgEntity extends PersistentMsgEntity {
     Long rcvrId;
 
     @Field(MsgEntityFieldName.MSG_TYPE)
-    MsgType msgType = MsgType.NOTIF;
+    MsgType msgType = MsgType.DEVICE;
 
     private void setMsgType(MsgType msgType) {
         this.msgType = msgType;

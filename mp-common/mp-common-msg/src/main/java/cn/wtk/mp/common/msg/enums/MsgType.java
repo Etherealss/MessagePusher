@@ -12,9 +12,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MsgType implements BaseEnum {
     ACK(0, "ack"),
-    PERSONAL(1, "私信"),
+    PERSONAL(1, "个人消息"),
     GROUP(2, "群消息"),
-    NOTIF(3, "通知"),
+    DEVICE(3, "设备消息"),
     ;
     private final int code;
     private final String name;

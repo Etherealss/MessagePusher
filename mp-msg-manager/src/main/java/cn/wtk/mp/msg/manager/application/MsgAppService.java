@@ -1,8 +1,8 @@
 package cn.wtk.mp.msg.manager.application;
 
+import cn.wtk.mp.common.msg.entity.DeviceMsg;
 import cn.wtk.mp.common.msg.entity.GroupMsg;
 import cn.wtk.mp.common.msg.entity.Msg;
-import cn.wtk.mp.common.msg.entity.NotifMsg;
 import cn.wtk.mp.common.msg.entity.PersonalMsg;
 import cn.wtk.mp.msg.manager.domain.msg.dispatcher.GroupRcvrMsgDispathcer;
 import cn.wtk.mp.msg.manager.domain.msg.dispatcher.SingleRcvrMsgDispathcer;
@@ -59,8 +59,8 @@ public class MsgAppService {
             case GROUP:
                 groupMsgService.insert((GroupMsg) msg);
                 break;
-            case NOTIF:
-                notifMsgService.insert((NotifMsg) msg);
+            case DEVICE:
+                notifMsgService.insert((DeviceMsg) msg);
                 break;
             default:
         }
@@ -74,7 +74,7 @@ public class MsgAppService {
             case GROUP:
                 groupRcvrMsgDispathcer.doDispatch((GroupMsg) msg);
                 break;
-            case NOTIF:
+            case DEVICE:
                 break;
             default:
         }
