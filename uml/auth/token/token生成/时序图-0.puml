@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+actor 其他服务 as Server
+participant Auth服务 as Auth
+participant 服务信息管理 as ServerInfoService
+database 数据库 as DB
+participant 服务摘要验证器 as ServerDigestValidator
+participant 服务摘要生成器 as ServerDigestGenerator
+
+Server -> Auth ++: 提供digest，请求获取Token
+Auth -> ServerInfoService ++: 验证服务信息
+ServerInfoService -> DB ++: 获取服务信息
+return 服务信息
+ServerInfoService -> ServerDigestValidator ++: 验证服务信息
+ServerDigestValidator -> ServerDigestGenerator ++: 根据数据库的信息生成digest
+return digest
+ServerDigestValidator -> ServerDigestValidator: 验证digest
+alt 验证不通过
+    ServerInfoService <- ServerDigestValidator : 服务信息不匹配
+    Auth <- ServerInfoService: 服务信息不匹配
+    Server <- Auth: 服务信息不匹配
+end
+
+newpage
+return: 验证成功
+return: 验证成功
+
+participant Token凭证管理 as TokenCredentialService
+participant Token处理器 as IToeknHandler
+database Redis as Redis
+
+Auth -> TokenCredentialService ++: 生成Token
+TokenCredentialService -> TokenCredentialService ++--: 根据配置生成服务Token
+TokenCredentialService -> IToeknHandler ++: 缓存Token
+IToeknHandler -> Redis ++: 缓存Token
+return ok
+return ok
+return Token
+return Token
+
+@enduml

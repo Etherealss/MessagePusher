@@ -1,0 +1,37 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+actor 发送方 as Client
+participant Acceptor服务 as Acceptor
+database Redis
+database Kafka
+
+activate Client
+
+Client -> Acceptor ++: 发送消息，包含 TempID
+Acceptor -> Redis++: 根据 TempID 判断是否有相同的消息
+return 如果TempID存在，返回MsgID
+
+alt TempID已经存在
+    Client <- Acceptor: 消息正在发送，返回MsgID
+else TempID不存在
+    Acceptor -> Acceptor ++--: 其他操作，如关系检验以及生成MsgID
+    Acceptor -> Kafka ++: 发布消息
+    return ok
+    Acceptor -> Redis++: 设置 TempID，value为MsgID
+    return ok
+    return 消息正在发送，返回MsgID
+end
+
+
+@enduml

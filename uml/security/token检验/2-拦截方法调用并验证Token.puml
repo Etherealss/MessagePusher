@@ -1,0 +1,37 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+participant 服务 as Server
+participant AOP
+participant 安全验证器 as IPreAuthHandler
+
+activate Server
+
+Server -> AOP ++: 执行Controller方法前进入AOP
+AOP -> IPreAuthHandler ++: 判断是否需要验证
+IPreAuthHandler -> IPreAuthHandler++--: 判断是否存在注解
+alt 不存在注解，不需要验证
+    AOP <- IPreAuthHandler : 不需要验证
+    Server <- AOP: AOP结束，继续执行Controller方法
+else 存在注解，需要验证
+    IPreAuthHandler -> ThreadLocal ++: 获取TokenCredential
+    return TokenCredential
+    alt TokenCredential为空
+        AOP <- IPreAuthHandler : Token认证失败
+        Server <- AOP:  Token认证失败
+    else TokenCredential不为空
+        AOP <- IPreAuthHandler : Token认证通过
+        Server <- AOP:  Token认证通过
+    end
+end
+
+@enduml

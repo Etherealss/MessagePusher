@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber 0
+
+actor 发送方 as Sender
+participant 消息接收器 as Server
+participant 安全认证 as Auth
+participant 非功能性保证 as NonFunctional
+participant Kafka
+participant 消息管理 as Manager
+participant MongoDB
+
+activate Sender
+?-> Manager ++: 监听Kafka
+
+Sender -> Server ++: 推送消息
+Server -> Auth ++: 安全认证
+return 认证结果
+Server -> NonFunctional ++: 非功能性特性保证
+note over NonFunctional: 暂时忽略细节
+return ok
+Server -> Kafka ++: 发布消息
+return ok
+return 发送成功，\n消息正在推送
+
+deactivate Sender
+
+Kafka <- Manager  ++: 消费消息
+Kafka --> Manager: 消息数据
+Manager -> MongoDB ++: 保存消息
+return ok
+Kafka <- Manager  --: ack
+
+@enduml

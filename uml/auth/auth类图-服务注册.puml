@@ -1,0 +1,49 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+package 应用层 {
+    class ServerAppService {
+        - ServerInfoService serverInfoService
+        - Long register(String serverName, String secret)
+    }
+}
+
+
+package domain {
+
+    class ServerInfoService {
+        - PasswordEncoder passwordEncoder
+        - ServerInfoRepository serverInfoRepository
+        - ServerDigestValidator serverDigestValidator
+        - ServerInfoEntity verifyAndGetInfo(String serverName, String secret)
+        - Long createAuthInfo(String serverName, String secret)
+    }
+    interface ServerInfoRepository {
+        + ServerInfo findById(Long id)
+        + void insert(ServerInfoEntity)
+    }
+    class ServerDigestValidator {
+        - ServerDigestGenerator serverDigestGenerator
+        + boolean validate(String userInput, ServerInfoEntity)
+    }
+    ServerDigestValidator --> ServerDigestGenerator: 摘要生成
+
+    class ServerDigestGenerator {
+        - MessageDigest messageDigest
+        + byte[] generate(Long serverId, String serverName, String secret)
+    }
+}
+
+ServerAppService --> ServerInfoService
+ServerInfoService --> ServerInfoRepository: 数据库操作
+ServerInfoService --> ServerDigestValidator: 摘要验证
+
+
+@enduml

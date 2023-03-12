@@ -1,0 +1,77 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+class HeaderInterceptor {
+    - ICredentialVerifier<ServerTokenCredential> tokenVerifier;
+    - ServerCredentialConfig serverCredentialConfig;
+    + boolean preHandle(HttpServletRequest, HttpServletResponse, Object handler)
+}
+note left of HeaderInterceptor: 在收到HTTP请求时拦截请求，根据需要验证token并暂存
+HeaderInterceptor --> ServerSecurityContextHolder: 保存请求方的 TokenCredential
+HeaderInterceptor --> ICredentialVerifier: 验证请求方的 token
+class ServerSecurityContextHolder {
+    - {static} ThreadLocal<ServerTokenCredential> CREDENTIALS
+    - {static} ServerCredentialConfig TOKEN_CONFIG
+    + {static} void set(ServerTokenCredential)
+    + {static} ServerTokenCredential get()
+    + {static} ServerTokenCredential require()
+    + {static} void remove()
+}
+note right of ServerSecurityContextHolder: 暂存TokenCredential到ThreadLocal中
+
+abstract class CredentialCacheHandler {
+    - RedisTemplate<String, TokenCredential> redisTemplate
+    # {abstract} String getCacheKey(String token)
+    # {abstract} TokenCredential verifyAndGetCredential(String token)
+    + <T extends TokenCredential> T verifyAndGet(String token)
+    - <T extends TokenCredential> TokenCredential getByRemote(String token, String key)
+    - void cacheCredential(String key, TokenCredential value, Date expireAt)
+    + <T> void invalidCache(String token)
+}
+note left of CredentialCacheHandler:凭证缓存控制器
+CredentialCacheHandler --> RedisTemplate: Redis操作
+class RedisTemplate
+note left of RedisTemplate: 封装Redis操作
+
+class ServerCredentialCacheHandler extends CredentialCacheHandler {
+    - ServerCredentialConfig serverCredentialConfig
+    - ServerCredentialFeign serverCredentialFeign
+    # String getCacheKey(String token)
+    # TokenCredential verifyAndGetCredential(String token)
+}
+note left of ServerCredentialCacheHandler: 服务凭证缓存
+ServerCredentialCacheHandler --> ServerCredentialFeign: 远程访问Auth服务
+interface ServerCredentialFeign {
+    ServerTokenCredential verify(String token)
+    ServerTokenCredential createCredential(ServerAuthCommand)
+}
+note left of ServerCredentialFeign: OpenFeign远程调用
+
+
+interface ICredentialVerifier<T extends TokenCredential> {
+    T verify(String token)
+}
+note right of ICredentialVerifier: token校验
+class RemoteServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
+    - ServerCredentialCacheHandler credentialCacheHandler
+    - ServerTokenCredential verify(String token)
+}
+RemoteServerCredentialVerifier --> ServerCredentialCacheHandler
+note right of RemoteServerCredentialVerifier: 通过远程调用进行token校验
+
+class LocalServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
+    - TokenCredentialService tokenCredentialService
+    - ServerCredentialAuthConfig serverCredentialAuthConfig
+    - ServerTokenCredential verify(String token)
+}
+note right of LocalServerCredentialVerifier: 通过本地方法进行token校验
+
+@enduml

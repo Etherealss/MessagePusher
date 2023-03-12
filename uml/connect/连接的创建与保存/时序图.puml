@@ -1,0 +1,41 @@
+@startuml
+
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+actor 连接者 as Client
+participant 网关服务 as Gateway
+participant Connect服务节点 as Connect
+participant 连接验证 as ConnAuthHandler
+participant Auth服务 as AuthFeign
+participant 连接管理 as ServerConnContainer
+participant 路由信息 as RouteAddressManager
+database Redis
+
+activate Client
+Client -> Gateway++: 创建连接
+Gateway -> Connect++: 请求路由
+Connect -> ConnAuthHandler ++: 连接验证
+ConnAuthHandler -> AuthFeign ++: 验证Token
+return 验证结果
+return 验证结果\n假设验证通过
+Connect -> ServerConnContainer ++: 添加连接
+ServerConnContainer -> ServerConnContainer++--: 新连接添加到\nConnector中
+ServerConnContainer -> RouteAddressManager++: 如果是新连接者\n则保存路由信息
+RouteAddressManager -> Redis ++: 保存路由信息
+return ok
+return ok
+return ok
+return ok
+return ok
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber 13
+
+actor 其他服务 as Server
+participant Auth服务 as Auth
+participant 服务信息管理 as ServerInfoService
+participant Token凭证管理 as TokenCredentialService
+participant Token处理器 as IToeknHandler
+database Redis as Redis
+
+activate Server
+activate Auth
+activate ServerInfoService
+
+Auth <- ServerInfoService--: 验证通过
+Auth -> TokenCredentialService ++: 生成Token
+TokenCredentialService -> TokenCredentialService ++--: 根据配置生成服务Token
+TokenCredentialService -> IToeknHandler ++: 缓存Token
+IToeknHandler -> Redis ++: 缓存Token
+return ok
+return ok
+return Token
+
+Server <- Auth: Token
+
+@enduml

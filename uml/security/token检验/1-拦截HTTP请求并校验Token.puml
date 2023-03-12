@@ -1,0 +1,58 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+actor 请求者 as Client
+participant 服务 as Server
+participant 拦截器 as HeaderInterceptor
+participant ThreadLocal as ThreadLocal
+participant Token验证器 as ICreentialVerifier
+participant Token验证结果缓存 as ServerCredentialCacheHandler
+participant Auth服务 as Auth
+database Redis
+
+Client -> Server++: 发送请求
+Server -> HeaderInterceptor ++: 拦截请求
+HeaderInterceptor -> HeaderInterceptor++--: 获取Header中的token
+HeaderInterceptor -> ICreentialVerifier ++: 验证token
+ICreentialVerifier -> ServerCredentialCacheHandler ++: 验证token
+ServerCredentialCacheHandler -> Redis ++:查缓存
+return 缓存结果
+
+alt 缓存不存在
+    ServerCredentialCacheHandler -> Auth++: 验证token
+    return 验证结果，如果通过校验\n则返回 TokenCredential
+    ServerCredentialCacheHandler -> Redis++:缓存验证结果
+    return ok
+else 缓存存在
+    ICreentialVerifier <- ServerCredentialCacheHandler: 跳过远程调用，\n直接返回验证结果
+end
+
+ServerCredentialCacheHandler -> ServerCredentialCacheHandler ++--: 验证缓存
+alt 验证通过
+    ICreentialVerifier <- ServerCredentialCacheHandler: 返回缓存的\nTokenCredential
+else 验证不通过
+    ICreentialVerifier <- ServerCredentialCacheHandler--: 返回缓存null
+end
+
+ICreentialVerifier -> ICreentialVerifier++--: 检查验证结果
+alt 验证通过
+    HeaderInterceptor <- ICreentialVerifier: 返回验证结果中的TokenCredential
+else 验证不通过
+    HeaderInterceptor <- ICreentialVerifier --: 返回空
+end
+
+HeaderInterceptor -> ThreadLocal ++: 暂存TokenCredential
+return ok
+return ok
+
+@enduml

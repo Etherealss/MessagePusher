@@ -1,0 +1,83 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber 1
+
+actor 发送方 as Sender
+participant 消息接收器 as Acceptor
+participant 安全认证 as Auth
+participant 幂等 as ResendHandler
+participant 有序 as SeqHandler
+participant 关系检查 as RelationHandler
+participant 关系服务 as Relation
+database Redis
+database Kafka
+participant 消息管理 as Manager
+database MongoDB
+
+activate Sender
+
+Sender -> Acceptor ++: 推送消息
+Acceptor -> Auth ++: 安全认证
+return 认证结果
+
+Acceptor -> ResendHandler ++: 重传处理
+
+ResendHandler -> Redis++: 根据 TempID 判断是否有相同的消息
+return 结果
+
+alt TempID已经存在
+    Acceptor <- ResendHandler: 消息正在发送
+end
+
+return ok
+Acceptor -> SeqHandler ++: 有序
+return ok
+Acceptor -> RelationHandler ++: 关系
+alt 个人消息
+    RelationHandler -> Relation++: 验证订阅关系
+    return 验证结果
+else 群组消息
+    RelationHandler -> Relation++: 验证订阅关系
+    return 验证结果
+end
+return 假设验证通过，继续后续流程
+Acceptor -> Acceptor ++--: 生成 MsgID
+
+Acceptor -> ResendHandler++: 设置重传
+ResendHandler -> Redis++: 上锁保证发布Kafka消息和设置TempID的原子性
+return ok
+ResendHandler -> Redis++: TempID CAS
+return 结果
+alt TempID已经存在
+    ResendHandler -> Redis++: 解锁
+    return ok
+    Acceptor <- ResendHandler: 消息正在发送
+else TempID不存在
+    Acceptor -> Kafka ++: 发布消息
+    return ok
+    ResendHandler -> Redis++: 解锁
+    return ok
+    return 消息正在发送
+end
+
+return 发送成功，\n消息正在推送
+
+deactivate Sender
+?-> Manager ++: 监听Kafka
+
+Kafka <- Manager  ++: 消费消息
+Kafka --> Manager: 消息数据
+Manager -> MongoDB ++: 保存消息
+return ok
+Kafka <- Manager  --: ack
+
+@enduml

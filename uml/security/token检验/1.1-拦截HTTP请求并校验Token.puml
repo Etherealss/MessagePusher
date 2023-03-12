@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+participant 服务 as Server
+participant 拦截器 as HeaderInterceptor
+participant Token验证器 as ICreentialVerifier
+participant ThreadLocal as ThreadLocal
+
+activate Server
+Server -> HeaderInterceptor ++: 拦截请求
+HeaderInterceptor -> HeaderInterceptor++--: 获取Header中的token
+HeaderInterceptor -> ICreentialVerifier ++: 验证token
+alt 验证不通过
+    HeaderInterceptor <- ICreentialVerifier: null
+else 验证通过
+    HeaderInterceptor <- ICreentialVerifier--: TokenCredential
+    HeaderInterceptor -> ThreadLocal ++: 暂存TokenCredential
+    return ok
+end
+return ok
+
+@enduml
