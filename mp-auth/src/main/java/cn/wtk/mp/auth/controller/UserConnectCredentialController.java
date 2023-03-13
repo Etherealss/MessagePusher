@@ -1,7 +1,7 @@
 package cn.wtk.mp.auth.controller;
 
 
-import cn.wtk.mp.auth.application.ConnectorCredentialAppService;
+import cn.wtk.mp.auth.application.ConnectorAuthenticationAppService;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
 import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.connector.ConnectorCredential;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @ResponseAdvice
 public class UserConnectCredentialController {
 
-    private final ConnectorCredentialAppService connectorCredentialAppService;
+    private final ConnectorAuthenticationAppService connectorAuthenticationAppService;
 
     /**
      * 创建 token
@@ -29,7 +29,7 @@ public class UserConnectCredentialController {
     @PostMapping
     public ConnectorCredential createCredential(@PathVariable Long appId,
                                                 @PathVariable Long connectorId) {
-        return connectorCredentialAppService.create(appId, connectorId);
+        return connectorAuthenticationAppService.create(appId, connectorId);
     }
 
     @InternalAuth
@@ -37,6 +37,6 @@ public class UserConnectCredentialController {
     public ConnectorCredential verify(@PathVariable Long appId,
                                       @PathVariable Long connectorId,
                                       @PathVariable String token) {
-        return connectorCredentialAppService.verifyAndGet(appId, connectorId, token);
+        return connectorAuthenticationAppService.verifyAndGet(appId, connectorId, token);
     }
 }

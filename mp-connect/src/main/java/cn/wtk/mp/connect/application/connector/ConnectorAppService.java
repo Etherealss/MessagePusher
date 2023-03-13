@@ -1,7 +1,7 @@
 package cn.wtk.mp.connect.application.connector;
 
-import cn.wtk.mp.connect.domain.server.connector.ConnectorService;
-import cn.wtk.mp.connect.domain.server.connector.device.ConnectorDeviceService;
+import cn.wtk.mp.connect.domain.conn.server.connector.ConnectorService;
+import cn.wtk.mp.connect.domain.conn.server.connector.device.ConnectorDeviceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

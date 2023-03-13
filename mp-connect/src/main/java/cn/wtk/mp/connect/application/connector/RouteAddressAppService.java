@@ -1,6 +1,6 @@
 package cn.wtk.mp.connect.application.connector;
 
-import cn.wtk.mp.connect.domain.server.connector.RouteAddressManager;
+import cn.wtk.mp.connect.domain.conn.server.connector.RouteAddressManager;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

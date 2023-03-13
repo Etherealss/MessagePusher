@@ -29,7 +29,7 @@ public class ServerCredentialConfiguration {
             ServerDigestGenerator serverDigestGenerator
     ) {
         log.info("非 auth 服务，使用 RemoteIServerCredentialProvider 生成 Token");
-        return new RemoteIServerCredentialProvider(
+        return new RemoteServerCredentialProvider(
                 serverCredentialFeign,
                 config,
                 redisTemplate,

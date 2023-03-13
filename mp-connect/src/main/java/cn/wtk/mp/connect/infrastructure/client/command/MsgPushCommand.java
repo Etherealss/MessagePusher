@@ -8,10 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author wtk
@@ -38,6 +36,4 @@ public class MsgPushCommand {
     Date saveTime;
     @NotNull
     Long senderId;
-    @NotEmpty
-    List<Long> rcvrIds;
 }
