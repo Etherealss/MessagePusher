@@ -32,19 +32,19 @@ class ServerCredentialCacheHandler extends CredentialCacheHandler {
 note left of ServerCredentialCacheHandler: 服务凭证缓存
 ServerCredentialCacheHandler --> ServerCredentialFeign: 远程访问Auth服务
 interface ServerCredentialFeign {
-    ServerTokenCredential verify(String token)
-    ServerTokenCredential createCredential(ServerAuthCommand)
+    + ServerTokenCredential verify(String token)
+    + ServerTokenCredential createCredential(ServerAuthCommand)
 }
 note left of ServerCredentialFeign: OpenFeign远程调用
 
 
 interface ICredentialVerifier<T extends TokenCredential> {
-    T verify(String token)
+    + T verify(String token)
 }
 note right of ICredentialVerifier: token校验
 class RemoteServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
     - ServerCredentialCacheHandler credentialCacheHandler
-    - ServerTokenCredential verify(String token)
+    + ServerTokenCredential verify(String token)
 }
 RemoteServerCredentialVerifier --> ServerCredentialCacheHandler
 note bottom of RemoteServerCredentialVerifier: 通过远程调用进行token校验
@@ -52,7 +52,7 @@ note bottom of RemoteServerCredentialVerifier: 通过远程调用进行token校�
 class LocalServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
     - TokenCredentialService tokenCredentialService
     - ServerCredentialAuthConfig serverCredentialAuthConfig
-    - ServerTokenCredential verify(String token)
+    + ServerTokenCredential verify(String token)
 }
 note bottom of LocalServerCredentialVerifier: 通过本地方法进行token校验
 
@@ -65,7 +65,7 @@ class CurServerAuthenticationHolder {
 CurServerAuthenticationHolder --> IServerCredentialProvider: 获取服务凭证
 
 interface IServerCredentialProvider {
-    ServerTokenCredential create();
+    + ServerTokenCredential create();
 }
 
 class RemoteIServerCredentialProvider implements IServerCredentialProvider {
@@ -83,6 +83,7 @@ class LocalServerCredentialProvider implements IServerCredentialProvider {
     - ServerCredentialConfig serverCredentialConfig;
     - ServerAuthenticationAppService serverAuthenticationAppService;
     - ServerDigestGenerator serverDigestGenerator;
+     + ServerTokenCredential create();
 }
 LocalServerCredentialProvider --> ServerCredentialConfig
 LocalServerCredentialProvider --> ServerDigestGenerator

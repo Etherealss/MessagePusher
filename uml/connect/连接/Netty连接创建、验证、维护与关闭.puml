@@ -1,0 +1,84 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package infrastructure {
+    class AuthFeign {
+        + Boolean authToken(ConnectorCredential);
+    }
+
+    class ServerConnContainerListener {
+        - ServerConnContainer serverConnContainer;
+        void addConn(ConnCreatedEvent event)
+        void removeConn(ConnRemovedEvent event)
+    }
+}
+
+
+class NettyServerChannelInitializer {
+    - ConnectionAuthHandler connectionAuthHandler;
+    - ConnAuthHandler connAuthHandler;
+    ...
+    # void initChannel(SocketChannel)
+}
+class ConnectionAuthHandler  {
+    - AuthFeign authFeign;
+    + void channelRead(ChannelHandlerContext, Object msg)
+    + AuthResult doAuth(Map<String, String> urlParameters)
+}
+class ServerConnManager {
+    - Map<Long, Connector> connectors;
+    + void addConn(Long connectorId, Connection)
+    + void removeConn(Long connectorId, UUID connId)
+    + Connection getConn(Long connectorId, UUID connId)
+    + Map<ConnId, Connection> getConns(Long connectorId)
+}
+
+class Connector {
+    - Long appId;
+    - Serializable connectorId;
+    - Map<UUID, Connection> conns;
+    + void addConn(Connection)
+    + Connection getConn(Long connId)
+    + Connection removeConn(Long connId)
+    + int hashCode()
+    + boolean equals(Object o)
+}
+
+class Connection {
+    - UUID connId;
+    - Long connectorId;
+    - Long appId;
+    - ChannelHandlerContext ctx;
+    + int hashCode()
+    + boolean equals(Object o)
+}
+
+class ConnectionStateHandler  {
+    + void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+    + void channelInactive(ChannelHandlerContext ctx) throws Exception
+    - void publishConnClosedEvent(ChannelHandlerContext ctx)
+}
+
+
+
+ConnectionStateHandler ..> ServerConnContainerListener: 发布连接关闭事件
+ConnectionAuthHandler ..> AuthFeign: 鉴权
+NettyServerChannelInitializer --> ConnectionStateHandler: 配置Handler
+
+NettyServerChannelInitializer ---> ConnectionAuthHandler: 配置Handler
+
+
+ConnectionAuthHandler ..> ServerConnContainerListener: 发布新连接创建事件
+ServerConnContainerListener ..> ServerConnManager: 保存新连接或移除连接
+ServerConnManager o.. Connector
+Connection .o Connector
+
+@enduml

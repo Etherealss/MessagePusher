@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+
+interface ICredentialVerifier<T extends TokenCredential> {
+    + T verify(String token)
+}
+class RemoteServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
+    - ServerCredentialCacheHandler credentialCacheHandler
+    + ServerTokenCredential verify(String token)
+}
+
+class LocalServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
+    - TokenCredentialService tokenCredentialService
+    - ServerCredentialAuthConfig serverCredentialAuthConfig
+    + ServerTokenCredential verify(String token)
+}
+
+
+newpage
+
+interface IServerCredentialProvider {
+    + ServerTokenCredential create()
+}
+
+class RemoteIServerCredentialProvider implements IServerCredentialProvider {
+    - ServerCredentialFeign serverCredentialFeign;
+    - ServerCredentialConfig config;
+    - RedisTemplate<String, ServerTokenCredential> redisTemplate;
+    - ServerDigestGenerator serverDigestGenerator;
+    + ServerTokenCredential create()
+}
+
+class LocalServerCredentialProvider implements IServerCredentialProvider {
+    - ServerCredentialConfig serverCredentialConfig;
+    - ServerAuthenticationAppService serverAuthenticationAppService;
+    - ServerDigestGenerator serverDigestGenerator;
+}
+
+@enduml

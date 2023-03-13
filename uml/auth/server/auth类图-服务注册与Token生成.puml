@@ -8,23 +8,29 @@ skinparam activity  {
     ArrowFontSize 14
     FontSize 14
 }
-package 应用层 {
+
+package application {
+    class ServerAuthenticationAppService {
+        - ServerInfoService serverInfoService
+        - TokenCredentialService tokenCredentialService
+        - ServerCredentialAuthConfig serverCredentialAuthConfig
+        - ServerTokenCredential createServerCredential(ServerAuthCommand)
+        - ServerTokenCredential verifyAndGetToken(String token)
+    }
     class ServerAppService {
         - ServerInfoService serverInfoService
         - Long register(String serverName, String secret)
     }
-    class ServerAuthenticationAppService {
-        - ServerInfoService serviceInfoService;
-        - TokenCredentialService tokenCredentialService;
-        - ServerCredentialAuthConfig serverCredentialAuthConfig;
-        + ServerTokenCredential createServerCredential(Long serverId,String userInputDigest)
-        + ServerTokenCredential verifyAndGetToken(String token)
-    }
 }
 
-
 package domain {
-
+    class TokenCredentialService<T extends TokenCredential> {
+        - ITokenHandler tokenHandler
+        + completeAndSave(TokenCredential, TokenCredentialSpec)
+        + T verifyAndGet(String token, Class<T> credentialType)
+        + T verifyAndInvalidateToken(String token, Class<T> credentialType)
+        + T invalidateToken(String token, Class<T> credentialType)
+    }
     class ServerInfoService {
         - PasswordEncoder passwordEncoder
         - ServerInfoRepository serverInfoRepository
@@ -40,17 +46,19 @@ package domain {
         - ServerDigestGenerator serverDigestGenerator
         + boolean validate(String userInput, ServerInfoEntity)
     }
-    ServerDigestValidator --> ServerDigestGenerator: 摘要生成
 
     class ServerDigestGenerator {
         - MessageDigest messageDigest
         + byte[] generate(Long serverId, String serverName, String secret)
     }
 }
+ServerAuthenticationAppService ..> TokenCredentialService: Token生成与Token校验
+ServerAppService .> ServerInfoService: 注册服务
+ServerAuthenticationAppService .> ServerInfoService: 验证服务
 
-ServerAppService --> ServerInfoService
-ServerInfoService --> ServerInfoRepository: 数据库操作
-ServerInfoService --> ServerDigestValidator: 摘要验证
+ServerInfoService ..> ServerInfoRepository: 数据库操作
+ServerInfoService ..> ServerDigestValidator: 摘要验证
+ServerDigestValidator ..> ServerDigestGenerator: 摘要生成
 
 
 @enduml

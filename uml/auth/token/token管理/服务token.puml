@@ -32,6 +32,6 @@ package 基础设施层 {
     }
     class RedisTemplate
 }
-TokenCredentialService --> ITokenHandler: Token存取
-RedisTemplate <- RedisTokenHandlerImpl: Spring Redis操作
+TokenCredentialService ..> ITokenHandler: Token存取
+RedisTemplate <. RedisTokenHandlerImpl: Spring Redis操作
 @enduml

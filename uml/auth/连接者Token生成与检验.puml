@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+package application {
+    class ConnectorAuthenticationAppService {
+        - ConnectorCredentialAuthConfig credentialCacheConfig
+        - TokenCredentialService tokenCredentialService
+        - ConnectorCredentialAuthConfig config
+        + ConnectorCredential create(Long appId, Long connectorId)
+        +  ConnectorCredential verifyAndGet(Long appId, Long connectorId, String token)
+    }
+}
+
+
+package domain {
+    class TokenCredentialService<T extends TokenCredential> {
+        - ITokenHandler tokenHandler
+        + completeAndSave(TokenCredential, TokenCredentialSpec)
+        + T verifyAndGet(String token, Class<T> credentialType)
+        + T verifyAndInvalidateToken(String token, Class<T> credentialType)
+        + T invalidateToken(String token, Class<T> credentialType)
+    }
+}
+ConnectorAuthenticationAppService ..> TokenCredentialService: Token生成与校验
+@enduml

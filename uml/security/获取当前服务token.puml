@@ -1,0 +1,61 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+
+class CurServerAuthenticationHolder {
+    - ServerTokenCredential serverTokenCredential
+    - IServerCredentialProvider serverCredentialProvider
+    + ServerTokenCredential get()
+}
+
+CurServerAuthenticationHolder --> IServerCredentialProvider: 获取服务凭证
+
+interface IServerCredentialProvider {
+    + ServerTokenCredential create();
+}
+
+class RemoteIServerCredentialProvider implements IServerCredentialProvider {
+    - ServerCredentialFeign serverCredentialFeign;
+    - ServerCredentialConfig config;
+    - RedisTemplate<String, ServerTokenCredential> redisTemplate;
+    - ServerDigestGenerator serverDigestGenerator;
+    + ServerTokenCredential create()
+}
+RemoteIServerCredentialProvider --> RedisTemplate: 缓存远程调用得到的token
+RemoteIServerCredentialProvider --> ServerDigestGenerator
+RemoteIServerCredentialProvider --> ServerCredentialConfig
+
+class LocalServerCredentialProvider implements IServerCredentialProvider {
+    - ServerCredentialConfig serverCredentialConfig;
+    - ServerAuthenticationAppService serverAuthenticationAppService;
+    - ServerDigestGenerator serverDigestGenerator;
+    + ServerTokenCredential create();
+}
+LocalServerCredentialProvider --> ServerCredentialConfig
+LocalServerCredentialProvider --> ServerDigestGenerator
+
+class ServerTokenFeignRequestInterceptor {
+    - ServerCredentialConfig config;
+    - CurServerAuthenticationHolder curServerAuthenticationHolder;
+}
+note left of ServerTokenFeignRequestInterceptor: 远程调用拦截器
+
+ServerTokenFeignRequestInterceptor --> CurServerAuthenticationHolder: 在进行远程调用时自动装配本服务的token
+
+class ServerCredentialConfig {
+    - String headerName;
+    - Long serverId;
+    - String serverName;
+    - String secret;
+    - String cacheKey;
+}
+
+@enduml

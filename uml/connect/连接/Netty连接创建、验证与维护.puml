@@ -1,0 +1,68 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+class AuthFeign {
+    + Boolean authToken(ConnectorCredential);
+}
+
+class NettyServerChannelInitializer {
+    - ConnAuthHandler connAuthHandler;
+    ...
+    # void initChannel(SocketChannel)
+}
+class ConnectionAuthHandler  {
+    - AuthFeign authFeign;
+    + void channelRead(ChannelHandlerContext, Object msg)
+    + AuthResult doAuth(Map<String, String> urlParameters)
+}
+class ServerConnManager {
+    - Map<Long, Connector> connectors;
+    + void addConn(Long connectorId, Connection)
+    + void removeConn(Long connectorId, UUID connId)
+    + Connection getConn(Long connectorId, UUID connId)
+    + Map<ConnId, Connection> getConns(Long connectorId)
+}
+
+class Connector {
+    - Long appId;
+    - Serializable connectorId;
+    - Map<UUID, Connection> conns;
+    + void addConn(Connection)
+    + Connection getConn(Long connId)
+    + Connection removeConn(Long connId)
+    + int hashCode()
+    + boolean equals(Object o)
+}
+
+class Connection {
+    - UUID connId;
+    - Long connectorId;
+    - Long appId;
+    - ChannelHandlerContext ctx;
+    + int hashCode()
+    + boolean equals(Object o)
+}
+
+ConnectionAuthHandler .> AuthFeign: 鉴权
+
+NettyServerChannelInitializer --> ConnectionAuthHandler: 连接验证
+
+class ServerConnContainerListener {
+    - ServerConnContainer serverConnContainer;
+    void addConn(ConnCreatedEvent event)
+}
+
+ConnectionAuthHandler ..> ServerConnContainerListener: 发布新连接创建事件
+ServerConnContainerListener ..> ServerConnManager: 保存新连接
+ServerConnManager o. Connector
+Connection ..o Connector
+
+@enduml

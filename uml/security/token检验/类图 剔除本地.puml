@@ -9,19 +9,25 @@ skinparam activity  {
     FontSize 14
 }
 
+class HeaderInterceptor {
+    - ICredentialVerifier<ServerTokenCredential> tokenVerifier;
+    - ServerCredentialConfig serverCredentialConfig;
+    + boolean preHandle(HttpServletRequest, HttpServletResponse, Object handler)
+}
+HeaderInterceptor ..> ICredentialVerifier: 验证请求方的 token
+
 abstract class CredentialCacheHandler {
     - RedisTemplate<String, TokenCredential> redisTemplate
     # {abstract} String getCacheKey(String token)
     # {abstract} TokenCredential verifyAndGetCredential(String token)
-    + <T extends TokenCredential> T verifyAndGet(String token)
-    - <T extends TokenCredential> TokenCredential getByRemote(String token, String key)
+    + TokenCredential verifyAndGet(String token)
+    - TokenCredential getByRemote(String token, String key)
     - void cacheCredential(String key, TokenCredential value, Date expireAt)
     + <T> void invalidCache(String token)
 }
-note left of CredentialCacheHandler:凭证缓存控制器
-CredentialCacheHandler --> RedisTemplate: Redis操作
+note top of CredentialCacheHandler:凭证缓存制器，是一个抽象类
+CredentialCacheHandler ..> RedisTemplate: Spring Redis操作
 class RedisTemplate
-note left of RedisTemplate: 封装Redis操作
 
 class ServerCredentialCacheHandler extends CredentialCacheHandler {
     - ServerCredentialConfig serverCredentialConfig
@@ -29,24 +35,22 @@ class ServerCredentialCacheHandler extends CredentialCacheHandler {
     # String getCacheKey(String token)
     # TokenCredential verifyAndGetCredential(String token)
 }
-note left of ServerCredentialCacheHandler: 服务凭证缓存
-ServerCredentialCacheHandler --> ServerCredentialFeign: 远程访问Auth服务
+note right of ServerCredentialCacheHandler: 服务凭证缓存实现类
+ServerCredentialCacheHandler ..> ServerCredentialFeign: 远程访问Auth服务
 interface ServerCredentialFeign {
-    ServerTokenCredential verify(String token)
-    ServerTokenCredential createCredential(ServerAuthCommand)
+    + ServerTokenCredential verify(String token)
+    + ServerTokenCredential createCredential(ServerAuthCommand)
 }
 note left of ServerCredentialFeign: OpenFeign远程调用
 
 
 interface ICredentialVerifier<T extends TokenCredential> {
-    T verify(String token)
+    + T verify(String token)
 }
-note right of ICredentialVerifier: token校验
 class RemoteServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
     - ServerCredentialCacheHandler credentialCacheHandler
-    - ServerTokenCredential verify(String token)
+    + ServerTokenCredential verify(String token)
 }
-RemoteServerCredentialVerifier --> ServerCredentialCacheHandler
-note right of RemoteServerCredentialVerifier: 通过远程调用进行token校验
+RemoteServerCredentialVerifier ..> ServerCredentialCacheHandler
 
 @enduml

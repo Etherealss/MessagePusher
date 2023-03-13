@@ -14,9 +14,9 @@ class HeaderInterceptor {
     - ServerCredentialConfig serverCredentialConfig;
     + boolean preHandle(HttpServletRequest, HttpServletResponse, Object handler)
 }
+HeaderInterceptor --> ICredentialVerifier: 验证请求方的 token
 note left of HeaderInterceptor: 在收到HTTP请求时拦截请求，根据需要验证token并暂存
 HeaderInterceptor --> ServerSecurityContextHolder: 保存请求方的 TokenCredential
-HeaderInterceptor --> ICredentialVerifier: 验证请求方的 token
 class ServerSecurityContextHolder {
     - {static} ThreadLocal<ServerTokenCredential> CREDENTIALS
     - {static} ServerCredentialConfig TOKEN_CONFIG
@@ -50,19 +50,19 @@ class ServerCredentialCacheHandler extends CredentialCacheHandler {
 note left of ServerCredentialCacheHandler: 服务凭证缓存
 ServerCredentialCacheHandler --> ServerCredentialFeign: 远程访问Auth服务
 interface ServerCredentialFeign {
-    ServerTokenCredential verify(String token)
-    ServerTokenCredential createCredential(ServerAuthCommand)
+    + ServerTokenCredential verify(String token)
+    + ServerTokenCredential createCredential(ServerAuthCommand)
 }
 note left of ServerCredentialFeign: OpenFeign远程调用
 
 
 interface ICredentialVerifier<T extends TokenCredential> {
-    T verify(String token)
+    + T verify(String token)
 }
 note right of ICredentialVerifier: token校验
 class RemoteServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
     - ServerCredentialCacheHandler credentialCacheHandler
-    - ServerTokenCredential verify(String token)
+    + ServerTokenCredential verify(String token)
 }
 RemoteServerCredentialVerifier --> ServerCredentialCacheHandler
 note right of RemoteServerCredentialVerifier: 通过远程调用进行token校验
@@ -70,7 +70,7 @@ note right of RemoteServerCredentialVerifier: 通过远程调用进行token校�
 class LocalServerCredentialVerifier<ServerTokenCredential> implements ICredentialVerifier {
     - TokenCredentialService tokenCredentialService
     - ServerCredentialAuthConfig serverCredentialAuthConfig
-    - ServerTokenCredential verify(String token)
+    + ServerTokenCredential verify(String token)
 }
 note right of LocalServerCredentialVerifier: 通过本地方法进行token校验
 

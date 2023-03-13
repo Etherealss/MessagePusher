@@ -1,0 +1,100 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package infrastructure {
+    class NettyServerConfig
+
+    class NettyServer implements ApplicationListener, ApplicationRunner {
+        - Channel serverChannel
+        - EventLoopGroup bossGroup
+        - EventLoopGroup workerGroup
+        - NettyServerConfig nettyServerConfig
+        - NettyServerInitializer nettyServerInitializer
+        + run()
+        + onApplicationEvent(ContextClosedEvent)
+    }
+
+    class AuthFeign {
+        + Boolean authToken(ConnectorCredential credential);
+    }
+
+    class ServerConnContainerListener {
+        - ServerConnContainer serverConnContainer;
+        + void removeConn(ConnClosedEvent event)
+    }
+}
+
+package domain {
+    class NettyServerInitializer {
+    }
+    note top of NettyServerInitializer: 配置并初始化服务端处理客户端Channel的Handlers
+    class ConnectionAuthHandler  {
+        - AuthFeign authFeign;
+        + void channelRead(ChannelHandlerContext ctx, Object msg)
+        + AuthResult doAuth(Map<String, String> urlParameters)
+    }
+    note top of ConnectionStateHandler: 处理客户端连接的状态变更
+    class ServerConnManager {
+        - Map<Long, Connector> connectors;
+        - RedisTemplate<AppId+ConnectorId, Host+Port> redis;
+        + void addConn(Long connectorId, Connection)
+        + void removeConn(Long connectorId, connId)
+        + Connection getConn(Long connectorId, connId)
+        + Map<ConnId, Connection> getConns(Long connectorId)
+    }
+
+    class Connector {
+        - Long appId;
+        - Serializable connectorId;
+        - Map<connId, Connection> conns;
+    }
+
+    class Connection {
+        - UUID connId;
+        - ChannelHandlerContext ctx;
+        - Serializable connectorId;
+    }
+
+    class ConnectionStateHandler {
+        - ServerConnManager serverConnManager;
+        + void channelActive() // 创建了新连接
+        + void channelRead() // 接收新消息
+        + void exceptionCaught() // 异常
+        + void channelInactive() // 断线、重连
+    }
+}
+
+
+ConnectionAuthHandler ..> AuthFeign: 鉴权
+
+NettyServer .> NettyServerInitializer : 初始化NettyServer
+NettyServer .> NettyServerConfig: 获取配置
+NettyServerInitializer ..> NettyServerConfig: 获取配置
+NettyServerInitializer .> ConnectionStateHandler: 连接状态
+NettyServerInitializer ..> ConnectionAuthHandler: 连接验证
+
+
+ConnectionAuthHandler ..> ServerConnManager: 保存Channel连接
+ServerConnManager o.. Connector
+Connector o.. Connection
+
+
+ConnectionStateHandler ..> ServerConnContainerListener: 连接断开，发布事件
+ServerConnContainerListener .> ServerConnManager: 移除连接
+
+class RouteAddressManager {
+    - RedisTemplate<String, String> redisTemplate;
+    - NettyServerConfig config;
+    + void handleConnectorCreated(ConnectorCreatedEvent event)
+    + void handleConnectorRemove(ConnectorRemovedEvent event)
+    + ConnectorAddressDTO getConnectorRouteAddress(Long connectorId)
+}
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+class NettyServerChannelInitializer {
+    - ConnectionStateHandler connectionStateHandler;
+    ...
+    # void initChannel(SocketChannel)
+}
+class ConnectionStateHandler  {
+    + void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+    + void channelInactive(ChannelHandlerContext ctx) throws Exception
+    - void publishConnClosedEvent(ChannelHandlerContext ctx)
+}
+
+class ServerConnManager {
+    - Map<Long, Connector> connectors;
+    + void addConn(Long connectorId, Connection)
+    + void removeConn(Long connectorId, UUID connId)
+    + Connection getConn(Long connectorId, UUID connId)
+    + Map<ConnId, Connection> getConns(Long connectorId)
+}
+
+NettyServerChannelInitializer --> ConnectionStateHandler: 配置Handler
+
+class ServerConnContainerListener {
+    - ServerConnContainer serverConnContainer;
+    void removeConn(ConnRemovedEvent event)
+}
+
+ConnectionStateHandler ..> ServerConnContainerListener: 发布连接关闭事件
+ServerConnContainerListener ..> ServerConnManager: 移除连接
+
+@enduml

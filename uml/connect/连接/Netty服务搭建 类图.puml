@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package infrastructure {
+    class NettyServerConfig {
+        - String ip;
+        - Integer port;
+        - String path;
+        - Integer idleSeconds = 180;
+        ...
+    }
+    interface ApplicationRunner {
+        void run(ApplicationArguments args) throws Exception;
+    }
+    interface ApplicationListener {
+        + onApplicationEvent(ContextClosedEvent)
+    }
+    class NettyServer implements ApplicationListener, ApplicationRunner {
+        - Channel serverChannel;
+        - EventLoopGroup bossGroup;
+        - EventLoopGroup workerGroup;
+        - NettyServerConfig nettyServerConfig;
+        - NettyServerInitializer nettyServerInitializer;
+        + run()
+        + onApplicationEvent(ContextClosedEvent)
+    }
+}
+
+package domain {
+    class NettyServerChannelInitializer {
+        - NettyServerConfig nettyServerConfig; // Netty服务配置
+        - IdleTimeoutHandlerAdapter idleTimeoutHandlerAdapter; // 心跳检测
+        - MsgPushHandler msgPushHandler; // 消息推送
+        - ConnAuthHandler connAuthHandler; // 连接验证
+        - ConnectionStateHandler connectionStateHandler; // 连接状态维护
+        # void initChannel(SocketChannel socketChannel)
+    }
+}
+
+
+NettyServer ..> NettyServerChannelInitializer : 初始化NettyServer
+NettyServer .> NettyServerConfig: 获取配置
+NettyServerChannelInitializer ..> NettyServerConfig: 获取配置
+@enduml
