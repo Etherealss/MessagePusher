@@ -12,15 +12,13 @@ public class AuthResult {
     boolean success;
     String errorMsg;
     Long connectorId;
-    Long deviceId;
     Long appId;
 
-    public static AuthResult success(Long connectorId, Long appId, Long deviceId) {
+    public static AuthResult success(Long connectorId, Long appId) {
         AuthResult authResult = new AuthResult();
         authResult.success = true;
         authResult.connectorId = connectorId;
         authResult.appId = appId;
-        authResult.deviceId = deviceId;
         return authResult;
     }
 

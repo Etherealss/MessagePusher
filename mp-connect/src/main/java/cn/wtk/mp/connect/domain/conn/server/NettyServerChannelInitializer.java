@@ -1,7 +1,7 @@
 package cn.wtk.mp.connect.domain.conn.server;
 
-import cn.wtk.mp.connect.domain.conn.server.connector.device.ConnAuthHandler;
-import cn.wtk.mp.connect.domain.conn.server.connector.device.ConnectionStateHandler;
+import cn.wtk.mp.connect.domain.conn.server.connector.connection.ConnAuthHandler;
+import cn.wtk.mp.connect.domain.conn.server.connector.connection.ConnectionStateHandler;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;

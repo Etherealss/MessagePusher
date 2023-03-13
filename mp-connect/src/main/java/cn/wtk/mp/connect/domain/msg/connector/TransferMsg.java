@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TransferMsg {
+public abstract class TransferMsg {
     Long msgId;
     Long appId;
     MsgType msgType;

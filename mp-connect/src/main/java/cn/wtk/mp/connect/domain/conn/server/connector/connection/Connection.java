@@ -1,8 +1,10 @@
-package cn.wtk.mp.connect.domain.conn.server.connector.device;
+package cn.wtk.mp.connect.domain.conn.server.connector.connection;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * @author wtk
@@ -10,8 +12,8 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class DeviceConnection {
-    private Long deviceId;
+public class Connection {
+    private UUID connId;
     private Long connectorId;
     private Long appId;
     private ChannelHandlerContext ctx;

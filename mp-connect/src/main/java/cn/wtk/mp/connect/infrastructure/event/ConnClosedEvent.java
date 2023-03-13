@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 /**
  * @author wtk
  * @date 2023/2/24
@@ -13,11 +15,11 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public class ConnClosedEvent extends DomainEvent {
     Long connectorId;
-    Long connId;
+    UUID connId;
 
-    public ConnClosedEvent(Long connectorId, Long deviceId) {
-        super(deviceId);
+    public ConnClosedEvent(Long connectorId, UUID connId) {
+        super(connId);
         this.connectorId = connectorId;
-        this.connId = deviceId;
+        this.connId = connId;
     }
 }

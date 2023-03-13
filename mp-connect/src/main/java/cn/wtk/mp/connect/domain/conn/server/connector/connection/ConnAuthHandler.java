@@ -1,6 +1,7 @@
-package cn.wtk.mp.connect.domain.conn.server.connector.device;
+package cn.wtk.mp.connect.domain.conn.server.connector.connection;
 
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
+import cn.wtk.mp.common.base.utils.UUIDUtil;
 import cn.wtk.mp.common.base.utils.UrlUtil;
 import cn.wtk.mp.connect.domain.conn.server.AuthResult;
 import cn.wtk.mp.connect.domain.conn.server.ServerConnContainer;
@@ -21,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author wtk
@@ -34,7 +36,6 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
 
     private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
-    private static final String PARAM_NAME_DEVICE_ID = "deviceId";
     private static final String PARAM_NAME_APP_ID = "appId";
     private static final String HEADER_ORIGIN = "Origin";
 
@@ -93,9 +94,8 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
         Objects.requireNonNull(urlParameters, "url参数Map不能为空");
         String connectorToken = urlParameters.get(PARAM_NAME_CONNECTOR_TOKEN);
         String connectorIdStr = urlParameters.get(PARAM_NAME_CONNECTOR_ID);
-        String deviceIdStr = urlParameters.get(PARAM_NAME_DEVICE_ID);
         String appIdStr = urlParameters.get(PARAM_NAME_APP_ID);
-        if (!isNotBlack(connectorToken, appIdStr, connectorIdStr, deviceIdStr)) {
+        if (!isNotBlack(connectorToken, appIdStr, connectorIdStr)) {
             log.info("缺少参数(connectorToken, appId 或 connectorId)，不允许创建连接");
             return AuthResult.fail("缺少参数(connectorToken, appId 或 connectorId)，不允许创建连接");
         }
@@ -109,9 +109,7 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
             // 验证 connectorToken
             Long connectorId = Long.valueOf(connectorIdStr);
             authFeign.verify(appIdStr, connectorId, connectorToken);
-            return AuthResult.success(
-                    connectorId, Long.valueOf(appIdStr), Long.valueOf(deviceIdStr)
-            );
+            return AuthResult.success(connectorId, Long.valueOf(appIdStr));
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getResult());
             return AuthResult.fail("token无效或appId错误");
@@ -129,22 +127,22 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
 
     private void addToManager(ChannelHandlerContext ctx, AuthResult authResult) {
         // 认证完毕，可以建立连接
-        Long deviceId = authResult.getDeviceId();
+        UUID connId = UUIDUtil.get();
         Long connectorId = authResult.getConnectorId();
-        DeviceConnection conn = new DeviceConnection(deviceId, connectorId, authResult.getAppId(), ctx);
+        Connection conn = new Connection(connId, connectorId, authResult.getAppId(), ctx);
         ctx.channel().attr(ChannelAttrKey.CONNECTOR).set(connectorId);
-        ctx.channel().attr(ChannelAttrKey.DEVICE_ID).set(deviceId);
+        ctx.channel().attr(ChannelAttrKey.CONN_ID).set(connId);
         serverConnContainer.addConn(conn);
-        log.info("连接创建：RemoteIP={}, connectorId={}, appId={}, deviceId={}",
+        log.info("连接创建：RemoteIP={}, connectorId={}, appId={}, connId={}",
                 ctx.channel().remoteAddress(),
                 connectorId,
                 authResult.getAppId(),
-                deviceId
+                connId
         );
     }
 
     private boolean isAuthenticated(Channel channel) {
-        return channel.attr(ChannelAttrKey.DEVICE_ID).get() != null;
+        return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
     }
 
     @Override

@@ -1,11 +1,12 @@
 package cn.wtk.mp.connect.domain.conn.server.connector;
 
-import cn.wtk.mp.connect.domain.conn.server.connector.device.DeviceConnection;
+import cn.wtk.mp.connect.domain.conn.server.connector.connection.Connection;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class Connector {
 
-    private final Map<Long, DeviceConnection> conns = new ConcurrentHashMap<>();
+    private final Map<UUID, Connection> conns = new ConcurrentHashMap<>();
     @Getter
     private final Long connectorId;
     @Getter
@@ -43,19 +44,19 @@ public class Connector {
         return Objects.hash(connectorId, appId);
     }
 
-    public void addConn(DeviceConnection conn) {
-        conns.put(conn.getDeviceId(), conn);
+    public void addConn(Connection conn) {
+        conns.put(conn.getConnId(), conn);
     }
 
-    public DeviceConnection removeConn(Long connId) {
+    public Connection removeConn(UUID connId) {
         return conns.remove(connId);
     }
 
-    public DeviceConnection getConn(Long connId) {
+    public Connection getConn(UUID connId) {
         return conns.get(connId);
     }
 
-    public boolean containsConn(Long connId) {
+    public boolean containsConn(UUID connId) {
         return conns.containsKey(connId);
     }
 
