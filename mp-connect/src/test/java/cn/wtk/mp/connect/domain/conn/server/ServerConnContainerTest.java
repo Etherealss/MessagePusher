@@ -1,6 +1,5 @@
 package cn.wtk.mp.connect.domain.conn.server;
 
-import cn.wtk.mp.common.base.uid.UidGenerator;
 import cn.wtk.mp.connect.domain.conn.server.connector.Connector;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,8 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 class ServerConnContainerTest {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
-    @Autowired
-    private UidGenerator uidGenerator;
 
     @Test
     void test() {
@@ -37,9 +35,9 @@ class ServerConnContainerTest {
             }
         }
         );
-        BlockingQueue<Long> queue = new LinkedBlockingQueue<>();
+        BlockingQueue<UUID> queue = new LinkedBlockingQueue<>();
         for (int i = 0; i < size; i++) {
-            MyRunnable1 task = new MyRunnable1(container, barrier, i, queue, uidGenerator);
+            MyRunnable1 task = new MyRunnable1(container, barrier, i, queue);
             threadExecutor.submit(task);
         }
         try {
@@ -54,7 +52,7 @@ class ServerConnContainerTest {
 
         // remove 测试
         barrier.reset();
-        for (Long connId : queue) {
+        for (UUID connId : queue) {
             MyRunnable2 task = new MyRunnable2(container, barrier, connectorId, connId);
             threadExecutor.submit(task);
         }

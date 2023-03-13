@@ -3,6 +3,7 @@ package cn.wtk.mp.connect.domain.conn.server;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -13,7 +14,7 @@ public class MyRunnable2 implements Runnable {
     private final ServerConnContainer container;
     private final CyclicBarrier barrier;
     private final Long connectorId;
-    private final Long connId;
+    private final UUID connId;
 
     @Override
     public void run() {

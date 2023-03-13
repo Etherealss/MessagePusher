@@ -1,10 +1,10 @@
 package cn.wtk.mp.connect.domain.conn.server;
 
-import cn.wtk.mp.common.base.uid.UidGenerator;
 import cn.wtk.mp.connect.domain.conn.server.connector.connection.Connection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -19,12 +19,11 @@ public class MyRunnable1 implements Runnable {
     private final ServerConnContainer container;
     private final CyclicBarrier barrier;
     private final int no;
-    private final BlockingQueue<Long> queue;
-    private final UidGenerator uidGenerator;
+    private final BlockingQueue<UUID> queue;
 
     @Override
     public void run() {
-        Long connId = uidGenerator.nextId();
+        UUID connId = UUID.randomUUID();
         queue.offer(connId);
         Connection connection = new Connection(connId, 1L, 1L, null);
         container.addConn(connection);
