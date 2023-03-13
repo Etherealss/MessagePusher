@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package application {
+    class RouteAddressAppService {
+        - RouteAddressManager routeAddressManager;
+        + ConnectorAddressDTO getConnectorRouteAddress(Long connectorId)
+    }
+}
+
+
+package domain {
+    class RouteAddressManager {
+        - RedisTemplate<String, String> redisTemplate;
+        - NettyServerConfig config;
+        + void addRouteAddress(Long connectorId)
+        + void removeRouteAddress(Long connectorId)
+        + ConnectorAddressDTO getConnectorRouteAddress(Long connectorId)
+    }
+}
+
+package infrastructure {
+    class ConnectionListener {
+        - ServerConnContainer serverConnContainer;
+        void addConn(ConnectorCreatedEvent event)
+        void removeConn(ConnectorRemovedEvent event)
+    }
+}
+
+RouteAddressAppService ..> RouteAddressManager: 获取路由信息
+RouteAddressManager <.. ConnectionListener: 添加、删除路由信息
+
+@enduml

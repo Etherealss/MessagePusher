@@ -55,13 +55,13 @@ ConnectionAuthHandler .> AuthFeign: 鉴权
 
 NettyServerChannelInitializer --> ConnectionAuthHandler: 连接验证
 
-class ServerConnContainerListener {
+class ConnectionListener {
     - ServerConnContainer serverConnContainer;
     void addConn(ConnCreatedEvent event)
 }
 
-ConnectionAuthHandler ..> ServerConnContainerListener: 发布新连接创建事件
-ServerConnContainerListener ..> ServerConnManager: 保存新连接
+ConnectionAuthHandler ..> ConnectionListener: 发布新连接创建事件
+ConnectionListener ..> ServerConnManager: 保存新连接
 ServerConnManager o. Connector
 Connection ..o Connector
 

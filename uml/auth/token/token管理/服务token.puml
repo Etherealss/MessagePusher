@@ -8,7 +8,7 @@ skinparam activity  {
     ArrowFontSize 14
     FontSize 14
 }
-package 领域层 {
+package domain {
     class TokenCredentialService<T extends TokenCredential> {
         - ITokenHandler tokenHandler
         + completeAndSave(TokenCredential, TokenCredentialSpec)
@@ -17,7 +17,7 @@ package 领域层 {
         + T invalidateToken(String token, Class<T> credentialType)
     }
 }
-package 基础设施层 {
+package infrastructure {
     interface ITokenHandler {
         void saveToken(TokenCredential credential)
         TokenCredential getToken(String token)

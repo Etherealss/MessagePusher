@@ -11,7 +11,7 @@ skinparam activity  {
 
 package infrastructure {
 
-    class ServerConnContainerListener {
+    class ConnectionListener {
         - ServerConnContainer serverConnContainer;
         + void removeConn(ConnClosedEvent event)
     }
@@ -63,8 +63,8 @@ ServerConnManager o.. Connector
 Connector o.. Connection
 
 
-ConnectionStateHandler ..> ServerConnContainerListener: 连接断开，发布事件
-ServerConnContainerListener .> ServerConnManager: 移除连接
+ConnectionStateHandler ..> ConnectionListener: 连接断开，发布事件
+ConnectionListener .> ServerConnManager: 移除连接
 
 class RouteAddressManager {
     - RedisTemplate<String, String> redisTemplate;

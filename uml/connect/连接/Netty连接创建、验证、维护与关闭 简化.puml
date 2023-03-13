@@ -14,7 +14,7 @@ package infrastructure {
         + Boolean authToken(ConnectorCredential);
     }
 
-    class ServerConnContainerListener {
+    class ConnectionListener {
         - ServerConnContainer serverConnContainer;
         void addConn(ConnCreatedEvent event)
         void removeConn(ConnRemovedEvent event)
@@ -65,11 +65,11 @@ class ConnectionStateHandler  {
 
 
 
-ConnectionStateHandler ..> ServerConnContainerListener: 发布连接关闭事件
+ConnectionStateHandler ..> ConnectionListener: 发布连接关闭事件
 ConnectionAuthHandler ..> AuthFeign: 鉴权
 
-ConnectionAuthHandler ..> ServerConnContainerListener: 发布新连接创建事件
-ServerConnContainerListener ..> ServerConnManager: 保存新连接或移除连接
+ConnectionAuthHandler ..> ConnectionListener: 发布新连接创建事件
+ConnectionListener ..> ServerConnManager: 保存新连接或移除连接
 ServerConnManager o.. Connector
 Connection .o Connector
 
