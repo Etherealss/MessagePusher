@@ -1,0 +1,51 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package application {
+    class ConnectorMsgAppService {
+        - ConnectorMsgService connectorMsgService;
+        + void pushMsg(MultiConnectorMsgPushCommand command)
+    }
+}
+
+package domain {
+    class ServerConnContainer {
+        - Map<Long, Connector> connectors;
+        + Connector getConnector(Long connectorId)
+    }
+
+    class ConnectorMsgService {
+        + List<Long> pushMsg(\n\tList<MsgPushCommand> msgs, List<Connector> recrs\n)
+    }
+}
+
+ConnectorMsgAppService .> ServerConnContainer: 获取连接
+ConnectorMsgAppService ..> ConnectorMsgService: 消息推送
+
+class MultiConnectorMsgPushCommand {
+    - List<MsgPushCommand> msgs
+}
+
+class MsgPushCommand {
+    - Long msgId;
+    - Long appId;
+    - MsgType msgType;
+    - String msgTopic;
+    - Object payload;
+    - Date sendTime;
+    - Long senderId;
+    - List<Long> rcvrIds;
+}
+
+
+MultiConnectorMsgPushCommand o. MsgPushCommand
+
+@enduml

@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package infrastructure {
+    class MsgMqListener {
+        - ApplicationEventPublisher eventPublisher;
+        + void consumeMsg(\n\tList<ConsumerRecord<Long, Msg>> record,\n\tAcknowledgment ack\n)
+    }
+}
+
+class MsgConsumeEventListener {
+    + void handleMsgConsumeEvent(MsgConsumerEvent)
+}
+
+note right of MsgConsumeEventListener: 通过Spring事件监听器进行解耦
+
+MsgMqListener ..> MsgConsumeEventListener: 消费到新消息，发布事件
+
+package app {
+    class MsgAppService {
+        - PersonalMsgService personalMsgService;
+        - GroupMsgService groupMsgService;
+        + void recvNewMsg(List<Msg> msgs, Acknowledgment)
+        - void save(List<Msg> msgs)
+        - List<MsgBody> find(List<Long> msgIds)
+        - void delete(List<Long> msgIds)
+        - void updateTransferStatus(Map<Long, TransferStatus>)
+    }
+}
+package domain {
+    class PersonalMsgService {
+        - MongoTemplate mongoTemplate;
+        + void insert(List<PersonalMsgBody> msgs)
+        + List<PersonalMsgBody> get(List<Long> msgIds)
+        - void delete(List<Long> msgIds)
+        - void updateTransferStatus(Map<Long, TransferStatus>)
+    }
+    class GroupMsgService {
+        - MongoTemplate mongoTemplate;
+        + void insert(List<GroupMsgBody> msgs)
+        + List<GroupMsgBody> get(List<Long> msgIds)
+        - void delete(List<Long> msgIds)
+        - void updateTransferStatus(Map<Long, TransferStatus>)
+    }
+}
+MsgAppService ..> PersonalMsgService: 保存
+MsgAppService ..> GroupMsgService: 保存
+
+MsgConsumeEventListener ..> MsgAppService: 处理新消息
+
+
+@enduml

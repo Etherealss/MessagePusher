@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package app {
+    class MsgAppService {
+        - PersonalMsgService personalMsgService;
+        - GroupMsgService groupMsgService;
+        - List<MsgBody> findBatch(List<Long> msgIds)
+        - List<MsgBody> findUnread(List<Long> msgIds)
+        - void delete(List<Long> msgIds)
+        - void updateTransferStatus(Map<Long, TransferStatus>)
+    }
+}
+package domain {
+    class PersonalMsgService {
+        - MongoTemplate mongoTemplate;
+        + void insert(List<PersonalMsgBody> msgs)
+        + List<PersonalMsgBody> get(List<Long> msgIds)
+        - void delete(List<Long> msgIds)
+        - void updateTransferStatus(Map<Long, TransferStatus>)
+    }
+    class GroupMsgService {
+        - MongoTemplate mongoTemplate;
+        + void insert(List<GroupMsgBody> msgs)
+        + List<GroupMsgBody> get(List<Long> msgIds)
+        - void delete(List<Long> msgIds)
+        - void updateTransferStatus(Map<Long, TransferStatus>)
+    }
+}
+MsgAppService ..> PersonalMsgService
+MsgAppService ..> GroupMsgService
+
+@enduml

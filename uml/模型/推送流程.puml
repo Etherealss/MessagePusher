@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:消息推送;
+:消息非功能性校验;
+if (是否需要持久化) then (是)
+    :消息持久化;
+else (否)
+endif
+if (消息类型) then (个人消息)
+    if (是否需要关系校验) then (是)
+        :订阅关系校验;
+    endif
+else (群组消息)
+    :群组关系检查;
+endif
+if (是否通过校验) then (否)
+    stop
+endif
+
+:消息推送;
+
+stop
+
+@enduml

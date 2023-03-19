@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package application {
+    class GroupAppService {
+        - GroupRelationService groupRelationService;
+        - GroupService groupService;
+        + Long createGroup(Long groupId, Long joinerId)
+        + void joinGroup(Long groupId, Long joinerId)
+        + void quitGroup(Long groupId, Long quitterId)
+        + List<Long> getGroupMembers(Long groupId)
+        + boolean checkMember(Long groupId, Long memberId)
+    }
+}
+
+package domain {
+    class GroupService {
+        - GroupRelationRepository groupRelationRepository;
+        - UidGenerator uidGenerator;
+        + Long createGroup(CreateGroupCommand command)
+    }
+    class GroupRelationService {
+        - MongoTemplate mongoTemplate;
+        + void createGroupRelation(Long groupId, Long joinerId)
+        + void removeGroupRelation(Long groupId, Long quitterId)
+        + List<Long> getGroupRelations(Long groupId)
+        + boolean checkGroupRelation(Long groupId, Long memberId)
+    }
+    class GroupRelationEntity {
+        - Long groupId;
+        - Long appId;
+        - String groupTopic;
+        - Long creatorId;
+        - List<Long> memberIds;
+    }
+}
+GroupAppService ..> GroupRelationService: 群组关系操作
+GroupAppService ..> GroupService: 群组操作
+GroupService .[hidden].> GroupRelationEntity
+@enduml

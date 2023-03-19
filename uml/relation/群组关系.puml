@@ -1,0 +1,23 @@
+@startjson
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+
+{
+    "groupId": "群组ID",
+    "appId": "应用ID",
+    "groupTopic": "群组主题",
+    "creatorId": "创建者的连接者ID",
+    "members": [
+        "连接者ID 1",
+        "连接者ID 2",
+        "..."
+    ]
+}
+@endjson

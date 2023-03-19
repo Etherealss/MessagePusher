@@ -1,0 +1,47 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+actor 发送方 as Client
+participant Acceptor服务 as Acceptor
+participant 重传处理器 as ResendHandler
+database Redis
+queue Kafka
+
+activate Client
+
+Client -> Acceptor ++: 发送消息，包含TempID
+Acceptor -> ResendHandler ++: 重传处理
+
+ResendHandler -> Redis++: 根据TempID判断\n是否有相同的消息
+return 如果TempId存在\n则返回已存在的MsgID
+
+alt TempID已经存在，Redis返回MsgID
+    Acceptor <-- ResendHandler: 重复消息，返回MsgID
+else TempID不存在
+    Acceptor <-- ResendHandler--: 非重复消息
+    Acceptor -> Acceptor ++--: 其他操作，如关系检验以及生成MsgID
+
+    Acceptor -> ResendHandler++: 设置重传
+    ResendHandler -> Redis++: TempID为Key，\nMsgID为Value进行CAS
+    return 如果TempID已存在，\n则返回已存在的MsgID
+    alt TempID已经存在，CAS失败，Redis返回MsgID
+        Acceptor <-- ResendHandler: 重复消息，返回MsgID
+    else TempID不存在，CAS成功
+        Acceptor <-- ResendHandler --: 非重复消息
+        Acceptor -> Kafka ++: 发布消息到Kafka
+        return ok
+    end
+end
+return 消息正在发送
+
+@enduml

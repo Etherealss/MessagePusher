@@ -1,0 +1,73 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+class MsgAcceptorAppService {
+    - MsgAcceptor msgAcceptor;
+    + Result<?> sendMsg(SendPersonalMsgCommand command, Long appId)
+    + Result<?> sendMsg(SendGroupMsgCommand command, Long appId)
+}
+
+MsgAcceptorAppService ..> MsgAcceptor
+
+class MsgAcceptor {
+    - MsgSeqHandler msgSeqHandler;
+    - MqProducer mqProducer;
+    - MsgMqTopic msgMqTopic;
+    - UidGenerator uidGenerator;
+    + Result<Long> sendMsg(Msg msg, MsgHeader msgHeader)
+}
+
+MsgAcceptor ..> MsgResendHandler: 幂等性保证
+MsgAcceptor ..> MsgSeqHandler: 有序性保证
+MsgAcceptor ..> MsgRelationVerifier: 消息关系验证
+MsgAcceptor ..> UidGenerator: 唯一ID生成
+MsgAcceptor .> MqProducer: 消息关系验证
+
+class MsgSeqHandler {
+    - RedisTemplate<String, String> redisTemplate;
+    - MsgSeqProperties msgSeqProperties;
+    - RetryTemplate msgSeqRetryTemplate;
+    + boolean handlerMsgSeq(MsgHeader msgHeader)
+    - boolean checkPreMsgAccepted(MsgHeader msgHeader)
+    - boolean isTimeLimitExceeded(Date preMsgSendTime)
+    + void setCurMsgTempId4Seq(MsgHeader msgHeader)
+}
+
+class MqProducer {
+    - KafkaTemplate<Long, Msg> kafkaTemplate;
+    + SendResult<Long, Msg> send(String topic, Long key, Msg msg)
+}
+
+interface UidGenerator {
+    + long nextId();
+}
+
+class SnowFlakeUidGenerator implements UidGenerator {
+    + SnowFlakeUidGenerator(long dataCenterId, long machineId)
+    + long nextId();
+}
+
+class MsgRelationVerifier {
+    - RelationFeign relationFeign;
+    + boolean doVerify(Msg msg)
+    - boolean verifySubRelation(PersonalMsg msg)
+    - boolean needVerifySubRelation(PersonalMsg msg)
+    - boolean verifyGroupRelation(GroupMsg msg)
+
+}
+
+class MsgResendHandler {
+    - RedisTemplate<String, String> redisTemplate;
+    - MsgResendProperties msgResendProperties;
+    + boolean isDuplicateMsg(MsgHeader msgHeader)
+}
+
+@enduml

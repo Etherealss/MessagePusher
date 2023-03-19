@@ -1,0 +1,28 @@
+@startjson
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+{
+    "connectorId": "连接者ID",
+    "relations": [
+        {
+            "subrId": "连接者ID 1",
+            "relationTopic": "关系主题 1"
+        },
+        {
+            "subrId": "订阅的连接者ID 1",
+            "relationTopic": "关系主题 2"
+        },
+        {
+            "subrId": "订阅的连接者ID 2",
+            "relationTopic": "关系主题 3"
+        }
+    ]
+}
+@endjson

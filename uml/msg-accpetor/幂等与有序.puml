@@ -1,0 +1,64 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package domain {
+    class MsgAcceptor {
+        - MsgResendHandler msgResendHandler;
+        - MsgSeqHandler msgSeqHandler;
+        + Result<Long> sendMsg(Msg)
+    }
+    class MsgSeqHandler {
+        - TempIdHandler tempIdHandler;
+        - MsgSeqProperties msgSeqProperties;
+        - RetryTemplate msgSeqRetryTemplate;
+        + boolean handlerMsgSeq(MsgHeader)
+        - boolean checkPreMsgAccepted(MsgHeader)
+        - boolean isTimeLimitExceeded(Date preSendTime)
+    }
+
+    class MsgResendHandler {
+        - TempIdHandler tempIdHandler;
+        - MsgResendProperties msgResendProperties;
+        + boolean isDuplicateMsg(MsgHeader)
+    }
+}
+
+
+package infrastructure {
+    class MsgSeqProperties {
+        Long timeLimit;
+        Integer retryTimes;
+        Long retryInterval;
+        String cacheKey;
+        Long expireMs;
+    }
+
+    class MsgResendProperties {
+        String cacheKey;
+        Long expireMs;
+    }
+    class TempIdHandler {
+        - RedisTemplate redisTemplate;
+        - void setCurMsgTempId(UUID tempId)
+        + UUID isTempIdExist(UUID tempId)
+    }
+}
+MsgAcceptor ..> MsgResendHandler: 幂等性保证
+MsgAcceptor ..> MsgSeqHandler: 有序性保证
+
+MsgResendHandler ..> MsgResendProperties: 配置
+MsgSeqHandler ..> MsgSeqProperties: 配置
+
+MsgResendHandler .> TempIdHandler: 操作TempID
+MsgSeqHandler ..> TempIdHandler: 操作TempID
+
+TempIdHandler ..> RedisTemplate: Spring Redis操作
+@enduml

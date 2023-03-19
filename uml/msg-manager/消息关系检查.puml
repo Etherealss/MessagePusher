@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+
+package domain {
+    class MsgAcceptor {
+        - MsgRelationVerifier msgRelationVerifier;
+        + Result<Long> sendMsg(Msg msg, MsgHeader msgHeader)
+    }
+
+    class MsgRelationVerifier {
+        - RelationFeign relationFeign;
+        + boolean doVerify(Msg msg)
+        - boolean verifySubRelation(PersonalMsg msg)
+        - boolean needVerifySubRelation(PersonalMsg msg)
+        - boolean verifyGroupRelation(GroupMsg msg)
+    }
+}
+MsgAcceptor ..> MsgRelationVerifier: 消息关系验证
+
+package infrastructure {
+    interface RelationFeign {
+        Boolean checkSubRelation(Long connectorId,Long subrId,String relationTopic);
+        Boolean checkMember(Long groupId,Long memberId);
+    }
+}
+MsgRelationVerifier ..> RelationFeign
+@enduml

@@ -1,0 +1,78 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+package application {
+    class MsgAppService {
+        - SingleRcvrMsgDispathcer singleRcvrMsgDispathcer;
+        - GroupRcvrMsgDispathcer groupRcvrMsgDispathcer;
+        + void recvNewMsg(List<Msg> msgs, Acknowledgment)
+    }
+}
+
+package domain {
+    abstract class AbstractMsgDispatcher<T extends Msg> {
+        # MsgPusher msgPusher;
+        # ConnectFiegn connectFiegn;
+        # MsgConverter converter;
+        # RelationFeign relationFeign;
+        + List<Long> doDispatch(List<T> msgs);
+        # Map<Long, List<Long>> getRevrIds(List<MsgHeader> headers)
+        # Map<Long, ConnectorAddress> getRouteAddress(List<Long> rcvrIds)
+        - List<Long> pushMsg(String ip, Integer port, List<T> msgs)
+    }
+    note left of AbstractMsgDispatcher::"getRevrIds(List<MsgHeader> headers)"
+        返回值是某个MsgID对应的多个连接者ID的Map
+    end note
+    note left of AbstractMsgDispatcher::"getRouteAddress(List<Long> rcvrIds)"
+        返回值是某个连接者ID对应的路由信息
+    end note
+
+    class SingleRcvrMsgDispathcer{
+        # Map<Long, List<Long>> getRevrIds(List<MsgHeader> headers)
+        # Map<Long, ConnectorAddress> getRouteAddress(List<Long> rcvrIds)
+    }
+
+    class GroupRcvrMsgDispathcer {
+        # Map<Long, List<Long>> getRevrIds(List<MsgHeader> headers)
+        # Map<Long, ConnectorAddress> getRouteAddress(List<Long> rcvrIds)
+    }
+}
+
+package infrastructure {
+    interface RelationFeign {
+        + Boolean checkSubRelation(\n\tLong connectorId,Long subrId,\n\tString relationTopic\n)
+        + List<Long> getGroupMembers(Long groupId)
+    }
+
+    interface ConnectFiegn {
+        + void pushMsg(\n\tMultiMsgPushCommand msg, String ip, Integer rcvrPort\n)
+        + ConnectorAddress getConnectorAddress(Long connectorId)
+    }
+
+
+    class MsgPusher {
+        - ConnectFiegn connectFiegn;
+        + boolean pushMsg(\n\tMultiMsgPushCommand msg, String rcvrIp, Integer rcvrPort\n)
+    }
+}
+
+MsgAppService ..> SingleRcvrMsgDispathcer
+MsgAppService ..> GroupRcvrMsgDispathcer
+
+AbstractMsgDispatcher ..> MsgPusher: 消息推送
+AbstractMsgDispatcher .> RelationFeign: 关系检查
+AbstractMsgDispatcher .> ConnectFiegn: 连接路由
+
+MsgPusher ..> ConnectFiegn: 消息推送
+
+SingleRcvrMsgDispathcer ..|> AbstractMsgDispatcher
+GroupRcvrMsgDispathcer ..|> AbstractMsgDispatcher
+
+@enduml

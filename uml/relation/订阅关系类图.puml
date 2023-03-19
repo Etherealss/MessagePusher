@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package application {
+    class SubRelationAppService {
+        - SubRelationService subRelationService;
+        + void createSubRelation(Long connectorId, Long subrId, String relationTopic)
+        + void removeSubRelation(Long connectorId, Long subrId, String relationTopic)
+        + List<String> getSubRelations(Long connectorId, Long subrId)
+        + boolean checkSubRelation(Long connectorId, Long subrId, String relationTopic)
+    }
+}
+
+package domain {
+    class SubRelationService {
+        - MongoTemplate mongoTemplate;
+        + void upsertSubRelation(Long connectorId, Long subrId, String relationTopic)
+        + void removeSubRelation(Long connectorId, Long subrId, String relationTopic)
+        + List<String> getSubRelations(Long connectorId, Long subrId)
+        + boolean checkSubRelation(Long connectorId, Long subrId, String relationTopic)
+    }
+    class SubRelationEntity {
+        Long connectorId;
+        List<SubRelationItem> relations;
+    }
+    class SubRelationItem {
+        Long subrId;
+        String relationTopic;
+    }
+}
+
+SubRelationAppService ..> SubRelationService
+SubRelationItem <-* SubRelationEntity
+SubRelationService -[hidden]-> SubRelationEntity
+
+@enduml

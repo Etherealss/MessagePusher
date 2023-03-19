@@ -1,0 +1,69 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+
+package application {
+    class SubRelationAppService {
+        - SubRelationService subRelationService;
+        + void createSubRelation(CreateSubRelationCommand)
+        + void removeSubRelation(RemoveSubRelationCommand)
+        + List<String> getSubRelations(Long connectorId, Long subrId)
+        + boolean checkSubRelation(Long connectorId, Long subrId, String relationTopic)
+    }
+
+    class GroupAppService {
+        - GroupRelationService groupRelationService;
+        - GroupService groupService;
+        + Long createGroup(CreateGroupCommand command)
+        + void joinGroup(JoinGroupCommand command)
+        + void quitGroup(QuitGroupRelationCommand command)
+        + List<Long> getGroupMembers(Long groupId)
+        + boolean checkMember(Long groupId, Long memberId)
+    }
+}
+
+package domain {
+    class GroupRelationService {
+        - MongoTemplate mongoTemplate;
+        + void createGroupRelation(JoinGroupCommand command)
+        + void removeGroupRelation(QuitGroupRelationCommand command)
+        + List<Long> getGroupRelations(Long groupId)
+        + boolean checkGroupRelation(Long groupId, Long memberId
+    }
+
+    class SubRelationService {
+        - MongoTemplate mongoTemplate;
+        + void upsertSubRelation(CreateSubRelationCommand)
+        + void removeSubRelation(RemoveSubRelationCommand)
+        + List<String> getSubRelations(Long connectorId, Long subrId)
+        + boolean checkSubRelation(Long connectorId, Long subrId, String relationTopic)
+    }
+
+    class GroupRelationEntity {
+        - Long groupId;
+        - Long appId;
+        - String groupTopic;
+        - Long creatorId;
+        - List<Long> memberIds;
+    }
+
+    class SubRelationEntity {
+        Long connectorId;
+        List<SubRelationItem> relations;
+    }
+    class SubRelationItem {
+        Long subrId;
+        String relationTopic;
+    }
+}
+SubRelationAppService ..> SubRelationService
+GroupAppService ..> GroupRelationService
+SubRelationItem <-* SubRelationEntity
+@enduml
