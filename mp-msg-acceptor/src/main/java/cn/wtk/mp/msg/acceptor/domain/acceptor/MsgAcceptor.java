@@ -1,7 +1,6 @@
 package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
 import cn.wtk.mp.common.base.enums.ApiInfo;
-import cn.wtk.mp.common.base.exception.BaseException;
 import cn.wtk.mp.common.base.pojo.Result;
 import cn.wtk.mp.common.base.uid.UidGenerator;
 import cn.wtk.mp.common.msg.entity.Msg;
@@ -37,12 +36,6 @@ public class MsgAcceptor {
             return new Result<>(true, ApiInfo.MSG_DUPILICATE);
         }
         msgSeqHandler.handlerMsgSeq(spec);
-
-        if (!msgRelationVerifier.doVerify(msg)) {
-            throw new BaseException(ApiInfo.MSG_REALTION_MISMATCH,
-                    "发送方与接收方关系不匹配，无法发送。"
-            );
-        }
         long msgId = uidGenerator.nextId();
         msg.setMsgId(msgId);
         try {

@@ -68,7 +68,11 @@ public class RedisLockHelper {
         redisScript.setScriptText(SCRIPT_TEXT);
         redisScript.setResultType(Long.class);
         //没有指定序列化方式，默认使用上面配置的
-        Object result = stringRedisTemplate.execute(redisScript, Collections.singletonList(lockKey), value);
+        Object result = stringRedisTemplate.execute(
+                redisScript,
+                Collections.singletonList(lockKey),
+                value
+        );
         return Long.valueOf(1L).equals(result);
     }
 

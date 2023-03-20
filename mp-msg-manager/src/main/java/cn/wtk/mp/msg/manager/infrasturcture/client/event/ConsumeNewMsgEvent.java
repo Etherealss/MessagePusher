@@ -1,7 +1,7 @@
 package cn.wtk.mp.msg.manager.infrasturcture.client.event;
 
 import cn.wtk.mp.common.base.pojo.DomainEvent;
-import cn.wtk.mp.common.msg.entity.Msg;
+import cn.wtk.mp.msg.manager.domain.msg.ManageMsg;
 import lombok.Getter;
 import org.springframework.kafka.support.Acknowledgment;
 
@@ -12,11 +12,11 @@ import org.springframework.kafka.support.Acknowledgment;
  */
 @Getter
 public class ConsumeNewMsgEvent extends DomainEvent {
-    private final Msg msg;
+    private final ManageMsg msg;
     private final Acknowledgment ack;
 
-    public ConsumeNewMsgEvent(Msg msg, Acknowledgment ack) {
-        super(msg);
+    public ConsumeNewMsgEvent(ManageMsg msg, Acknowledgment ack) {
+        super(ack);
         this.msg = msg;
         this.ack = ack;
     }

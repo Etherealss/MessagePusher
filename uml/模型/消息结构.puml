@@ -8,64 +8,13 @@ skinparam activity  {
     FontSize 14
 }
 
-abstract class AbstractMsg {
-    - Long msgId;
-    - Long appId;
-    - MsgType msgType;
-    - Date sendTime;
-}
-
-abstract class TransferMsg extends AbstractMsg {
-    - String msgTopic;
-    - Object payload;
-    - Object detail;
-    - MsgTransferStatus transferStatus;
-    - Date saveTime;
-    - Date recvTime;
-    - Long senderId;
-}
-TransferMsg -- MsgTransferStatus
-AckMsg -- MsgTransferStatus
-
-enum MsgTransferStatus {
-    SENDING
-    SENT
-    REND
-    FAIL
-    REJECT
-}
-
-class PersonalMsg extends TransferMsg {
-    - Long rcvrId;
-    - String relationTopic;
-}
-
-class GroupMsg extends TransferMsg {
-    - Long groupId;
-}
-
-class AckMsg extends AbstractMsg {
-    - Long ackMsgId;
-    - MsgTransferStatus ackType;
-}
-
-newpage
-
-skinparam shadowing false
-skinparam defaultFontName xfonts-wqy
-skinparam dpi 300
-skinparam activity  {
-    DiamondFontSize 14
-    ArrowFontSize 14
-    FontSize 14
-}
 class Msg {
     - MsgHeader msgHeader;
     - MsgBody msgBody;
 }
 
-Msg -- MsgHeader
-Msg -- MsgBody
+Msg --> MsgHeader
+Msg --> MsgBody
 
 class MsgHeader {
     - UUID tempId
@@ -87,6 +36,7 @@ class MsgBody {
     - String msgTopic;
     - MsgType msgType;
     - Date sendTime;
+    - MsgTransferStatus status;
     - Object payload;
     - Object detail;
 }
@@ -97,4 +47,14 @@ class PersonalMsgBody extends MsgBody {
 class GroupMsgBody extends MsgBody {
     - Long groupId;
 }
+
+enum MsgTransferStatus {
+    SENDING
+    SENT
+    REND
+    FAIL
+    REJECT
+}
+
+MsgTransferStatus <-- MsgBody
 @enduml

@@ -1,14 +1,11 @@
 package cn.wtk.mp.msg.manager.domain.msg.dispatcher;
 
-import cn.wtk.mp.common.msg.entity.PersonalMsg;
-import cn.wtk.mp.msg.manager.domain.msg.IMsgDispatcher;
-import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MsgPushCommand;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
+import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
+import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgPushConverter;
+import cn.wtk.mp.msg.manager.infrasturcture.exception.RelationException;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.RelationFeign;
 import cn.wtk.mp.msg.manager.infrasturcture.service.MsgPusher;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -20,29 +17,29 @@ import java.util.List;
  * @date 2023/2/23
  */
 @Slf4j
-@RequiredArgsConstructor
 @Component
-public class SingleRcvrMsgDispathcer implements IMsgDispatcher<PersonalMsg> {
+public class SingleRcvrMsgDispathcer extends AbstractMsgDispatcher {
 
-    private final MsgPusher msgPusher;
-    private final ConnectFiegn connectFiegn;
-    private final MsgConverter converter;
 
-    /**
-     * {@inheritDoc}
-     */
+    public SingleRcvrMsgDispathcer(MsgPusher msgPusher, ConnectFiegn connectFiegn, MsgPushConverter converter, RelationFeign relationFeign) {
+        super(msgPusher, connectFiegn, converter, relationFeign);
+    }
+
     @Override
-    public List<Long> doDispatch(PersonalMsg msg) {
-        Long rcvrId = msg.getRcvrId();
-        MsgPushCommand msgPushCommand = converter.toPushDTO(msg);
-        msgPushCommand.setRcvrIds(Collections.singletonList(rcvrId));
-        MultiMsgPushCommand multiMsgPushCommand = new MultiMsgPushCommand(msgPushCommand);
-        ConnectorAddressDTO rcvrAddress = connectFiegn.getConnectorAddress(rcvrId);
-        boolean successful = msgPusher.pushMsg(multiMsgPushCommand, rcvrAddress.getIp(), rcvrAddress.getPort());
-        if (successful) {
-            return Collections.emptyList();
+    protected List<Long> getRevrIds(MsgHeader msgHeader) {
+        List<Long> rcvrIds = Collections.singletonList(msgHeader.getRcvrId());
+        if (!msgHeader.getNeedRelationVerify()) {
+            return rcvrIds;
+        }
+        Boolean success = super.relationFeign.checkSubRelation(
+                msgHeader.getSenderId(),
+                msgHeader.getRcvrId(),
+                msgHeader.getRelationTopic()
+        );
+        if (Boolean.TRUE.equals(success)) {
+            return rcvrIds;
         } else {
-            return Collections.singletonList(rcvrId);
+            throw new RelationException("关系不匹配");
         }
     }
 }

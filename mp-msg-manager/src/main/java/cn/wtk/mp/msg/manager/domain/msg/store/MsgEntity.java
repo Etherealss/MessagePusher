@@ -5,6 +5,7 @@ import cn.wtk.mp.common.msg.enums.MsgType;
 import cn.wtk.mp.msg.manager.infrasturcture.constant.MsgEntityFieldName;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -17,12 +18,13 @@ import java.util.Date;
  * @date 2023-02-11
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Document(MsgEntityFieldName.TABLE)
 @Getter
 @Setter
 @ToString(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class PersistentMsgEntity {
+public abstract class MsgEntity {
     @MongoId(FieldType.INT64)
     @Field(MsgEntityFieldName.MSG_ID)
     Long msgId;

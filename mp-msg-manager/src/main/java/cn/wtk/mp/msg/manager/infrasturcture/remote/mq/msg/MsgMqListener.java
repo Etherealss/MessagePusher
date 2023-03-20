@@ -1,6 +1,7 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.mq.msg;
 
-import cn.wtk.mp.common.msg.entity.Msg;
+import cn.wtk.mp.msg.manager.domain.msg.ManageMsg;
+import cn.wtk.mp.msg.manager.infrasturcture.client.event.ConsumeNewMsgEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,8 +25,9 @@ public class MsgMqListener {
             topics = {"${mp.manager.mq.consumer.msg.topic}"},
             groupId = "${mp.manager.mq.consumer.msg.group}"
     )
-    public void consumeMsg(ConsumerRecord<Long, Msg> record, final Acknowledgment ack) {
-        log.info("消费者消费 Msg -> {}", record.value());
-//        eventPublisher.publishEvent(new ConsumeNewMsgEvent(record.value(), ack));
+    public void consumeMsg(ConsumerRecord<Long, ManageMsg> record, final Acknowledgment ack) {
+        log.info("消费者消费 Msg -> {}", record.value().getMsgBody().getMsgId()
+        );
+        eventPublisher.publishEvent(new ConsumeNewMsgEvent(record.value(), ack));
     }
 }

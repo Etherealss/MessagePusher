@@ -40,5 +40,4 @@ public class MsgAcceptorAppService {
         msg.setMsgType(MsgType.GROUP);
         return msgAcceptor.sendMsg(msg, spec);
     }
-
 }

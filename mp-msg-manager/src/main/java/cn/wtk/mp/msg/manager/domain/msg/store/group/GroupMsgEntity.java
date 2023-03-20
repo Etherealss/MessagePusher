@@ -1,13 +1,10 @@
 package cn.wtk.mp.msg.manager.domain.msg.store.group;
 
 import cn.wtk.mp.common.msg.enums.MsgType;
-import cn.wtk.mp.msg.manager.domain.msg.store.PersistentMsgEntity;
+import cn.wtk.mp.msg.manager.domain.msg.store.MsgEntity;
 import cn.wtk.mp.msg.manager.infrasturcture.constant.MsgEntityFieldName;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -15,10 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * @date 2023-02-12
  */
 @EqualsAndHashCode(callSuper = true)
-@Document("mp-msg-group")
-@Data
+@Getter
+@Setter
+@ToString(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GroupMsgEntity extends PersistentMsgEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+public class GroupMsgEntity extends MsgEntity {
     @Field(MsgEntityFieldName.SENDER_ID)
     Long senderId;
 

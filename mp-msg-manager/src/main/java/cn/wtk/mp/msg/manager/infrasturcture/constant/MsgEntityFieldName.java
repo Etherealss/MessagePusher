@@ -5,6 +5,7 @@ package cn.wtk.mp.msg.manager.infrasturcture.constant;
  * @date 2023/2/22
  */
 public class MsgEntityFieldName {
+    public static final String TABLE = "mp-msg";
     public static final String MSG_ID = "msgId";
     public static final String APP_ID = "appId";
     public static final String SEND_TIME = "sendTime";
