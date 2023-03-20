@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author wtk
  * @date 2023/2/24
@@ -18,5 +20,9 @@ public class RouteAddressAppService {
 
     public ConnectorAddressDTO getConnectorRouteAddress(Long connectorId) {
         return routeAddressManager.getConnectorRouteAddress(connectorId);
+    }
+
+    public List<ConnectorAddressDTO> getConnectorRouteAddress(List<Long> connectorIds) {
+        return routeAddressManager.getConnectorRouteAddresses(connectorIds);
     }
 }

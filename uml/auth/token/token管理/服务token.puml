@@ -17,6 +17,7 @@ package domain {
         + T invalidateToken(String token, Class<T> credentialType)
     }
 }
+
 package infrastructure {
     interface ITokenHandler {
         void saveToken(TokenCredential credential)
@@ -30,8 +31,9 @@ package infrastructure {
         ---
         实现接口方法
     }
-    class RedisTemplate
 }
+class RedisTemplate
+
 TokenCredentialService ..> ITokenHandler: Token存取
-RedisTemplate <. RedisTokenHandlerImpl: Spring Redis操作
+RedisTemplate <. RedisTokenHandlerImpl: 通过Redis存取Token
 @enduml

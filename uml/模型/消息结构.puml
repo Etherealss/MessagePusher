@@ -37,15 +37,10 @@ class MsgBody {
     - MsgType msgType;
     - Date sendTime;
     - MsgTransferStatus status;
+    - Long rcvrId;
+    - Long groupId;
     - Object payload;
     - Object detail;
-}
-class PersonalMsgBody extends MsgBody {
-    - Long rcvrId;
-}
-
-class GroupMsgBody extends MsgBody {
-    - Long groupId;
 }
 
 enum MsgTransferStatus {
