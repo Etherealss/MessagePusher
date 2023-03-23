@@ -2,6 +2,7 @@ package cn.wtk.mp.connect.domain.conn.server;
 
 import cn.wtk.mp.connect.domain.conn.server.connector.Connector;
 import cn.wtk.mp.connect.domain.conn.server.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.msg.connector.TransferMsg;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
 import com.mongodb.lang.NonNull;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +48,7 @@ public class ServerConnContainer {
         }
     }
 
-    public Connection removeConn(@NonNull Long connectorId,@NonNull UUID connId) {
+    public Connection removeConn(@NonNull Long connectorId, @NonNull UUID connId) {
         // 要获取lambda表达式里的变量需要使用Atomic对象
         AtomicReference<Connection> connRef = new AtomicReference<>();
         AtomicBoolean connectorRemoved = new AtomicBoolean(false);
@@ -68,7 +70,7 @@ public class ServerConnContainer {
         return connRef.get();
     }
 
-    public Connection getConn(@NonNull Long connectorId,@NonNull UUID connId) {
+    public Connection getConn(@NonNull Long connectorId, @NonNull UUID connId) {
         Connector connector = connectors.get(connectorId);
         if (connector == null) {
             return null;
@@ -77,8 +79,20 @@ public class ServerConnContainer {
     }
 
     public Connector getConnector(@NonNull Long connectorId) {
-        Connector connector = connectors.get(connectorId);
-        return connector;
+        return connectors.get(connectorId);
+    }
+
+    /**
+     * TODO 异常处理、重试
+     * @param msgs
+     */
+    public void pushMsg(List<TransferMsg> msgs) {
+        for (TransferMsg msg : msgs) {
+            for (Long rcvrId : msg.getRcvrIds()) {
+                Connector connector = this.getConnector(rcvrId);
+                connector.pushMsg(msg);
+            }
+        }
     }
 
     public int getConnetorSize() {

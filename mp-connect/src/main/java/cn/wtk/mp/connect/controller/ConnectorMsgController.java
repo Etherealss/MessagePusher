@@ -1,7 +1,8 @@
 package cn.wtk.mp.connect.controller;
 
 import cn.wtk.mp.common.base.web.ResponseAdvice;
-import cn.wtk.mp.connect.infrastructure.client.command.msg.connector.MultiConnectorMsgPushCommand;
+import cn.wtk.mp.connect.application.connector.MsgPushAppService;
+import cn.wtk.mp.connect.infrastructure.client.command.MultiMsgPushCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -16,13 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/connectors/{connectorId}/msgs")
+@RequestMapping
 @RequiredArgsConstructor
 @ResponseAdvice
 public class ConnectorMsgController {
 
-    @PostMapping
-    public void pushMsg(@RequestBody @Validated MultiConnectorMsgPushCommand msg) {
+    private final MsgPushAppService msgPushAppService;
 
+    @PostMapping("/list/connectors/msgs")
+    public void pushMsg(@RequestBody @Validated MultiMsgPushCommand msg) {
+        msgPushAppService.pushMsg(msg);
     }
 }

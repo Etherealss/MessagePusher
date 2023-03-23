@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.client.command.msg.connector;
+package cn.wtk.mp.connect.infrastructure.client.command;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,8 +18,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @NoArgsConstructor
-public class MultiConnectorMsgPushCommand {
+public class MultiMsgPushCommand {
     @Valid
     @NotEmpty
-    List<ConnectorMsgPushCommand> msgs;
+    List<MsgPushCommand> msgs;
 }

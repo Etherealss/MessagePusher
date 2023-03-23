@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author wtk
@@ -13,12 +14,13 @@ import java.util.Date;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public abstract class TransferMsg {
+public class TransferMsg {
     Long msgId;
     Long appId;
     MsgType msgType;
     String msgTopic;
-    Object data;
+    List<Long> rcvrIds;
+    Object payload;
     Date sendTime;
     Date saveTime;
     Long senderId;

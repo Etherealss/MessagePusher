@@ -1,6 +1,7 @@
 package cn.wtk.mp.connect.domain.conn.server.connector;
 
 import cn.wtk.mp.connect.domain.conn.server.connector.connection.Connection;
+import cn.wtk.mp.connect.domain.msg.connector.TransferMsg;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,13 @@ public class Connector {
     public Connector(Long connectorId, Long appId) {
         this.connectorId = connectorId;
         this.appId = appId;
+    }
+
+    public boolean pushMsg(TransferMsg msg) {
+        for (Connection conn : conns.values()) {
+            conn.pushMsg(msg);
+        }
+        return true;
     }
 
     @Override

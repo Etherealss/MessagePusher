@@ -1,5 +1,8 @@
 package cn.wtk.mp.connect.domain.conn.server.connector.connection;
 
+import cn.wtk.mp.connect.domain.msg.connector.TransferMsg;
+import cn.wtk.mp.connect.infrastructure.remote.netty.MessageSender;
+import cn.wtk.mp.connect.infrastructure.remote.netty.WebSocketMsg;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,4 +20,8 @@ public class Connection {
     private Long connectorId;
     private Long appId;
     private ChannelHandlerContext ctx;
+
+    public void pushMsg(TransferMsg msg) {
+        MessageSender.send(ctx.channel(), new WebSocketMsg(msg));
+    }
 }

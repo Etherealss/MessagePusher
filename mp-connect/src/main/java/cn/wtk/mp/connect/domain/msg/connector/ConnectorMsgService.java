@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 public class ConnectorMsgService {
 
-    public void pushMsg(List<ConnectorTransferMsg> msgs) {
+    public void pushMsg(List<TransferMsg> msgs) {
 
     }
 }

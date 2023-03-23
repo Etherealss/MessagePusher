@@ -1,5 +1,6 @@
 package cn.wtk.mp.connect.domain.conn.server.connector.connection;
 
+import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import cn.wtk.mp.common.base.utils.UUIDUtil;
 import cn.wtk.mp.common.base.utils.UrlUtil;
@@ -9,6 +10,7 @@ import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import cn.wtk.mp.connect.infrastructure.remote.feign.AuthFeign;
 import cn.wtk.mp.connect.infrastructure.remote.netty.MessageSender;
+import cn.wtk.mp.connect.infrastructure.remote.netty.WebSocketMsg;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -40,7 +42,6 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
     private static final String HEADER_ORIGIN = "Origin";
 
     private final AuthFeign authFeign;
-    private final MessageSender messageSender;
     private final ServerConnContainer serverConnContainer;
     private final NettyServerConfig nettyServerConfig;
 
@@ -61,7 +62,8 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
             httpRequestAuth(ctx, (FullHttpRequest) msg);
         } else {
             log.info("连接尚未认证，关闭连接");
-            messageSender.send(ctx.channel(), "连接尚未认证");
+            WebSocketMsg data = new WebSocketMsg(ApiInfo.CONNECT_UNAUTH);
+            MessageSender.send(ctx.channel(), data);
             ctx.close();
         }
         super.channelRead(ctx, msg);
@@ -78,8 +80,10 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
             // 如果URI一致，才会通过握手建立WebSocket连接
             request.setUri(nettyServerConfig.getPath());
         } else {
-            // TODO 发送给客户端的数据结构
-            messageSender.send(ctx.channel(), authResult.getErrorMsg());
+            WebSocketMsg data = new WebSocketMsg(
+                    ApiInfo.CONNECT_AUTH_FAIL, authResult.getErrorMsg()
+            );
+            MessageSender.send(ctx.channel(), data);
             ctx.close();
         }
     }
