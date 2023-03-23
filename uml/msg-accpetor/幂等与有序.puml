@@ -59,6 +59,4 @@ MsgSeqHandler ..> MsgSeqProperties: 配置
 
 MsgResendHandler .> TempIdHandler: 操作TempID
 MsgSeqHandler ..> TempIdHandler: 操作TempID
-
-TempIdHandler ..> RedisTemplate: Spring Redis操作
 @enduml

@@ -25,13 +25,8 @@ alt 不存在注解，不需要验证
 else 存在注解，需要验证
     IPreAuthHandler -> ThreadLocal ++: 获取TokenCredential
     return TokenCredential
-    alt TokenCredential为空
-        AOP <- IPreAuthHandler : Token认证失败
-        Server <- AOP:  Token认证失败
-    else TokenCredential不为空
-        AOP <- IPreAuthHandler : Token认证通过
-        Server <- AOP:  Token认证通过
-    end
+    return TokenCredential为空则认证不通过
+    return TokenCredential为空则认证不通过
 end
 
 @enduml

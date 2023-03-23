@@ -23,16 +23,16 @@ return 缓存结果
 
 alt 缓存不存在
     ServerCredentialCacheHandler -> Auth++: 验证token
-    return 验证结果，如果通过校验\n则返回 TokenCredential
+    return 验证结果，如果通过校验，则返回 TokenCredential
     ServerCredentialCacheHandler -> Redis++:缓存验证结果
     return ok
 else 缓存存在
-    ICreentialVerifier <- ServerCredentialCacheHandler: 跳过远程调用，\n直接返回验证结果
+    ICreentialVerifier <- ServerCredentialCacheHandler: 跳过远程调用，直接返回验证结果
 end
 
 ServerCredentialCacheHandler -> ServerCredentialCacheHandler ++--: 验证缓存
 alt 验证通过
-    ICreentialVerifier <- ServerCredentialCacheHandler: 返回缓存的\nTokenCredential
+    ICreentialVerifier <- ServerCredentialCacheHandler: 返回缓存的 TokenCredential
 else 验证不通过
     ICreentialVerifier <- ServerCredentialCacheHandler--: 返回缓存null
 end
