@@ -43,7 +43,7 @@ public class MsgAppService {
         if (!msg.getMsgHeader().getNeedPersistent()) {
             return;
         }
-        msgService.insert(msg);
+        msgService.insert(msg.getMsgBody());
     }
 
     private void dispatch(ManageMsg msg) {

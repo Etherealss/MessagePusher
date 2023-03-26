@@ -44,6 +44,12 @@ public abstract class MsgEntity {
     @Field(MsgEntityFieldName.SENDER_ID)
     Long senderId;
 
+    @Field(MsgEntityFieldName.RCVR_ID)
+    Long rcvrId;
+
+    @Field(MsgEntityFieldName.MSG_TYPE)
+    MsgType msgType = MsgType.GROUP;
+
     @Field(MsgEntityFieldName.SEND_TIME)
     Date sendTime;
 
@@ -52,6 +58,4 @@ public abstract class MsgEntity {
 
     @Field(MsgEntityFieldName.RECV_TIME)
     Date recvTime;
-
-    public abstract MsgType getMsgType();
 }

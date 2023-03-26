@@ -1,7 +1,6 @@
 package cn.wtk.mp.msg.manager.domain.msg;
 
 import cn.wtk.mp.common.msg.entity.Msg;
-import cn.wtk.mp.msg.manager.infrasturcture.client.converter.GroupMsgConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class MsgManager {
 
     private final MongoTemplate mongoTemplate;
-    private final GroupMsgConverter msgConverter;
 
     public boolean insertMsg(Msg msg) {
         return true;
