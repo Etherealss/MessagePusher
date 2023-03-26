@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/msgs")
+@RequestMapping("/msgs/all/{msgId}")
 @RequiredArgsConstructor
 @ResponseAdvice
 public class MsgController {
+
 }

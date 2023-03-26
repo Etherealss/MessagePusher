@@ -19,9 +19,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PersonalMsgEntity extends MsgEntity {
-    @Field(MsgEntityFieldName.SENDER_ID)
-    Long senderId;
-
     @Field(MsgEntityFieldName.RCVR_ID)
     Long rcvrId;
 

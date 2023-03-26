@@ -1,0 +1,69 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+package application {
+    class MsgAppService {
+        - SingleRcvrMsgDispathcer singleRcvrMsgDispathcer
+        - GroupRcvrMsgDispathcer groupRcvrMsgDispathcer
+        + void recvNewMsg(List<Msg> msgs, Acknowledgment)
+    }
+}
+
+package domain {
+    abstract class AbstractMsgDispatcher<T extends Msg> {
+        # MsgPusher msgPusher
+        # ConnectFiegn connectFiegn
+        # MsgConverter converter
+        # RelationFeign relationFeign
+        + void doDispatch(ManageMsg msg)
+        # {abstract} List<Long> getRevrIds(MsgHeader msgHeader)
+        - List<ConnectorAddressDTO> getAddresses(List<Long> revrIds)
+        - void pushMsg(String ip, Integer port, MsgPushCommand msgPushCommand)
+    }
+
+    class SingleRcvrMsgDispathcer{
+        # List<Long> getRevrIds(MsgHeader msgHeader)
+    }
+
+    class GroupRcvrMsgDispathcer {
+        # List<Long> getRevrIds(MsgHeader msgHeader)
+    }
+}
+
+package infrastructure {
+    interface RelationFeign {
+        + Boolean checkSubRelation(\n\tLong connectorId,Long subrId,\n\tString relationTopic\n)
+        + List<Long> getGroupMembers(Long groupId)
+    }
+
+    interface ConnectFiegn {
+        + void pushMsg(\n\tMultiMsgPushCommand msg, String ip, Integer rcvrPort\n)
+        + ConnectorAddress getConnectorAddress(Long connectorId)
+    }
+
+    class MsgPusher {
+        - ConnectFiegn connectFiegn
+        + boolean pushMsg(\n\tMultiMsgPushCommand msg, \n\tString rcvrIp, Integer rcvrPort\n)
+    }
+}
+
+MsgAppService ..> SingleRcvrMsgDispathcer
+MsgAppService ..> GroupRcvrMsgDispathcer
+
+AbstractMsgDispatcher ..> MsgPusher: 消息推送
+AbstractMsgDispatcher .> RelationFeign: 关系检查
+AbstractMsgDispatcher .> ConnectFiegn: 连接路由
+
+MsgPusher ..> ConnectFiegn: 消息推送
+
+SingleRcvrMsgDispathcer ..|> AbstractMsgDispatcher
+GroupRcvrMsgDispathcer ..|> AbstractMsgDispatcher
+
+@enduml

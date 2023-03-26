@@ -4,6 +4,7 @@ import cn.wtk.mp.common.base.enums.MapperComponentModel;
 import cn.wtk.mp.common.msg.entity.PersonalMsg;
 import cn.wtk.mp.msg.manager.domain.msg.MsgBody;
 import cn.wtk.mp.msg.manager.domain.msg.store.personal.PersonalMsgEntity;
+import cn.wtk.mp.msg.manager.infrasturcture.client.dto.PersonalMsgDTO;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MsgPushCommand;
 import org.mapstruct.Mapper;
 
@@ -18,4 +19,6 @@ public interface PersonalMsgConverter {
     PersonalMsgEntity toEntity(MsgBody personalMsg);
     List<PersonalMsgEntity> toEntities(List<MsgBody> personalMsg);
     MsgPushCommand toPushDTO(PersonalMsg msg);
+    PersonalMsgDTO toDTO(PersonalMsgEntity entity);
+    List<PersonalMsgDTO> toDTO(List<PersonalMsgEntity> entity);
 }

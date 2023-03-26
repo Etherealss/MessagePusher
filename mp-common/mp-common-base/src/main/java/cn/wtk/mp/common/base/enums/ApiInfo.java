@@ -40,6 +40,9 @@ public enum ApiInfo {
     MSG_REALTION_MISMATCH(4000402, "[消息发送-关系不匹配]"),
     MSG_SEND_FAIL(5000403, "[消息发送-发送失败]"),
 
+    // ------------------- 05 连接 ------------------------
+    CONNECT_UNAUTH(4030501, "[连接-未校验]"),
+    CONNECT_AUTH_FAIL(4030502, "[连接-校验失败]"),
     ;
 
     final HttpStatus httpStatus;

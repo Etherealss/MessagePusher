@@ -32,9 +32,9 @@ public class MsgAcceptor {
 
     public Result<Long> sendMsg(Msg msg, MsgHandlerSpec spec) {
         // TODO 异步并发操作，线程池限流操作，责任链流水线
-        if (msgResendHandler.isDuplicateMsg(spec.getTempId())) {
-            return new Result<>(true, ApiInfo.MSG_DUPILICATE);
-        }
+//        if (msgResendHandler.isDuplicateMsg(spec.getTempId())) {
+//            return new Result<>(true, ApiInfo.MSG_DUPILICATE);
+//        }
         msgSeqHandler.handlerMsgSeq(spec);
         long msgId = uidGenerator.nextId();
         msg.setMsgId(msgId);

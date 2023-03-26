@@ -41,6 +41,9 @@ public abstract class MsgEntity {
     @Field(MsgEntityFieldName.TRANSFET_STATUS)
     MsgTransferStatus transferStatus;
 
+    @Field(MsgEntityFieldName.SENDER_ID)
+    Long senderId;
+
     @Field(MsgEntityFieldName.SEND_TIME)
     Date sendTime;
 

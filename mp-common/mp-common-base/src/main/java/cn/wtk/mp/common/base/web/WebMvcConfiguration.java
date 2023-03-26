@@ -23,7 +23,7 @@ import java.util.List;
  * @author wtk
  * @date 2022-01-26
  */
-@Slf4j(topic = "other")
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class WebMvcConfiguration implements WebMvcConfigurer {

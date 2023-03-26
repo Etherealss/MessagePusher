@@ -5,7 +5,7 @@ import cn.wtk.mp.common.msg.enums.MsgType;
 import cn.wtk.mp.msg.manager.domain.msg.ManageMsg;
 import cn.wtk.mp.msg.manager.domain.msg.store.group.GroupMsgService;
 import cn.wtk.mp.msg.manager.domain.msg.store.personal.PersonalMsgService;
-import cn.wtk.mp.msg.manager.infrasturcture.client.converter.PersonalMsgConverter;
+import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
 import cn.wtk.mp.msg.manager.infrasturcture.constant.MsgEntityFieldName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class MsgService {
 
     private final MongoTemplate mongoTemplate;
-    private final PersonalMsgConverter msgConverter;
+    private final MsgConverter msgConverter;
     private final PersonalMsgService personalMsgService;
     private final GroupMsgService groupMsgService;
 

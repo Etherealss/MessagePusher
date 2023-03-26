@@ -47,7 +47,7 @@ public class TokenCredentialService {
         if (credential.getClass() == credentialType) {
             return (T) credential;
         } else {
-            throw new BugException("token 类型不匹配，无法强转");
+            throw new BugException("Token 类型不匹配，无法强转");
         }
     }
 
@@ -61,7 +61,7 @@ public class TokenCredentialService {
         if (credential.getClass() == credentialType) {
             return (T) credential;
         } else {
-            throw new BugException("token 类型不匹配，无法强转");
+            throw new BugException("Token 类型不匹配，无法强转");
         }
     }
 
@@ -71,7 +71,7 @@ public class TokenCredentialService {
         if (credential.getClass() == credentialType) {
             return (T) credential;
         } else {
-            throw new BugException("token 类型不匹配，无法强转");
+            throw new BugException("Token 类型不匹配，无法强转");
         }
     }
 }

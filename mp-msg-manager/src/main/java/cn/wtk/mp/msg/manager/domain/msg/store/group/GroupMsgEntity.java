@@ -19,8 +19,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupMsgEntity extends MsgEntity {
-    @Field(MsgEntityFieldName.SENDER_ID)
-    Long senderId;
 
     @Field(MsgEntityFieldName.GROUP_ID)
     Long groupId;

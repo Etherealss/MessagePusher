@@ -21,6 +21,7 @@
         <module>mp-msg-acceptor</module>
         <module>mp-relation</module>
         <module>mp-msg-manager</module>
+        <module>mp-client-test</module>
     </modules>
 
     <properties>
