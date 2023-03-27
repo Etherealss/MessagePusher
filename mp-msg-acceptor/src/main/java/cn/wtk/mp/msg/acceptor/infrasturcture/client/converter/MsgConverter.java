@@ -1,9 +1,8 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.client.converter;
 
 import cn.wtk.mp.common.base.enums.MapperComponentModel;
-import cn.wtk.mp.common.msg.entity.GroupMsg;
-import cn.wtk.mp.common.msg.entity.PersonalMsg;
-import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgBody;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHeader;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendGroupMsgCommand;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendMsgCommand;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendPersonalMsgCommand;
@@ -15,7 +14,7 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = MapperComponentModel.SPRING)
 public interface MsgConverter {
-    PersonalMsg toMsg(SendPersonalMsgCommand command);
-    GroupMsg toMsg(SendGroupMsgCommand command);
-    MsgHandlerSpec toMsgHandlerSpec(SendMsgCommand command);
+    MsgBody toMsg(SendPersonalMsgCommand command);
+    MsgBody toMsg(SendGroupMsgCommand command);
+    MsgHeader toMsgHeader(SendMsgCommand command);
 }

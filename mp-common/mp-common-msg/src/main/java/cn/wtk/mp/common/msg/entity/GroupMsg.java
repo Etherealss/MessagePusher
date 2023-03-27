@@ -1,9 +1,7 @@
 package cn.wtk.mp.common.msg.entity;
 
 import cn.wtk.mp.common.msg.enums.MsgType;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -11,7 +9,10 @@ import lombok.experimental.FieldDefaults;
  * @date 2023-02-12
  */
 @EqualsAndHashCode(callSuper = true)
-@Data
+@ToString(callSuper = true)
+@Getter
+@Setter
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GroupMsg extends PersistentMsg {
     Long senderId;

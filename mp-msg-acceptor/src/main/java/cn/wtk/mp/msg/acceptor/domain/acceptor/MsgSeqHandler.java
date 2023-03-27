@@ -43,7 +43,7 @@ public class MsgSeqHandler {
      * @param spec
      * @return 可保证前一条 msg 已送达时返回 true。无法保证前一条消息已送达时返回 false。
      */
-    public boolean handlerMsgSeq(MsgHandlerSpec spec) {
+    public boolean handlerMsgSeq(MsgHeader spec) {
         boolean preMsgAccepted = checkPreMsgAccepted(spec);
         /*
         先等待前一条消息送达，如果确认已送达或超时，则会来到这里。
@@ -54,7 +54,7 @@ public class MsgSeqHandler {
         return preMsgAccepted;
     }
 
-    private boolean checkPreMsgAccepted(MsgHandlerSpec spec) {
+    private boolean checkPreMsgAccepted(MsgHeader spec) {
         if (isTimeLimitExceeded(spec.getPreMsgSendTime())) {
             return false;
         }
@@ -80,7 +80,7 @@ public class MsgSeqHandler {
     }
 
 
-    private void setCurMsgTempId4Seq(MsgHandlerSpec spec) {
+    private void setCurMsgTempId4Seq(MsgHeader spec) {
         String tempIdKey = msgSeqProperties.getCacheKey() + ":" + spec.getTempId().toString();
         redisTemplate.opsForValue().set(tempIdKey, DEFAULT_VALUE, Duration.ofMillis(msgSeqProperties.getExpireMs()));
     }

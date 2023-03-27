@@ -1,18 +1,14 @@
 package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
 import cn.wtk.mp.common.base.enums.ApiInfo;
-import cn.wtk.mp.common.base.pojo.Result;
+import cn.wtk.mp.common.base.exception.service.SimpleServiceException;
 import cn.wtk.mp.common.base.uid.UidGenerator;
-import cn.wtk.mp.common.msg.entity.Msg;
 import cn.wtk.mp.msg.acceptor.infrasturcture.config.MsgMqTopic;
-import cn.wtk.mp.msg.acceptor.infrasturcture.mq.MqProducer;
+import cn.wtk.mp.msg.acceptor.infrasturcture.mq.KafkaMsg;
+import cn.wtk.mp.msg.acceptor.infrasturcture.mq.MqMsgProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author wtk
@@ -26,38 +22,20 @@ public class MsgAcceptor {
     private final MsgResendHandler msgResendHandler;
     private final MsgRelationVerifier msgRelationVerifier;
     private final MsgSeqHandler msgSeqHandler;
-    private final MqProducer mqProducer;
+    private final MqMsgProducer mqMsgProducer;
     private final MsgMqTopic msgMqTopic;
     private final UidGenerator uidGenerator;
 
-    public Result<Long> sendMsg(Msg msg, MsgHandlerSpec spec) {
+    public Long sendMsg(MsgBody msg, MsgHeader spec) {
         // TODO 异步并发操作，线程池限流操作，责任链流水线
-//        if (msgResendHandler.isDuplicateMsg(spec.getTempId())) {
-//            return new Result<>(true, ApiInfo.MSG_DUPILICATE);
-//        }
+        if (msgResendHandler.checkAndSet4Duplicate(spec.getTempId())) {
+            throw new SimpleServiceException(ApiInfo.MSG_DUPILICATE);
+        }
         msgSeqHandler.handlerMsgSeq(spec);
         long msgId = uidGenerator.nextId();
         msg.setMsgId(msgId);
-        try {
-            SendResult<Long, Msg> result = mqProducer.send(msgMqTopic.getMsgTopic(), msg.getRcvrId(), msg);
-            // 入参是 Nullable，需要判断
-            if (log.isInfoEnabled() && result != null) {
-                RecordMetadata recordMetadata = result.getRecordMetadata();
-                log.info(
-                        "生产者成功发送消息到topic:{} partition:{}的消息",
-                        recordMetadata.topic(),
-                        recordMetadata.partition()
-                );
-            }
-            return Result.ok(msgId);
-        } catch (ExecutionException | InterruptedException e) {
-            log.warn("消息发送至 MQ 失败：{}", e.getMessage());
-            return new Result<>(
-                    false,
-                    ApiInfo.MSG_SEND_FAIL,
-                    "消息发送至 MQ 失败：" + e.getMessage()
-            );
-        }
+        mqMsgProducer.produce(new KafkaMsg(spec, msg));
+        return msgId;
     }
 
 }

@@ -1,9 +1,11 @@
-package cn.wtk.mp.msg.manager.domain.msg;
+package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
 import cn.wtk.mp.common.msg.enums.MsgType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Date;
 
 /**
  * @author wtk
@@ -11,12 +13,15 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MsgHeader {
-    MsgType msgType;
-    Boolean needPersistent;
-    Boolean needRelationVerify;
-    String relationTopic;
+public class MsgBody {
+    Long msgId;
+    Long appId;
     Long senderId;
+    String msgTopic;
+    MsgType msgType;
+    Date sendTime;
+    Object payload;
+    Object detail;
     Long rcvrId;
     Long groupId;
 }

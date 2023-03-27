@@ -1,6 +1,6 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.config;
 
-import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHeader;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +15,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
- * @see MsgHandlerSpec#getTempId()
- * @see MsgHandlerSpec#getPreMsgTempId() ()
+ * @see MsgHeader#getTempId()
+ * @see MsgHeader#getPreMsgTempId() ()
  * @author wtk
  * @date 2023-02-12
  */

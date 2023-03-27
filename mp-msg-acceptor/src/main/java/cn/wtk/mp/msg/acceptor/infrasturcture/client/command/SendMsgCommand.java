@@ -1,6 +1,6 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.client.command;
 
-import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHeader;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -18,18 +18,18 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SendMsgCommand {
     /**
-     * {@link MsgHandlerSpec#getTempId()}
+     * {@link MsgHeader#getTempId()}
      */
     @NotNull
-    UUID tempMsgId;
+    UUID tempId;
 
     /**
-     * {@link MsgHandlerSpec#getPreMsgTempId()} ()}
+     * {@link MsgHeader#getPreMsgTempId()}
      */
-    UUID preTempMsgId;
+    UUID preMsgTempId;
 
     /**
-     * {@link MsgHandlerSpec#getPreMsgSendTime()} ()} ()}
+     * {@link MsgHeader#getPreMsgSendTime()}
      */
     Date preMsgSendTime;
 
@@ -39,9 +39,13 @@ public class SendMsgCommand {
     @NotEmpty
     String msgTopic;
 
-    @NotNull
-    Object data;
+    Object payload;
+
+    Object detail;
 
     @NotNull
     Boolean persistent;
+
+    @NotNull
+    Long senderId;
 }

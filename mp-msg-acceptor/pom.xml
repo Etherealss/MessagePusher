@@ -24,10 +24,6 @@
         </dependency>
         <dependency>
             <groupId>cn.wtk</groupId>
-            <artifactId>mp-common-database</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.wtk</groupId>
             <artifactId>mp-common-security</artifactId>
         </dependency>
         <dependency>

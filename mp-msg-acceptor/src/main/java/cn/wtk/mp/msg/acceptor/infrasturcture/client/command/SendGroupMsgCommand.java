@@ -16,7 +16,5 @@ import javax.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SendGroupMsgCommand extends SendMsgCommand {
     @NotNull
-    Long senderId;
-    @NotNull
     Long groupId;
 }

@@ -1,6 +1,6 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.config;
 
-import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHeader;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +26,7 @@ public class MsgSeqProperties {
 
     /**
      * 检查消息顺序的时间限制
-     * @see MsgHandlerSpec#getPreMsgSendTime()
+     * @see MsgHeader#getPreMsgSendTime()
      */
     @NotNull
     Long timeLimit;

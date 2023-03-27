@@ -1,7 +1,7 @@
 package cn.wtk.mp.msg.acceptor.controller;
 
-import cn.wtk.mp.common.base.pojo.Result;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
+import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.msg.acceptor.application.MsgAcceptorAppService;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendGroupMsgCommand;
@@ -28,13 +28,15 @@ public class MsgController {
     private final MsgAcceptorAppService msgAcceptorAppService;
 
     @PostMapping("/personal")
-    public Result<?> sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command) {
+    @InternalAuth
+    public Long sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command) {
         Long appId = ServerSecurityContextHolder.require().getServerId();
         return msgAcceptorAppService.sendMsg(command, appId);
     }
 
     @PostMapping("/group")
-    public Result<?> sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command) {
+    @InternalAuth
+    public Long sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command) {
         Long appId = ServerSecurityContextHolder.require().getServerId();
         return msgAcceptorAppService.sendMsg(command, appId);
     }

@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
  * @date 2023-02-12
  */
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,23 +22,5 @@ public class PersonalMsg extends PersistentMsg {
     @Override
     public Long getRcvrId() {
         return rcvrId;
-    }
-
-    @Override
-    public String toString() {
-        return "PersonalMsg{" +
-                "senderId=" + senderId +
-                ", rcvrId=" + rcvrId +
-                ", relationTopic='" + relationTopic + '\'' +
-                ", transferStatus=" + transferStatus +
-                ", saveTime=" + saveTime +
-                ", recvTime=" + recvTime +
-                ", msgTopic='" + msgTopic + '\'' +
-                ", data=" + data +
-                ", msgId=" + msgId +
-                ", appId=" + appId +
-                ", msgType=" + msgType +
-                ", sendTime=" + sendTime +
-                '}';
     }
 }

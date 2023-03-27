@@ -73,9 +73,7 @@ public class MsgService {
         if (unread) {
             criteria.and(MsgEntityFieldName.TRANSFET_STATUS).is(MsgTransferStatus.SENT);
         } else {
-            Criteria criteria1 = Criteria.where(MsgEntityFieldName.TRANSFET_STATUS).is(MsgTransferStatus.SENT);
-            Criteria criteria2 = Criteria.where(MsgEntityFieldName.TRANSFET_STATUS).is(MsgTransferStatus.REND);
-            criteria.orOperator(criteria1, criteria2);
+            criteria.and(MsgEntityFieldName.TRANSFET_STATUS).gte(MsgTransferStatus.SENDING);
         }
         Query query = Query.query(criteria);
         query.limit(size);

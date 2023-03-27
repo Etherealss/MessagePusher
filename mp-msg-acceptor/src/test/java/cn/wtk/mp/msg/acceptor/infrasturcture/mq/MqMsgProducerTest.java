@@ -14,10 +14,10 @@ import java.util.concurrent.ExecutionException;
 @Slf4j(topic = "test")
 @DisplayName("MqProviderTest测试")
 @SpringBootTest
-class MqProducerTest {
+class MqMsgProducerTest {
 
     @Autowired
-    private MqProducer provider;
+    private MqMsgProducer provider;
     @Autowired
     private MsgMqTopic msgMqTopic;
 
@@ -33,7 +33,7 @@ class MqProducerTest {
         msg.setSendTime(new Date());
         msg.setAppId(1L);
         try {
-            provider.send(msgMqTopic.getMsgTopic(), msg.getRcvrId(), msg);
+            provider.produce(msgMqTopic.getMsgTopic(), msg.getRcvrId(), msg);
         } catch (ExecutionException | InterruptedException e) {
             log.warn("{}", e.getMessage());
         }

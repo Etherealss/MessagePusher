@@ -1,9 +1,9 @@
 package cn.wtk.mp.msg.acceptor.infrasturcture.mq;
 
 import cn.wtk.mp.common.base.enums.ApiInfo;
-import cn.wtk.mp.common.base.pojo.Result;
-import cn.wtk.mp.common.msg.entity.Msg;
-import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
+import cn.wtk.mp.common.msg.enums.MsgType;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgBody;
+import cn.wtk.mp.msg.acceptor.infrasturcture.exception.SendMsgException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -20,15 +20,17 @@ import java.util.concurrent.ExecutionException;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class MqProducer {
+public class MqMsgProducer {
 
-    private final KafkaTemplate<Long, Msg> kafkaTemplate;
+    private final KafkaTemplate<Long, KafkaMsg> kafkaTemplate;
 
-    public Result<Long> sendMsg(Msg msg, MsgHandlerSpec spec) {
+    public void produce(KafkaMsg msg) throws SendMsgException {
         try {
-            SendResult<Long, Msg> result = this.send(msg.getMsgTopic(), msg.getRcvrId(), msg);
-            // 入参是 Nullable，需要判断
-            if (log.isInfoEnabled() && result != null) {
+            MsgBody msgBody = msg.getMsgBody();
+            Long key = msgBody.getMsgType().equals(MsgType.PERSONAL) ?
+                    msgBody.getRcvrId() : msgBody.getGroupId();
+            SendResult<Long, KafkaMsg> result = this.produce(msgBody.getMsgTopic(), key, msg);
+            if (log.isInfoEnabled()) {
                 RecordMetadata recordMetadata = result.getRecordMetadata();
                 log.info(
                         "生产者成功发送消息到topic:{} partition:{}的消息",
@@ -36,17 +38,12 @@ public class MqProducer {
                         recordMetadata.partition()
                 );
             }
-            return Result.ok(msg.getMsgId());
         } catch (ExecutionException | InterruptedException e) {
-            log.warn("消息发送至 MQ 失败：{}", e.getMessage());
-            return new Result<>(
-                    false,
-                    ApiInfo.MSG_SEND_FAIL,
-                    "消息发送至 MQ 失败：" + e.getMessage()
-            );
+            throw new SendMsgException(ApiInfo.MSG_SEND_FAIL, "消息发送至 MQ 失败：" + e.getMessage(), e);
         }
     }
-    public SendResult<Long, Msg> send(String topic, Long key, Msg msg) throws ExecutionException, InterruptedException {
+
+    public SendResult<Long, KafkaMsg> produce(String topic, Long key, KafkaMsg msg) throws ExecutionException, InterruptedException {
         // MQ 在发送失败时会自动重试，重试次数由配置文件指定。此处不必做无意义的重试
         return kafkaTemplate.send(topic, key, msg).get();
     }

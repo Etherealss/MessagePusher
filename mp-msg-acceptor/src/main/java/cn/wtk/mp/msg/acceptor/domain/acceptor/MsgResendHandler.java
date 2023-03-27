@@ -27,7 +27,7 @@ public class MsgResendHandler {
      * @param tempId 消息临时 ID，用于标识客户端发送的消息，可用于去重
      * @return 重复消息返回 true，首次接受到的消息返回 false
      */
-    public boolean isDuplicateMsg(UUID tempId) {
+    public boolean checkAndSet4Duplicate(UUID tempId) {
         String tempIdKey = msgResendProperties.getCacheKey() + ":" + tempId.toString();
         Duration duration = Duration.ofMillis(msgResendProperties.getExpireMs());
         // setIfAbsent 如果为空就set值，并返回1；如果存在(不为空)则不进行操作

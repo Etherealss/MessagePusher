@@ -13,8 +13,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SendPersonalMsgCommand extends SendMsgCommand {
-    @NotNull
-    Long senderId;
 
     @NotNull
     Long rcvrId;

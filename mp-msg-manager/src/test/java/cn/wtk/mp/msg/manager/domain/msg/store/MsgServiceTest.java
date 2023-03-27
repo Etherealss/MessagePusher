@@ -6,14 +6,19 @@ import cn.wtk.mp.common.msg.enums.MsgTransferStatus;
 import cn.wtk.mp.common.msg.enums.MsgType;
 import cn.wtk.mp.msg.manager.domain.msg.MsgBody;
 import cn.wtk.mp.msg.manager.infrasturcture.client.dto.MsgDTO;
+import cn.wtk.mp.msg.manager.infrasturcture.constant.MsgEntityFieldName;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.Date;
+import java.util.List;
 
 @Slf4j(topic = "test")
 @DisplayName("MsgServiceTest测试")
@@ -26,6 +31,9 @@ class MsgServiceTest {
 
     @Autowired
     private UidGenerator uidGenerator;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Test
     void testInsert() {
@@ -52,5 +60,13 @@ class MsgServiceTest {
     void getMsg() {
         MsgDTO msgDTO = msgService.getById(41591636664930304L);
         log.debug("{}", msgDTO);
+    }
+
+    @Test
+    void testGtMsgtype() {
+        Criteria criteria = Criteria
+                .where(MsgEntityFieldName.TRANSFET_STATUS).gte(MsgTransferStatus.SENDING);
+        List<MsgEntity> entities = mongoTemplate.find(Query.query(criteria), MsgEntity.class);
+        entities.forEach(e -> log.debug("{}", e));
     }
 }

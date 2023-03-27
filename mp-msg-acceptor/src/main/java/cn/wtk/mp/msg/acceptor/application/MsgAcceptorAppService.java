@@ -1,11 +1,9 @@
 package cn.wtk.mp.msg.acceptor.application;
 
-import cn.wtk.mp.common.base.pojo.Result;
-import cn.wtk.mp.common.msg.entity.GroupMsg;
-import cn.wtk.mp.common.msg.entity.PersonalMsg;
 import cn.wtk.mp.common.msg.enums.MsgType;
 import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgAcceptor;
-import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHandlerSpec;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgBody;
+import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHeader;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendGroupMsgCommand;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendPersonalMsgCommand;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.converter.MsgConverter;
@@ -25,17 +23,17 @@ public class MsgAcceptorAppService {
     private final MsgAcceptor msgAcceptor;
     private final MsgConverter msgConverter;
 
-    public Result<?> sendMsg(SendPersonalMsgCommand command, Long appId) {
-        PersonalMsg msg = msgConverter.toMsg(command);
-        MsgHandlerSpec spec = msgConverter.toMsgHandlerSpec(command);
+    public Long sendMsg(SendPersonalMsgCommand command, Long appId) {
+        MsgBody msg = msgConverter.toMsg(command);
+        MsgHeader spec = msgConverter.toMsgHeader(command);
         msg.setAppId(appId);
         msg.setMsgType(MsgType.PERSONAL);
         return msgAcceptor.sendMsg(msg, spec);
     }
 
-    public Result<?> sendMsg(SendGroupMsgCommand command, Long appId) {
-        GroupMsg msg = msgConverter.toMsg(command);
-        MsgHandlerSpec spec = msgConverter.toMsgHandlerSpec(command);
+    public Long sendMsg(SendGroupMsgCommand command, Long appId) {
+        MsgBody msg = msgConverter.toMsg(command);
+        MsgHeader spec = msgConverter.toMsgHeader(command);
         msg.setAppId(appId);
         msg.setMsgType(MsgType.GROUP);
         return msgAcceptor.sendMsg(msg, spec);
