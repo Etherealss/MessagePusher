@@ -38,14 +38,14 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        ChannelPipeline pipeline = socketChannel.pipeline()
-                                .addLast(new LengthFieldPrepender(4))
+                        socketChannel.pipeline()
                                 .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 4, 0, 4, true))
-                                //字符串编码解码
                                 //心跳检测
                                 .addLast(new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS))
                                 //客户端的逻辑
-                                .addLast(new NettyClientHandler(NettyClient.this));
+                                .addLast(new NettyClientHandler(NettyClient.this))
+                                .addLast(new LengthFieldPrepender(4, 0))
+                        ;
                     }
                 });
         connectServer();

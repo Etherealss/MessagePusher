@@ -8,6 +8,7 @@ import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @author wtk
@@ -22,10 +23,7 @@ public class MessageSendUtil {
      * @param data
      */
     public static void send(Channel channel, ChannelMsgBody data) {
-        if (channel == null) {
-            log.warn("Channel 为空");
-            throw new NullPointerException("Channel 为空");
-        }
+        Objects.requireNonNull(channel);
         if (!channel.isActive()) {
             log.warn("Channel 未激活");
             return;

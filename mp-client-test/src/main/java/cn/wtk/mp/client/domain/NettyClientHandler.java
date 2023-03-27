@@ -1,5 +1,6 @@
 package cn.wtk.mp.client.domain;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoop;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -7,6 +8,7 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2023/3/27
  */
 @Slf4j
-public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
+public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private NettyClient nettyClient;
     private String tenantId;
     private int attempts = 0;
@@ -24,8 +26,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-        log.info("服务器推送消息: {}", o.toString());
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
+        int readableBytes = byteBuf.readableBytes();
+        byte[] bytes = new byte[readableBytes];
+        byteBuf.readBytes(bytes);
+        String jsonData = new String(bytes, StandardCharsets.UTF_8);
+        log.info("服务器推送消息: {}", jsonData);
     }
 
     @Override

@@ -10,6 +10,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
@@ -93,6 +94,7 @@ public class SocketChooseHandler extends ByteToMessageDecoder {
 
     public void tcpAdd(ChannelHandlerContext ctx) {
         ctx.pipeline()
+                .addLast(new LengthFieldPrepender(4, 0))
                 .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 4, 0, 4, true))
                 .addLast(channelLogHandler)
                 .addLast(connAuthHandler)

@@ -18,7 +18,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,7 +36,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
 
     private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectorToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
@@ -75,6 +74,10 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
         }
         if (authResult.isSuccess()) {
             addToManager(ctx, authResult);
+            /*
+             * 必须继续往后传，WebSocket 消息需要传到 WebSocketServerProtocolHandler，完成握手
+             */
+            ctx.fireChannelRead(data);
         } else {
             ChannelMsg resp = new ChannelMsg(
                     ApiInfo.CONNECT_AUTH_FAIL, authResult.getErrorMsg()
@@ -82,6 +85,11 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
             MessageSender.send(ctx.channel(), resp);
             ctx.close();
         }
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
+
     }
 
     private AuthResult auth4WebSocket(ChannelHandlerContext ctx, FullHttpRequest request) {
@@ -172,10 +180,6 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
 
     private boolean isAuthenticated(Channel channel) {
         return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
     }
 
 }
