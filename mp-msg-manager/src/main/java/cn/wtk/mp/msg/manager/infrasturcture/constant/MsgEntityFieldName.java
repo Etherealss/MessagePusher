@@ -6,11 +6,12 @@ package cn.wtk.mp.msg.manager.infrasturcture.constant;
  */
 public class MsgEntityFieldName {
     public static final String TABLE = "mp-msg";
-    public static final String MSG_ID = "msgId";
+    public static final String MSG_ID = "_id";
     public static final String APP_ID = "appId";
     public static final String SEND_TIME = "sendTime";
     public static final String MSG_TOPIC = "msgTopic";
-    public static final String DATA = "data";
+    public static final String PAYLOAD = "payload";
+    public static final String DETAIL = "detail";
     public static final String TRANSFET_STATUS = "transferStatus";
     public static final String SAVE_TIME = "saveTime";
     public static final String RECV_TIME = "recvTime";

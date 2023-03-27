@@ -2,7 +2,7 @@ package cn.wtk.mp.msg.manager.domain.msg.dispatcher;
 
 import cn.wtk.mp.msg.manager.domain.msg.ManageMsg;
 import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
-import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgPushConverter;
+import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
@@ -24,7 +24,7 @@ import java.util.List;
 public abstract class AbstractMsgDispatcher {
     protected final MsgPusher msgPusher;
     protected final ConnectFiegn connectFiegn;
-    protected final MsgPushConverter converter;
+    protected final MsgConverter converter;
     protected final RelationFeign relationFeign;
 
     /**
@@ -33,7 +33,7 @@ public abstract class AbstractMsgDispatcher {
      * @return 推送失败的 rcvrId
      */
     public void doDispatch(ManageMsg msg) {
-        List<Long> revrIds = this.getRevrIds(msg.getMsgHeader());
+        List<Long> revrIds = this.getRcvrIds(msg.getMsgHeader());
         List<ConnectorAddressDTO> addresses = getAddresses(revrIds);
         for (ConnectorAddressDTO address : addresses) {
             MsgPushCommand msgPushCommand = converter.toPushCommand(msg.getMsgBody());
@@ -42,7 +42,7 @@ public abstract class AbstractMsgDispatcher {
         }
     }
 
-    protected abstract List<Long> getRevrIds(MsgHeader msgHeader);
+    protected abstract List<Long> getRcvrIds(MsgHeader msgHeader);
 
     private List<ConnectorAddressDTO> getAddresses(List<Long> revrIds) {
         BatchConnectorIdQuery query = new BatchConnectorIdQuery(revrIds);

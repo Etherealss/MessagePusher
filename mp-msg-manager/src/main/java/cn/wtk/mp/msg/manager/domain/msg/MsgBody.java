@@ -22,6 +22,6 @@ public class MsgBody {
     Date sendTime;
     Object payload;
     Object detail;
-    Long revrId;
+    Long rcvrId;
     Long groupId;
 }

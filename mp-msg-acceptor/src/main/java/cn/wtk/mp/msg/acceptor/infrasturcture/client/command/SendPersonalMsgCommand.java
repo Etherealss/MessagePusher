@@ -17,7 +17,7 @@ public class SendPersonalMsgCommand extends SendMsgCommand {
     Long senderId;
 
     @NotNull
-    Long revrId;
+    Long rcvrId;
 
     String relationTopic;
 }

@@ -3,7 +3,7 @@ package cn.wtk.mp.msg.manager.domain.msg.dispatcher;
 import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
-import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgPushConverter;
+import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
 import cn.wtk.mp.msg.manager.infrasturcture.exception.RelationException;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.RelationFeign;
@@ -21,12 +21,12 @@ import java.util.List;
 @Component
 public class GroupRcvrMsgDispathcer extends AbstractMsgDispatcher {
 
-    public GroupRcvrMsgDispathcer(MsgPusher msgPusher, ConnectFiegn connectFiegn, MsgPushConverter converter, RelationFeign relationFeign) {
+    public GroupRcvrMsgDispathcer(MsgPusher msgPusher, ConnectFiegn connectFiegn, MsgConverter converter, RelationFeign relationFeign) {
         super(msgPusher, connectFiegn, converter, relationFeign);
     }
 
     @Override
-    protected List<Long> getRevrIds(MsgHeader msgHeader) {
+    protected List<Long> getRcvrIds(MsgHeader msgHeader) {
         Long groupId = msgHeader.getGroupId();
         try {
             return relationFeign.getGroupMembers(groupId);

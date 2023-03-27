@@ -1,10 +1,11 @@
 package cn.wtk.mp.msg.manager.domain.msg.store;
 
 import cn.wtk.mp.MsgManagerApplication;
+import cn.wtk.mp.common.base.uid.UidGenerator;
+import cn.wtk.mp.common.msg.enums.MsgTransferStatus;
 import cn.wtk.mp.common.msg.enums.MsgType;
-import cn.wtk.mp.msg.manager.domain.msg.ManageMsg;
 import cn.wtk.mp.msg.manager.domain.msg.MsgBody;
-import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
+import cn.wtk.mp.msg.manager.infrasturcture.client.dto.MsgDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,27 +24,33 @@ class MsgServiceTest {
     @Autowired
     private MsgService msgService;
 
+    @Autowired
+    private UidGenerator uidGenerator;
+
     @Test
     void testInsert() {
-        MsgHeader header = new MsgHeader();
-        header.setMsgType(MsgType.PERSONAL);
         MsgBody body = new MsgBody();
         body.setMsgType(MsgType.PERSONAL);
         body.setMsgTopic("/test123");
-        body.setMsgId(11111L);
+        body.setMsgId(uidGenerator.nextId());
         body.setAppId(1321312313L);
         body.setSenderId(1L);
-        body.setRevrId(2L);
+        body.setRcvrId(2L);
         body.setDetail("MsgDetail");
-        body.setPayload("MsgDetail");
+        body.setPayload("MsgPayload");
         body.setSendTime(new Date());
-        ManageMsg msg = new ManageMsg();
-        msg.setMsgHeader(header);
-        msg.setMsgBody(body);
-        msgService.insert(msg);
+        msgService.insert(body);
     }
 
     @Test
     void testUpdateStatus() {
+        Long msgId = 41583215802732544L;
+        msgService.updateStatus(msgId, MsgTransferStatus.REND);
+    }
+
+    @Test
+    void getMsg() {
+        MsgDTO msgDTO = msgService.getById(41591636664930304L);
+        log.debug("{}", msgDTO);
     }
 }

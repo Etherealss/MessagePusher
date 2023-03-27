@@ -1,4 +1,4 @@
-package cn.wtk.mp.common.database.jpa;
+package cn.wtk.mp.common.database.audit;
 
 import cn.wtk.mp.common.database.pojo.entity.IdentifiedEntity;
 import cn.wtk.mp.common.base.uid.UidGenerator;

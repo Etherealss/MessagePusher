@@ -24,19 +24,22 @@ import java.util.Date;
 @ToString(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class MsgEntity {
+public class MsgEntity {
     @MongoId(FieldType.INT64)
     @Field(MsgEntityFieldName.MSG_ID)
     Long msgId;
 
-    @Field(MsgEntityFieldName.MSG_ID)
+    @Field(MsgEntityFieldName.APP_ID)
     Long appId;
 
     @Field(MsgEntityFieldName.MSG_TOPIC)
     String msgTopic;
 
-    @Field(MsgEntityFieldName.DATA)
-    Object data;
+    @Field(MsgEntityFieldName.PAYLOAD)
+    Object payload;
+
+    @Field(MsgEntityFieldName.DETAIL)
+    Object detail;
 
     @Field(MsgEntityFieldName.TRANSFET_STATUS)
     MsgTransferStatus transferStatus;

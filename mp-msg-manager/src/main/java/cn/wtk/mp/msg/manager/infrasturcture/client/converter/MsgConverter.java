@@ -25,16 +25,16 @@ public interface MsgConverter {
 
     MsgPushCommand toPushDTO(GroupMsg msg);
     MsgPushCommand toPushDTO(PersonalMsg msg);
+    MsgPushCommand toPushCommand(MsgBody msgBody);
 
     MsgDTO toDto(MsgEntity entity);
     List<MsgDTO> toDTOs(List<MsgEntity> entities);
 
     PersonalMsgDTO toPersonalDTO(MsgEntity entity);
-    List<PersonalMsgDTO> toPersonalDTO(List<MsgEntity> entities);
+    List<PersonalMsgDTO> toPersonalDTOs(List<MsgEntity> entities);
 
     @Mapping(source = "rcvrId", target = "groupId")
-    PersonalMsgDTO toGroupDTO(MsgEntity entity);
-
+    GroupMsgDTO toGroupDTO(MsgEntity entity);
     @Mapping(source = "rcvrId", target = "groupId")
     List<GroupMsgDTO> toGroupDTOs(List<MsgEntity> entities);
 }

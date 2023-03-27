@@ -36,8 +36,9 @@ public class MsgService {
     private final GroupMsgService groupMsgService;
 
     public void insert(MsgBody msg) {
-        MsgEntity entities = msgConverter.toEntity(msg);
-        mongoTemplate.insert(entities);
+        MsgEntity entity = msgConverter.toEntity(msg);
+        entity.setTransferStatus(MsgTransferStatus.SENDING);
+        mongoTemplate.insert(entity);
     }
 
     public MsgDTO getById(Long msgId) {
