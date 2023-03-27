@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.enums;
+package cn.wtk.mp.client.infrastructure.enums;
 
 import cn.wtk.mp.common.base.enums.BaseEnum;
 import lombok.AllArgsConstructor;

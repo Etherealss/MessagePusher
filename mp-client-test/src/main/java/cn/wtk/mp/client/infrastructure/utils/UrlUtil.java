@@ -1,10 +1,9 @@
-package cn.wtk.mp.common.base.utils;
+package cn.wtk.mp.client.infrastructure.utils;
 
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author wtk
@@ -48,7 +47,6 @@ public class UrlUtil {
      * @return url请求参数部分存入map集合
      */
     public static Map<String, String> getUrlParameters(String url) {
-        Objects.requireNonNull(url, "URL 不能为 null");
         Map<String, String> mapRequest = new HashMap<>(4);
         String strUrlParam = truncateUrlPage(url);
         if (!StringUtils.hasText(strUrlParam)) {

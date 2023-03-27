@@ -2,26 +2,28 @@ package cn.wtk.mp.connect.domain.conn.server.connector.connection;
 
 import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
+import cn.wtk.mp.common.base.utils.JsonUtil;
 import cn.wtk.mp.common.base.utils.UUIDUtil;
 import cn.wtk.mp.common.base.utils.UrlUtil;
 import cn.wtk.mp.connect.domain.conn.server.AuthResult;
 import cn.wtk.mp.connect.domain.conn.server.ServerConnContainer;
+import cn.wtk.mp.connect.infrastructure.client.dto.ChannelMsg;
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import cn.wtk.mp.connect.infrastructure.remote.feign.AuthFeign;
-import cn.wtk.mp.connect.infrastructure.remote.netty.MessageSender;
-import cn.wtk.mp.connect.infrastructure.remote.netty.WebSocketMsg;
+import cn.wtk.mp.connect.infrastructure.utils.MessageSender;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -34,9 +36,9 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectToken";
+    private static final String PARAM_NAME_CONNECTOR_TOKEN = "connectorToken";
     private static final String PARAM_NAME_CONNECTOR_ID = "connectorId";
     private static final String PARAM_NAME_APP_ID = "appId";
     private static final String HEADER_ORIGIN = "Origin";
@@ -46,8 +48,8 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
     private final NettyServerConfig nettyServerConfig;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.info("数据类型：{}", msg.getClass());
+    public void channelRead(ChannelHandlerContext ctx, Object data) throws Exception {
+        log.info("数据类型：{}", data.getClass());
         if (this.isAuthenticated(ctx.channel())) {
             /*
             这个方法只能在 channelRead 方法里调用，如果在 channelRead0 里调用会报错
@@ -55,37 +57,68 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
             如果不调用的话，当 ChannelInboundHandler 匹配到合适的消息（比如当前，匹配到 WebSocketFrame）
             它就不会继续往后面传了
              */
-            ctx.fireChannelRead(msg);
+            ctx.fireChannelRead(data);
             return;
         }
-        if (msg instanceof FullHttpRequest) {
-            httpRequestAuth(ctx, (FullHttpRequest) msg);
+        AuthResult authResult;
+        if (data instanceof FullHttpRequest) {
+            authResult = this.auth4WebSocket(ctx, (FullHttpRequest) data);
+        } else if (data instanceof ByteBuf) {
+            authResult = this.auth4Socket(ctx, (ByteBuf) data);
         } else {
-            log.info("连接尚未认证，关闭连接");
-            WebSocketMsg data = new WebSocketMsg(ApiInfo.CONNECT_UNAUTH);
-            MessageSender.send(ctx.channel(), data);
+            log.info("连接未认证且不符合认证格式，拒绝连接");
+            ChannelMsg resp = new ChannelMsg(ApiInfo.CONNECT_UNAUTH, "连接未认证且不符合认证格式，拒绝连接");
+            MessageSender.send(ctx.channel(), resp);
+            ctx.close();
+            return;
+        }
+        if (authResult.isSuccess()) {
+            addToManager(ctx, authResult);
+            /*
+             * 必须继续往后传，WebSocket 消息需要传到 WebSocketServerProtocolHandler，完成握手
+             */
+            ctx.fireChannelRead(data);
+        } else {
+            ChannelMsg resp = new ChannelMsg(
+                    ApiInfo.CONNECT_AUTH_FAIL, authResult.getErrorMsg()
+            );
+            MessageSender.send(ctx.channel(), resp);
             ctx.close();
         }
-        super.channelRead(ctx, msg);
     }
 
-    private void httpRequestAuth(ChannelHandlerContext ctx, FullHttpRequest request) {
+    @Override
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
+
+    }
+
+    private AuthResult auth4WebSocket(ChannelHandlerContext ctx, FullHttpRequest request) {
         String uri = request.uri();
         String origin = request.headers().get(HEADER_ORIGIN);
         Map<String, String> urlParameters = UrlUtil.getUrlParameters(uri);
         AuthResult authResult = this.doAuth(urlParameters);
         if (authResult.isSuccess()) {
-            addToManager(ctx, authResult);
             // WebSocketServerProtocolHandler内部会通过URI与配置文件的URI做比对，
             // 如果URI一致，才会通过握手建立WebSocket连接
             request.setUri(nettyServerConfig.getPath());
-        } else {
-            WebSocketMsg data = new WebSocketMsg(
-                    ApiInfo.CONNECT_AUTH_FAIL, authResult.getErrorMsg()
-            );
-            MessageSender.send(ctx.channel(), data);
-            ctx.close();
         }
+        return authResult;
+    }
+
+    private AuthResult auth4Socket(ChannelHandlerContext ctx, ByteBuf slicedByteBuf) {
+        int readableBytes = slicedByteBuf.readableBytes();
+        byte[] bytes = new byte[readableBytes];
+        slicedByteBuf.readBytes(bytes);
+        String jsonData = new String(bytes, StandardCharsets.UTF_8);
+        AuthMsg authMsg;
+        try {
+            authMsg = JsonUtil.toObject(jsonData, AuthMsg.class);
+        } catch (Exception e) {
+            return AuthResult.fail("认证消息格式错误：" + e.getMessage());
+        }
+        Map<String, String> urlParameters = UrlUtil.getUrlParameters(authMsg.getAuthUrl());
+        AuthResult authResult = this.doAuth(urlParameters);
+        return authResult;
     }
 
     /**
@@ -147,10 +180,6 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<WebSocketFrame>
 
     private boolean isAuthenticated(Channel channel) {
         return channel.attr(ChannelAttrKey.CONN_ID).get() != null;
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
     }
 
 }

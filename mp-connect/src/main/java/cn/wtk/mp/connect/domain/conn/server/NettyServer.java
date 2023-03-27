@@ -59,7 +59,7 @@ public class NettyServer implements ApplicationRunner, ApplicationListener<Conte
                     .childHandler(nettyServerChannelInitializer);
             Channel channel = serverBootstrap.bind().sync().channel();
             this.serverChannel = channel;
-            log.info("websocket 服务启动，IP={}, port={}", config.getIp(), config.getPort());
+            log.info("Connect Netty 服务启动，IP={}, port={}", config.getIp(), config.getPort());
             channel.closeFuture().sync();
         } catch (Exception e) {
             log.error("Netty 服务器出现异常", e);
@@ -81,6 +81,6 @@ public class NettyServer implements ApplicationRunner, ApplicationListener<Conte
         // TODO 清空 Redis 连接信息
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-        log.info("websocket 服务停止");
+        log.info("Connect Netty 服务停止");
     }
 }
