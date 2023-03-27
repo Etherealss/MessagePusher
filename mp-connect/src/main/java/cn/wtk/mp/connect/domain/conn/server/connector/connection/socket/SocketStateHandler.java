@@ -1,16 +1,20 @@
-package cn.wtk.mp.connect.domain.conn.server.connector.connection;
+package cn.wtk.mp.connect.domain.conn.server.connector.connection.socket;
 
+import cn.wtk.mp.common.base.enums.ApiInfo;
+import cn.wtk.mp.connect.infrastructure.client.dto.ChannelMsg;
 import cn.wtk.mp.connect.infrastructure.config.ChannelAttrKey;
 import cn.wtk.mp.connect.infrastructure.event.ConnClosedEvent;
+import cn.wtk.mp.connect.infrastructure.utils.MessageSender;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -22,23 +26,18 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ConnectionStateHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class SocketStateHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
-        log.debug("收到消息：{}", frame);
-        if (frame instanceof TextWebSocketFrame) {
-            TextWebSocketFrame textWebSocketFrame = (TextWebSocketFrame) frame;
-            String text = textWebSocketFrame.text();
-            ctx.channel().writeAndFlush(new TextWebSocketFrame("ack:" + text));
-        } else if (frame instanceof PingWebSocketFrame) {
-            ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
-        } else if (frame instanceof CloseWebSocketFrame) {
-            log.debug("客户端关闭连接");
-            publishConnClosedEvent(ctx);
-        }
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
+        int readableBytes = byteBuf.readableBytes();
+        byte[] bytes = new byte[readableBytes];
+        byteBuf.readBytes(bytes);
+        String requestData = new String(bytes, StandardCharsets.UTF_8);
+        log.debug("收到消息：{}", requestData);
+        MessageSender.send(ctx.channel(), new ChannelMsg(ApiInfo.OK, "ack:" + requestData));
     }
 
     @Override

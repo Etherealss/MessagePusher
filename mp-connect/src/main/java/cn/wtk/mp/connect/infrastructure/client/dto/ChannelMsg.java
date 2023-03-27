@@ -1,4 +1,4 @@
-package cn.wtk.mp.connect.infrastructure.remote.netty;
+package cn.wtk.mp.connect.infrastructure.client.dto;
 
 import cn.wtk.mp.common.base.enums.ApiInfo;
 import cn.wtk.mp.connect.domain.msg.connector.TransferMsg;
@@ -14,23 +14,23 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class WebSocketMsg {
+public class ChannelMsg {
     Integer code;
     String desc;
     TransferMsg msg;
 
-    public WebSocketMsg(ApiInfo apiInfo) {
+    public ChannelMsg(ApiInfo apiInfo) {
         this(apiInfo.getCode(), apiInfo.getMessage(), null);
     }
-    public WebSocketMsg(ApiInfo apiInfo, String desc) {
+    public ChannelMsg(ApiInfo apiInfo, String desc) {
         this(apiInfo.getCode(), apiInfo.getMessage() + desc, null);
     }
 
-    public WebSocketMsg(TransferMsg msg) {
+    public ChannelMsg(TransferMsg msg) {
         this(ApiInfo.OK.getCode(), ApiInfo.OK.getMessage(), msg);
     }
 
-    public WebSocketMsg(Integer code, String desc, TransferMsg msg) {
+    public ChannelMsg(Integer code, String desc, TransferMsg msg) {
         this.code = code;
         this.desc = desc;
         this.msg = msg;

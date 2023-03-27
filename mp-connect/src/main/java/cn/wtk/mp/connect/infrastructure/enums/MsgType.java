@@ -14,7 +14,6 @@ public enum MsgType implements BaseEnum {
     ACK(0, "ack"),
     PERSONAL(1, "私信"),
     GROUP(2, "群消息"),
-    NOTIF(3, "通知"),
     ;
     private final int code;
     private final String name;
