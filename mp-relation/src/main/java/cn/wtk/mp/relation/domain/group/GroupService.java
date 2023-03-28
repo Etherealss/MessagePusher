@@ -30,7 +30,7 @@ public class GroupService {
         GroupRelationEntity entity = converter.toEntity(command);
         long groupId = uidGenerator.nextId();
         entity.setGroupId(groupId);
-        entity.setMemberIds(Collections.emptyList());
+        entity.setMemberIds(Collections.singletonList(command.getCreatorId()));
         groupRelationRepository.save(entity);
         return groupId;
     }
