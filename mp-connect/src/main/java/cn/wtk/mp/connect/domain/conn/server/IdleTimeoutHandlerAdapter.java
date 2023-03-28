@@ -32,7 +32,7 @@ public class IdleTimeoutHandlerAdapter extends SimpleChannelInboundHandler<PingW
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, PingWebSocketFrame ping) throws Exception {
-        log.info("收到心跳包：{}", ping);
+        log.debug("收到心跳包：{}", ping);
         ctx.channel().writeAndFlush(new PongWebSocketFrame(ping.content().retain()));
     }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author wtk
@@ -14,7 +15,9 @@ import javax.validation.constraints.NotEmpty;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterServerCommand  {
     @NotEmpty
+    @Pattern(regexp = "^[a-zA-Z0-9\\-]+$")
     String serverName;
     @NotEmpty
+    @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*]{32}$")
     String secret;
 }
