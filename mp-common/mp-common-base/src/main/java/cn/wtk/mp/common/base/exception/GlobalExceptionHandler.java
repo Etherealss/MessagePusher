@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     /**
      * 权限认证异常
      */
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationException.class)
     public Result<Object> handle(AuthenticationException e) {
         log.info("权限认证异常: {}", e.getMessage());
@@ -102,6 +102,7 @@ public class GlobalExceptionHandler {
     /**
      * 包装绑定异常结果
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException.class)
     private Result<Void> wrapperBindingResult(BindException bindException) {
         BindingResult bindingResult = bindException.getBindingResult();

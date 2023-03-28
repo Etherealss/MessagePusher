@@ -2,6 +2,7 @@ package cn.wtk.mp.auth.application;
 
 import cn.wtk.mp.auth.domain.credential.TokenCredentialService;
 import cn.wtk.mp.auth.domain.credential.TokenCredentialSpec;
+import cn.wtk.mp.auth.infrastructure.client.command.CreateConnectCredentialCommand;
 import cn.wtk.mp.auth.infrastructure.config.ConnectorCredentialAuthConfig;
 import cn.wtk.mp.common.base.exception.rest.ParamErrorException;
 import cn.wtk.mp.common.security.service.auth.connector.ConnectorCredential;
@@ -21,10 +22,13 @@ public class ConnectorAuthenticationAppService {
     private final TokenCredentialService tokenCredentialService;
     private final ConnectorCredentialAuthConfig config;
 
-    public ConnectorCredential create(Long appId, Long connectorId) {
+    public ConnectorCredential create(Long appId, Long connectorId,
+                                      CreateConnectCredentialCommand command) {
         ConnectorCredential connectorCredential = new ConnectorCredential();
         connectorCredential.setAppId(appId);
         connectorCredential.setConnectorId(connectorId);
+        connectorCredential.setConnectIp(command.getConnectIp());
+        connectorCredential.setConnectPort(command.getConnectPort());
         TokenCredentialSpec tokenSpec = new TokenCredentialSpec(
                 config.getTokenTopic(),
                 config.getExpireMs()
@@ -33,7 +37,11 @@ public class ConnectorAuthenticationAppService {
         return connectorCredential;
     }
 
-    public ConnectorCredential verifyAndGet(Long appId, Long connectorId, String token) {
+    public ConnectorCredential verifyAndGet(Long appId,
+                                            Long connectorId,
+                                            String token,
+                                            String connectIp,
+                                            Integer connectPort) {
         ConnectorCredential connectorCredential = tokenCredentialService.verifyAndGet(
                 token, ConnectorCredential.class
         );
@@ -43,6 +51,11 @@ public class ConnectorAuthenticationAppService {
         if (!appId.equals((connectorCredential.getAppId()))) {
             throw new ParamErrorException("connectorCredential appId 不匹配");
         }
-        return connectorCredential;
+        if (connectIp.equals(connectorCredential.getConnectIp()) &&
+                connectPort.equals(connectorCredential.getConnectPort())) {
+            return connectorCredential;
+
+        }
+        throw new ParamErrorException("connectorCredential 路由地址不匹配");
     }
 }

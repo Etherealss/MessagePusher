@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 @Component
 public class ServerDigestGenerator {
 
-    public static final String ALGORITHM = "SHA-1";
+    public static final String ALGORITHM = "MD5";
 
     private final MessageDigest messageDigest;
 
@@ -26,9 +26,13 @@ public class ServerDigestGenerator {
         }
     }
 
-    public byte[] generate(Long serverId, String serverName, String secret) {
+    public String generate(Long serverId, String serverName, String secret) {
         String data = serverId.toString() + serverName + secret;
         byte[] digest = messageDigest.digest(data.getBytes(StandardCharsets.UTF_8));
-        return digest;
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b & 0xff));
+        }
+        return sb.toString();
     }
 }

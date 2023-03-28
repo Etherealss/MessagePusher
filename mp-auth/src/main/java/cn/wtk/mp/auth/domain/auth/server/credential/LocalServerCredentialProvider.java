@@ -25,13 +25,13 @@ public class LocalServerCredentialProvider implements IServerCredentialProvider 
 
     @Override
     public ServerTokenCredential create() {
-        byte[] digest = serverDigestGenerator.generate(
+        String digest = serverDigestGenerator.generate(
                 serverCredentialConfig.getServerId(),
                 serverCredentialConfig.getServerName(),
                 serverCredentialConfig.getSecret()
         );
         ServerAuthCommand command = new ServerAuthCommand(
-                serverCredentialConfig.getServerId(), new String(digest)
+                serverCredentialConfig.getServerId(), digest
         );
         Long serverId = serverCredentialConfig.getServerId();
         return serverAuthenticationAppService.createServerCredential(command);

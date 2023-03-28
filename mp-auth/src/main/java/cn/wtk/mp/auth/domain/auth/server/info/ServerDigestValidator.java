@@ -21,9 +21,9 @@ public class ServerDigestValidator {
         if (userInput.startsWith("test")) {
             return true;
         }
-        byte[] digest = serverDigestGenerator.generate(
+        String digest = serverDigestGenerator.generate(
                 entity.getId(), entity.getServerName(), entity.getSecret()
         );
-        return userInput.equals(new String(digest));
+        return userInput.equals(digest);
     }
 }

@@ -25,15 +25,15 @@ public enum ApiInfo {
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, 5030008, "[服务不可用]"),
 
     // ------------------- 02 登录 ------------------------
-    PASSWORD_ERROR(4000201, "[登录-密码错误]"),
 
     // ------------------- 03 auth ------------------------
-    USER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED, 4010301, "[鉴权-用户token缺失]"),
-    USER_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,4010302, "[鉴权-用户token无效或已过期]"),
-    SERVER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,4010303, "[鉴权-服务token缺失]"),
-    SERVER_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,4010304, "[鉴权-服务token无效或已过期]"),
-    NOT_PERMISSION(HttpStatus.FORBIDDEN, 4030305, "[鉴权-没有访问权限]"),
-    NOT_ROLE(HttpStatus.FORBIDDEN, 4030306, "[鉴权-非可访问角色]"),
+    USER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED, 4010301, "[认证-用户token缺失]"),
+    USER_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,4010302, "[认证-用户token无效或已过期]"),
+    SERVER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,4010303, "[认证-服务token缺失]"),
+    SERVER_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,4010304, "[认证-服务token无效或已过期]"),
+    NOT_PERMISSION(HttpStatus.FORBIDDEN, 4010305, "[认证-没有访问权限]"),
+    NOT_ROLE(HttpStatus.FORBIDDEN, 4010306, "[认证-非可访问角色]"),
+    PASSWORD_ERROR(4030307, "[认证-摘要错误]"),
 
     // ------------------- 04 消息发送 ------------------------
     MSG_DUPILICATE(HttpStatus.OK, 2000401, "[消息发送-消息重复]"),

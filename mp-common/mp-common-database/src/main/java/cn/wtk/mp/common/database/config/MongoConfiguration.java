@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -17,10 +16,10 @@ import java.util.List;
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "cn.wtk.mp")
-@EnableTransactionManagement
+//@EnableTransactionManagement MongoDB在单节点上不支持事务
 @EnableMongoAuditing
 @Slf4j
-public class MongoConfiguration  {
+public class MongoConfiguration {
 
     @PostConstruct
     public void init() {
@@ -29,7 +28,6 @@ public class MongoConfiguration  {
 
     /**
      * 注册 自定义的mongo转换器
-     *
      * @return 返回注册成功的 MongoCustomConversions
      */
     @Bean
@@ -37,4 +35,10 @@ public class MongoConfiguration  {
         log.info("MongoDB 注册自定义类型转换器");
         return MongoCustomConversions.create(adapter -> adapter.registerConverters(converters));
     }
+// MongoDB在单节点上不支持事务
+//    @Bean
+//    public MongoTransactionManager transactionManager(MongoDatabaseFactory mongoDbFactory) {
+//        return new MongoTransactionManager(mongoDbFactory);
+//    }
+
 }

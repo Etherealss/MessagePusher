@@ -19,10 +19,10 @@ public class RemoteServerCredentialProvider implements IServerCredentialProvider
 
     @Override
     public ServerTokenCredential create() {
-        byte[] digest = serverDigestGenerator.generate(
+        String digest = serverDigestGenerator.generate(
                 config.getServerId(), config.getServerName(), config.getSecret()
         );
-        ServerAuthCommand command = new ServerAuthCommand(config.getServerId(), new String(digest));
+        ServerAuthCommand command = new ServerAuthCommand(config.getServerId(), digest);
         return serverCredentialFeign.createCredential(command);
     }
 }

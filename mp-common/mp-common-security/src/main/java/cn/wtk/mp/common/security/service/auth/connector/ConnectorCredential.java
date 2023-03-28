@@ -23,6 +23,10 @@ public class ConnectorCredential extends TokenCredential {
 
     Long appId;
 
+    String connectIp;
+
+    Integer connectPort;
+
     public ConnectorCredential(Long connectorId, Long appId) {
         this.connectorId = connectorId;
         this.appId = appId;

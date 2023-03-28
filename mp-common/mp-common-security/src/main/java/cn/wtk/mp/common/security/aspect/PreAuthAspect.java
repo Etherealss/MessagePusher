@@ -34,7 +34,7 @@ public class PreAuthAspect {
             + "@annotation(org.springframework.web.bind.annotation.PutMapping) || "
             + "@annotation(org.springframework.web.bind.annotation.RequestMapping)";
 
-    public static final String POINTCUR_CONTROLLER = "execution(* com.nowander..controller..*.*(..))";
+    public static final String POINTCUR_CONTROLLER = "@annotation(cn.wtk.mp.common.security.annotation.InternalAuth)";
 
     private final List<IPreAuthHandler> preAuthHandlers;
     /**

@@ -2,6 +2,7 @@ package cn.wtk.mp.common.base.web;
 
 
 import cn.wtk.mp.common.base.interceptor.ConfigHandlerInterceptor;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -35,6 +36,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = setHttpMessageConverterToFirst(converters);
         ObjectMapper objectMapper = new ObjectMapper();
+        // 不返回 null 值给请求方
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         /*
          * 序列换成json时,将所有的long变成string
          * 因为js中得数字类型不能包含所有的java long值
