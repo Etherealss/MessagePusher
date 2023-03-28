@@ -6,7 +6,6 @@ import cn.wtk.mp.common.msg.dto.mq.ManagerMsgHeader;
 import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgBody;
 import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgHeader;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendGroupMsgCommand;
-import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendMsgCommand;
 import cn.wtk.mp.msg.acceptor.infrasturcture.client.command.SendPersonalMsgCommand;
 import org.mapstruct.Mapper;
 
@@ -18,7 +17,8 @@ import org.mapstruct.Mapper;
 public interface MsgConverter {
     MsgBody toMsg(SendPersonalMsgCommand command);
     MsgBody toMsg(SendGroupMsgCommand command);
-    MsgHeader toMsgHeader(SendMsgCommand command);
+    MsgHeader toMsgHeader(SendPersonalMsgCommand command);
+    MsgHeader toMsgHeader(SendGroupMsgCommand command);
     ManagerMsgHeader toMsgHeader(MsgHeader msgHeader);
     ManagerMsgBody toMsgBody(MsgBody msgBody);
 }

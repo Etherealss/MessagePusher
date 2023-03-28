@@ -20,7 +20,7 @@ import java.util.List;
 )
 public interface ConnectFiegn {
 
-    @PostMapping("/msg/action/push")
+    @PostMapping("/list/connectors/msgs")
     void pushMsg(@RequestBody @Validated MultiMsgPushCommand msg,
                  @RequestHeader(MsgRouteHandler.MSG_ROUTE_IP) String ip,
                  @RequestHeader(MsgRouteHandler.MSG_ROUTE_PORT) Integer rcvrPort

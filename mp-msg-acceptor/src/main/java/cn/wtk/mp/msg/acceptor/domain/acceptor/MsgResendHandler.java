@@ -19,7 +19,7 @@ import java.util.UUID;
 public class MsgResendHandler {
     private static final String DEFAULT_VALUE = "1";
 
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final MsgResendProperties msgResendProperties;
 
     /**

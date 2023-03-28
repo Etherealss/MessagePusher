@@ -29,15 +29,15 @@ public class MsgController {
 
     @PostMapping("/personal")
     @InternalAuth
-    public Long sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command) {
+    public void sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command) {
         Long appId = ServerSecurityContextHolder.require().getServerId();
-        return msgAcceptorAppService.sendMsg(command, appId);
+        msgAcceptorAppService.sendMsg(command, appId);
     }
 
     @PostMapping("/group")
     @InternalAuth
-    public Long sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command) {
+    public void sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command) {
         Long appId = ServerSecurityContextHolder.require().getServerId();
-        return msgAcceptorAppService.sendMsg(command, appId);
+        msgAcceptorAppService.sendMsg(command, appId);
     }
 }

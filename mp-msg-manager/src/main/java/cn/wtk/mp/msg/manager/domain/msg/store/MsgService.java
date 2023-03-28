@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class MsgService {
     private final PersonalMsgService personalMsgService;
     private final GroupMsgService groupMsgService;
 
+    @Transactional
     public void insert(MsgBody msg) {
         MsgEntity entity = msgConverter.toEntity(msg);
         entity.setTransferStatus(MsgTransferStatus.SENDING);
@@ -69,7 +71,6 @@ public class MsgService {
                 .and(MsgEntityFieldName.RCVR_ID).is(rcvrId)
                 .and(MsgEntityFieldName.MSG_TOPIC).is(msgTopic)
                 .and(MsgEntityFieldName.MSG_ID).gt(cursorMsgId);
-        // TODO 将消息改成int，通过比较大小判断消息状态
         if (unread) {
             criteria.and(MsgEntityFieldName.TRANSFET_STATUS).is(MsgTransferStatus.SENT);
         } else {
@@ -93,6 +94,7 @@ public class MsgService {
         return result.getDeletedCount() == 1;
     }
 
+    @Transactional
     public void updateStatus(Long msgId, MsgTransferStatus status) {
         Query query = Query.query(Criteria
                 .where(MsgEntityFieldName.MSG_ID).is(msgId)

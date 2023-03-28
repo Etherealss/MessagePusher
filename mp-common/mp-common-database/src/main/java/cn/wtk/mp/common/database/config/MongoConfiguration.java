@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "cn.wtk.mp")
+@EnableTransactionManagement
 @EnableMongoAuditing
 @Slf4j
 public class MongoConfiguration  {

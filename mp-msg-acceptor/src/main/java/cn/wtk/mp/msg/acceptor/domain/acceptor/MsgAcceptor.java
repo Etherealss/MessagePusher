@@ -25,7 +25,7 @@ public class MsgAcceptor {
     private final UidGenerator uidGenerator;
     private final MsgConverter msgConverter;
 
-    public Long sendMsg(MsgBody msgBody, MsgHeader header) {
+    public void sendMsg(MsgBody msgBody, MsgHeader header) {
         // TODO 异步并发操作，线程池限流操作，责任链流水线
         if (msgResendHandler.checkAndSet4Duplicate(header.getTempId())) {
             throw new SimpleServiceException(ApiInfo.MSG_DUPILICATE);
@@ -36,7 +36,6 @@ public class MsgAcceptor {
         mqMsgProducer.produce(new KafkaMsg(
                 msgConverter.toMsgHeader(header), msgConverter.toMsgBody(msgBody)
         ));
-        return msgId;
     }
 
 }

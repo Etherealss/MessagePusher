@@ -44,7 +44,7 @@ public class SendMsgCommand {
     Object detail;
 
     @NotNull
-    Boolean persistent;
+    Boolean needPersistent;
 
     @NotNull
     Long senderId;

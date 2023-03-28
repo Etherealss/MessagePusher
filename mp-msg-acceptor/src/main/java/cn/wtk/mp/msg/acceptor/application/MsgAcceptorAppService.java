@@ -10,6 +10,7 @@ import cn.wtk.mp.msg.acceptor.infrasturcture.client.converter.MsgConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * @author wtk
@@ -23,19 +24,23 @@ public class MsgAcceptorAppService {
     private final MsgAcceptor msgAcceptor;
     private final MsgConverter msgConverter;
 
-    public Long sendMsg(SendPersonalMsgCommand command, Long appId) {
+    public void sendMsg(SendPersonalMsgCommand command, Long appId) {
         MsgBody msgBody = msgConverter.toMsg(command);
         MsgHeader msgHeader = msgConverter.toMsgHeader(command);
+        msgHeader.setNeedRelationVerify(StringUtils.hasText(command.getRelationTopic()));
         msgBody.setAppId(appId);
         msgBody.setMsgType(MsgType.PERSONAL);
-        return msgAcceptor.sendMsg(msgBody, msgHeader);
+        msgHeader.setMsgType(MsgType.PERSONAL);
+        msgAcceptor.sendMsg(msgBody, msgHeader);
     }
 
-    public Long sendMsg(SendGroupMsgCommand command, Long appId) {
+    public void sendMsg(SendGroupMsgCommand command, Long appId) {
         MsgBody msgBody = msgConverter.toMsg(command);
         MsgHeader msgHeader = msgConverter.toMsgHeader(command);
+        msgHeader.setNeedRelationVerify(true);
         msgBody.setAppId(appId);
         msgBody.setMsgType(MsgType.GROUP);
-        return msgAcceptor.sendMsg(msgBody, msgHeader);
+        msgHeader.setMsgType(MsgType.GROUP);
+        msgAcceptor.sendMsg(msgBody, msgHeader);
     }
 }
