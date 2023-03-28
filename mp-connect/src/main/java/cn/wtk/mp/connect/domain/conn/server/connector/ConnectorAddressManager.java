@@ -2,10 +2,8 @@ package cn.wtk.mp.connect.domain.conn.server.connector;
 
 import cn.wtk.mp.common.base.exception.service.NotFoundException;
 import cn.wtk.mp.common.base.lock.CacheLock;
-import cn.wtk.mp.common.base.lock.RedisLockHelper;
-import cn.wtk.mp.common.base.lock.RedisLockOperator;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
-import cn.wtk.mp.connect.infrastructure.config.ConnectorAddressLockProperties;
+import cn.wtk.mp.connect.infrastructure.config.ConnectorAddressCacheProperties;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
@@ -20,7 +18,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -34,61 +31,60 @@ import java.util.stream.Collectors;
 public class ConnectorAddressManager {
     private final RedisTemplate<String, String> redisTemplate;
     private final NettyServerConfig config;
-    private final ConnectorAddressLockProperties properties;
-    private final RedisLockHelper connectRedisLockHelper;
+    private final ConnectorAddressCacheProperties cacheProperties;
     private final String connectorMappingKeyPrefix;
     private final String connectAddressKeyPrefix;
     private final AuthFeign authFeign;
 
     public ConnectorAddressManager(RedisTemplate<String, String> redisTemplate,
                                    NettyServerConfig config,
-                                   RedisLockOperator redisLockOperator,
-                                   ConnectorAddressLockProperties properties,
+                                   ConnectorAddressCacheProperties cacheProperties,
                                    @Value("${mp.redis-key.connector.server-mapping}")
                                    String connectorMappingKeyPrefix,
                                    @Value("${mp.redis-key.connector.pre-server-mapping}")
                                    String connectAddressKeyPrefix, AuthFeign authFeign) {
         this.redisTemplate = redisTemplate;
         this.config = config;
+        this.cacheProperties = cacheProperties;
         this.connectorMappingKeyPrefix = connectorMappingKeyPrefix;
         this.connectAddressKeyPrefix = connectAddressKeyPrefix;
-        this.properties = properties;
         this.authFeign = authFeign;
-        this.connectRedisLockHelper = new RedisLockHelper(
-                redisLockOperator,
-                properties.getTotalRetryTimes(),
-                properties.getRetryIntervalMs(),
-                properties.getLockFailedThrowException()
-        );
     }
 
     @CacheLock
     public ConnectorAddressDTO getAddress4Connect(Long appId, Long connectorId, String userToken) {
         log.debug("连接者：{} 请求获取路由信息以进行连接操作", connectorId);
-        String lockFlag = UUID.randomUUID().toString();
-        String lockKey = properties.getLockKeyPrefix() + ":" + connectorId;
-        try {
-            connectRedisLockHelper.lock(lockKey, lockFlag, 5, TimeUnit.SECONDS);
-            ConnectorAddressDTO connectorAddress = getAddress(connectorId);
-            String connectAddressKey = connectAddressKeyPrefix + ":" + connectorId.toString();
-            if (connectorAddress == null) {
-                String address = redisTemplate.opsForValue().get(connectAddressKey);
-                if (StringUtils.hasText(address)) {
-                    return new ConnectorAddressDTO(connectorId, address);
-                } else {
-                    String curServerAddress = config.getIp() + ":" + config.getPort();
-                    redisTemplate.opsForValue().set(connectAddressKey, curServerAddress);
-                    return new ConnectorAddressDTO(connectorId, config.getIp(), config.getPort());
-                }
-            } else {
-                String address = connectorAddress.getIp() + ":" + connectorAddress.getPort();
-                redisTemplate.opsForValue().set(connectAddressKey, address, 5, TimeUnit.MINUTES);
-                return connectorAddress;
-            }
-        } catch (Throwable e) {
-            connectRedisLockHelper.unlock(lockKey, lockFlag);
-            throw e;
+        String connectAddressKey = connectAddressKeyPrefix + ":" + connectorId.toString();
+        redisTemplate.expire(connectAddressKey, cacheProperties.getConnectExpireMs(), TimeUnit.MILLISECONDS);
+        String redisAddress = redisTemplate.opsForValue().get(connectAddressKey);
+        if (StringUtils.hasText(redisAddress)) {
+            return new ConnectorAddressDTO(connectorId, redisAddress);
         }
+        ConnectorAddressDTO connectorAddress = getAddress(connectorId);
+        String finalAddress;
+        if (connectorAddress == null) {
+            String curAddress = config.getIp() + ":" + config.getPort();
+            finalAddress = this.cas(connectAddressKey, curAddress);
+        } else {
+            String routeAddress = connectorAddress.getIp() + ":" + connectorAddress.getPort();
+            finalAddress = this.cas(connectAddressKey, routeAddress);
+        }
+        return new ConnectorAddressDTO(connectorId, finalAddress);
+    }
+
+    /**
+     * @return 最终设置到Redis的连接地址
+     */
+    private String cas(String key, String address) {
+        Boolean absent = redisTemplate.opsForValue()
+                .setIfAbsent(key, address, cacheProperties.getConnectExpireMs(), TimeUnit.MILLISECONDS);
+        if (Boolean.FALSE.equals(absent)) {
+            address = redisTemplate.opsForValue().get(key);
+            if (!StringUtils.hasText(address)) {
+                throw new RuntimeException("address 不应该为空，难道是 CAS 后还是过期了？");
+            }
+        }
+        return address;
     }
 
     @EventListener(ConnectorCreatedEvent.class)
@@ -114,12 +110,7 @@ public class ConnectorAddressManager {
         if (!StringUtils.hasText(address)) {
             return null;
         }
-        String[] info = address.split(":");
-        ConnectorAddressDTO dto = new ConnectorAddressDTO();
-        dto.setIp(info[0]);
-        dto.setPort(Integer.parseInt(info[1]));
-        dto.setConnectorId(connectorId);
-        return dto;
+        return new ConnectorAddressDTO(connectorId, address);
     }
 
     public List<ConnectorAddressDTO> getConnectorRouteAddresses(List<Long> connectorIds) {
