@@ -1,0 +1,64 @@
+@startuml
+
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+
+actor 连接者 as Client
+participant 外围系统 as Server
+participant Connect服务节点 as Connect
+participant 路由信息管理 as RouteAddressManager
+participant Auth服务 as AuthServer
+database Redis
+
+activate Client
+Client -> Server ++ : 创建连接
+Server -> Connect ++ : 获取连接地址
+Connect -> RouteAddressManager ++ : 确定连接地址
+RouteAddressManager -> Redis ++ : 设置连接地址的缓存时间
+return ok（连接地址不存在也不会报错）
+RouteAddressManager -> Redis ++ : 获取连接地址
+return 连接地址（可能为空）
+alt 连接地址不为空
+    Connect <- RouteAddressManager : 连接地址为Redis连接地址
+else 连接地址为空
+    RouteAddressManager -> Redis ++ : 获取连接者的路由信息
+    return 路由信息
+    alt 路由信息为空
+        RouteAddressManager -> Redis ++ : 以当前服务地址CAS设置连接地址
+        alt CAS成功
+            return ok
+            Connect <- RouteAddressManager : 连接地址为当前服务地址
+        else CAS失败
+            RouteAddressManager -> Redis ++ : 获取连接地址
+            return 连接地址（提前设置了过期时间，\n连接地址必定存在）
+            Connect <- RouteAddressManager : 连接地址为Redis连接地址
+        end
+    else 路由信息不为空
+        RouteAddressManager -> Redis ++ : 以路由信息CAS设置连接地址
+        alt CAS成功
+            return ok
+            Connect <- RouteAddressManager : 连接地址为路由信息地址
+        else CAS失败
+            RouteAddressManager -> Redis ++ : 获取连接地址
+            return 连接地址（提前设置了过期时间，\n连接地址必定存在）
+            Connect <- RouteAddressManager : 连接地址为Redis连接地址
+        end
+    end
+end
+return 连接地址
+return 连接地址
+Server -> AuthServer ++ : 提供连接地址，创建连接者Token
+return 连接者Token
+return 连接者Token\n和连接地址
+
+@enduml

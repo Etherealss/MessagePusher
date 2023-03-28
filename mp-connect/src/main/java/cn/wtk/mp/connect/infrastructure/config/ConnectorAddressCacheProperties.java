@@ -15,13 +15,12 @@ import javax.validation.constraints.NotNull;
  * @date 2023/3/28
  */
 @Configuration
-@ConfigurationProperties("mp.connector.address.cache")
+@ConfigurationProperties("mp.connect.address.cache")
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 public class ConnectorAddressCacheProperties {
     @NotBlank String routeCacheKey;
     @NotBlank String connectCacheKey;
-    @NotNull Long routeExpireMs;
     @NotNull Long connectExpireMs;
 }
