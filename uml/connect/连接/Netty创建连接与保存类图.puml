@@ -29,13 +29,13 @@ class ConnectionAuthHandler  {
     + void channelRead(ChannelHandlerContext ctx, Object msg)
     + AuthResult doAuth(Map<String, String> urlParameters)
 }
+note bottom: 处理客户端连接的状态变更
 
 class AuthFeign {
     + Boolean authToken(ConnectorCredential credential);
 }
 ConnectionAuthHandler ..> AuthFeign: 鉴权
 
-note top of ConnectionStateHandler: 处理客户端连接的状态变更
 
 NettyServer .> NettyServerInitializer : 初始化NettyServer
 NettyServer .> NettyServerConfig: 获取配置

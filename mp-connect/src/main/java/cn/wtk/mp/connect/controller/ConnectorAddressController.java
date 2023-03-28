@@ -1,11 +1,14 @@
 package cn.wtk.mp.connect.controller;
 
 import cn.wtk.mp.common.base.web.ResponseAdvice;
+import cn.wtk.mp.common.security.annotation.InternalAuth;
+import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.connect.application.connector.RouteAddressAppService;
-import cn.wtk.mp.connect.infrastructure.client.command.BatchConnectorIdQuery;
+import cn.wtk.mp.connect.infrastructure.client.command.UpdateConnectAddressCommand;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,13 +26,24 @@ public class ConnectorAddressController {
 
     private final RouteAddressAppService routeAddressAppService;
 
-    @GetMapping("/connectors/{connectorId}/address")
-    public ConnectorAddressDTO getConnectorAddress(@PathVariable Long connectorId) {
+    @PutMapping("/connectors/{connectorId}/addresses/connect")
+    @InternalAuth
+    public ConnectorAddressDTO updateConnectAddress4(@PathVariable Long connectorId,
+                                                     @RequestBody @Validated UpdateConnectAddressCommand command) {
+        return routeAddressAppService.getAddress4Connect(
+                ServerSecurityContextHolder.require().getServerId(), connectorId, command
+        );
+    }
+
+    @GetMapping("/connectors/{connectorId}/addresses/routes")
+    @InternalAuth
+    public ConnectorAddressDTO getRouteAddress(@PathVariable Long connectorId) {
         return routeAddressAppService.getConnectorRouteAddress(connectorId);
     }
 
-    @GetMapping("/list/connectors/address")
-    public List<ConnectorAddressDTO> getConnectorAddresses(@RequestBody BatchConnectorIdQuery query) {
-        return routeAddressAppService.getConnectorRouteAddress(query.getConnectorIds());
+    @GetMapping("/list/connectors/addresses/routes")
+    @InternalAuth
+    public List<ConnectorAddressDTO> getRouteAddresses(@RequestParam List<Long> ids) {
+        return routeAddressAppService.getConnectorRouteAddress(ids);
     }
 }

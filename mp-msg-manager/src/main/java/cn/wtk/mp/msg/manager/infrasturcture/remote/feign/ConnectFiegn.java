@@ -3,7 +3,6 @@ package cn.wtk.mp.msg.manager.infrasturcture.remote.feign;
 import cn.wtk.mp.msg.manager.infrasturcture.config.lb.MsgRouteHandler;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.query.BatchConnectorIdQuery;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +25,9 @@ public interface ConnectFiegn {
                  @RequestHeader(MsgRouteHandler.MSG_ROUTE_PORT) Integer rcvrPort
     );
 
-    @GetMapping("/connectors/{connectorId}/address")
+    @GetMapping("/connectors/{connectorId}/addresses/routes")
     ConnectorAddressDTO getConnectorAddress(@PathVariable Long connectorId);
 
-    @GetMapping("/list/connectors/address")
-    List<ConnectorAddressDTO> getConnectorAddress(@RequestBody BatchConnectorIdQuery query);
+    @GetMapping("/list/connectors/addresses/routes")
+    List<ConnectorAddressDTO> getConnectorAddress(@RequestParam List<Long> ids);
 }

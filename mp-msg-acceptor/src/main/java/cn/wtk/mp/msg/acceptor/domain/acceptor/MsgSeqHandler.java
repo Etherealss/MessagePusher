@@ -40,23 +40,26 @@ public class MsgSeqHandler {
 
     /**
      * 处理消息有序的逻辑
-     * @param msgHeader
-     * @return 可保证前一条 msg 已送达时返回 true。无法保证前一条消息已送达时返回 false。
+     * @param header
+     * @return 可认为前一条 msg 已送达时返回 true（无法严格保证）。无法保证前一条消息已送达时返回 false。
      */
-    public boolean handlerMsgSeq(MsgHeader msgHeader) {
-        boolean preMsgAccepted = checkPreMsgAccepted(msgHeader);
+    public boolean handlerMsgSeq(MsgHeader header) {
+        boolean preMsgAccepted = checkPreMsgAccepted(header);
         /*
         先等待前一条消息送达，如果确认已送达或超时，则会来到这里。
         此时设置当前消息的 tempId，后面的消息就可以与当前消息保证有序性
         TODO 问题：存在传递等待问题
          */
-        setCurMsgTempId4Seq(msgHeader);
+        setCurMsgTempId4Seq(header);
         return preMsgAccepted;
     }
 
     private boolean checkPreMsgAccepted(MsgHeader header) {
+        if (ignoreSeq(header)) {
+            return true;
+        }
         if (isTimeLimitExceeded(header.getPreMsgSendTime())) {
-            return false;
+            return true;
         }
         try {
             Boolean result = msgSeqRetryTemplate.execute(retryContext -> {
@@ -77,6 +80,10 @@ public class MsgSeqHandler {
                     header, e.getMessage());
         }
         return false;
+    }
+
+    private static boolean ignoreSeq(MsgHeader header) {
+        return header.getPreMsgSendTime() == null;
     }
 
 

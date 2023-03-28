@@ -1,6 +1,7 @@
 package cn.wtk.mp.connect.application.connector;
 
-import cn.wtk.mp.connect.domain.conn.server.connector.RouteAddressManager;
+import cn.wtk.mp.connect.domain.conn.server.connector.ConnectorAddressManager;
+import cn.wtk.mp.connect.infrastructure.client.command.UpdateConnectAddressCommand;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +17,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class RouteAddressAppService {
-    private final RouteAddressManager routeAddressManager;
+    private final ConnectorAddressManager connectorAddressManager;
+
+    public ConnectorAddressDTO getAddress4Connect(Long appId, Long connectorId,
+                                                  UpdateConnectAddressCommand command) {
+        return connectorAddressManager.getAddress4Connect(
+                appId, connectorId, command.getConnectorToken()
+        );
+    }
 
     public ConnectorAddressDTO getConnectorRouteAddress(Long connectorId) {
-        return routeAddressManager.getConnectorRouteAddress(connectorId);
+        return connectorAddressManager.getConnectorRouteAddress(connectorId);
     }
 
     public List<ConnectorAddressDTO> getConnectorRouteAddress(List<Long> connectorIds) {
-        return routeAddressManager.getConnectorRouteAddresses(connectorIds);
+        return connectorAddressManager.getConnectorRouteAddresses(connectorIds);
     }
 }

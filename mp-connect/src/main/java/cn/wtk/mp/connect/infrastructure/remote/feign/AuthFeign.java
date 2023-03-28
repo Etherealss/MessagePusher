@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface AuthFeign {
     @GetMapping("/apps/{appId}/connectors/{connectorId}/credentials/{token}")
-    ConnectorCredential verify(@PathVariable String appId,
+    ConnectorCredential verify(@PathVariable Long appId,
                                @PathVariable Long connectorId,
                                @PathVariable String token);
 }

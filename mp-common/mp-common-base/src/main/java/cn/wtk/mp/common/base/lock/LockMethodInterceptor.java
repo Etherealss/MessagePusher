@@ -25,16 +25,16 @@ import java.util.UUID;
 @Configuration
 public class LockMethodInterceptor {
 
-    private final RedisLockHelper redisLockHelper;
+    private final RedisLockOperator redisLockOperator;
     private final CacheKeyGenerator cacheKeyGenerator;
 
     private final String lockPrefix;
 
     @Autowired
-    public LockMethodInterceptor(RedisLockHelper redisLockHelper,
+    public LockMethodInterceptor(RedisLockOperator redisLockOperator,
                                  CacheKeyGenerator cacheKeyGenerator,
                                  @Value("${mp.common.lock.key-prefix}") String lockPrefix) {
-        this.redisLockHelper = redisLockHelper;
+        this.redisLockOperator = redisLockOperator;
         this.cacheKeyGenerator = cacheKeyGenerator;
         this.lockPrefix = lockPrefix;
     }
@@ -61,7 +61,7 @@ public class LockMethodInterceptor {
         try {
             // 循环重试
             for (int retryTimes = lock.retryTimes(); retryTimes >= 0; retryTimes--) {
-                boolean lockSuccess = redisLockHelper.lock(lockKey, lockFlag, lock.expire(), lock.timeUnit());
+                boolean lockSuccess = redisLockOperator.lock(lockKey, lockFlag, lock.expire(), lock.timeUnit());
                 if (lockSuccess) {
                     // 获取锁成功
                     log.debug("获取分布式锁成功，key: {}, value: {}，重试次数: {}", lockKey, lockFlag, lock.retryTimes() - retryTimes);
@@ -86,7 +86,7 @@ public class LockMethodInterceptor {
             }
         } finally {
             // 释放锁
-            redisLockHelper.unlockLua(lockKey, lockFlag);
+            redisLockOperator.unlockLua(lockKey, lockFlag);
             log.debug("释放分布式锁成功，key: {}, value: {}, 占有锁的时长: {}ms", lockKey, lockFlag, startTime > 0 ? System.currentTimeMillis() - startTime : 0);
         }
     }

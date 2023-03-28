@@ -9,7 +9,6 @@ import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushComma
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.RelationFeign;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.query.BatchConnectorIdQuery;
 import cn.wtk.mp.msg.manager.infrasturcture.service.MsgPusher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +45,7 @@ public abstract class AbstractMsgDispatcher {
     protected abstract List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException;
 
     private List<ConnectorAddressDTO> getAddresses(List<Long> revrIds) {
-        BatchConnectorIdQuery query = new BatchConnectorIdQuery(revrIds);
-        return connectFiegn.getConnectorAddress(query);
+        return connectFiegn.getConnectorAddress(revrIds);
     }
 
     private void pushMsg(String ip, Integer port, MsgPushCommand msgPushCommand) {

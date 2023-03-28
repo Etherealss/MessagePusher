@@ -1,0 +1,49 @@
+@startuml
+
+'https://plantuml.com/sequence-diagram
+
+skinparam shadowing false
+skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
+skinparam dpi 300
+skinparam activity  {
+    DiamondFontSize 14
+    ArrowFontSize 14
+    FontSize 14
+}
+autonumber
+autoactivate on
+
+actor 连接者 as Client
+participant 外围系统 as Server
+participant Connect服务节点 as Connect
+participant 路由信息管理 as RouteAddressManager
+participant Auth服务 as AuthServer
+database Redis
+
+activate Client
+Client -> Server : 创建连接
+Server -> AuthServer : 创建连接者Token
+return 连接者Token
+Server -> Connect : 获取连接地址
+Connect -> RouteAddressManager : 确定连接地址
+group 分布式锁
+    RouteAddressManager -> Redis : 获取连接者的路由信息
+    return 路由信息
+    alt 路由信息不为空
+        RouteAddressManager -> Redis : 以路由信息设置连接地址
+        return ok
+    else 路由信息为空
+        RouteAddressManager -> Redis : 获取连接者的连接地址
+        return 连接信息
+        alt 连接信息为空
+            RouteAddressManager -> Redis : 以当前服务地址设置连接地址
+            return ok
+        end
+    end
+end group
+return 连接地址
+return 连接地址
+return 连接者Token\n和连接地址
+
+@enduml
