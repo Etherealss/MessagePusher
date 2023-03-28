@@ -26,7 +26,7 @@ public class SingleRcvrMsgDispathcer extends AbstractMsgDispatcher {
     }
 
     @Override
-    protected List<Long> getRcvrIds(MsgHeader msgHeader) {
+    protected List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException {
         List<Long> rcvrIds = Collections.singletonList(msgHeader.getRcvrId());
         if (!msgHeader.getNeedRelationVerify()) {
             return rcvrIds;

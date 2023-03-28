@@ -1,9 +1,10 @@
 package cn.wtk.mp.msg.manager.infrasturcture.client.converter;
 
 import cn.wtk.mp.common.base.enums.MapperComponentModel;
-import cn.wtk.mp.common.msg.entity.GroupMsg;
-import cn.wtk.mp.common.msg.entity.PersonalMsg;
+import cn.wtk.mp.common.msg.dto.mq.ManagerMsgBody;
+import cn.wtk.mp.common.msg.dto.mq.ManagerMsgHeader;
 import cn.wtk.mp.msg.manager.domain.msg.MsgBody;
+import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
 import cn.wtk.mp.msg.manager.domain.msg.store.MsgEntity;
 import cn.wtk.mp.msg.manager.infrasturcture.client.dto.GroupMsgDTO;
 import cn.wtk.mp.msg.manager.infrasturcture.client.dto.MsgDTO;
@@ -23,8 +24,6 @@ public interface MsgConverter {
     MsgEntity toEntity(MsgBody msg);
     List<MsgEntity> toEntities(List<MsgBody> msg);
 
-    MsgPushCommand toPushDTO(GroupMsg msg);
-    MsgPushCommand toPushDTO(PersonalMsg msg);
     MsgPushCommand toPushCommand(MsgBody msgBody);
 
     MsgDTO toDto(MsgEntity entity);
@@ -37,4 +36,7 @@ public interface MsgConverter {
     GroupMsgDTO toGroupDTO(MsgEntity entity);
     @Mapping(source = "rcvrId", target = "groupId")
     List<GroupMsgDTO> toGroupDTOs(List<MsgEntity> entities);
+
+    MsgBody toMsgBody(ManagerMsgBody body);
+    MsgHeader toMsgHead(ManagerMsgHeader header);
 }

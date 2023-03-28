@@ -3,6 +3,7 @@ package cn.wtk.mp.msg.manager.domain.msg.dispatcher;
 import cn.wtk.mp.msg.manager.domain.msg.ManageMsg;
 import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
 import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
+import cn.wtk.mp.msg.manager.infrasturcture.exception.RelationException;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
@@ -42,7 +43,7 @@ public abstract class AbstractMsgDispatcher {
         }
     }
 
-    protected abstract List<Long> getRcvrIds(MsgHeader msgHeader);
+    protected abstract List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException;
 
     private List<ConnectorAddressDTO> getAddresses(List<Long> revrIds) {
         BatchConnectorIdQuery query = new BatchConnectorIdQuery(revrIds);

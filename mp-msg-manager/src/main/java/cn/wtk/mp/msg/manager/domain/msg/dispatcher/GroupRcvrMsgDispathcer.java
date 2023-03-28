@@ -26,7 +26,7 @@ public class GroupRcvrMsgDispathcer extends AbstractMsgDispatcher {
     }
 
     @Override
-    protected List<Long> getRcvrIds(MsgHeader msgHeader) {
+    protected List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException {
         Long groupId = msgHeader.getGroupId();
         try {
             return relationFeign.getGroupMembers(groupId);

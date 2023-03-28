@@ -55,10 +55,14 @@ public class MsgAppService {
             }
         } catch (RelationException e) {
             log.info("关系异常，不允许发送：{}", e.getMessage());
-            msgService.updateStatus(msg.getMsgBody().getMsgId(), MsgTransferStatus.REJECT);
+            if (msg.getMsgHeader().getNeedPersistent()) {
+                msgService.updateStatus(msg.getMsgBody().getMsgId(), MsgTransferStatus.REJECT);
+            }
         } catch (Exception e) {
-            log.warn("消息推送失：{}", e.getMessage());
-            msgService.updateStatus(msg.getMsgBody().getMsgId(), MsgTransferStatus.FAIL);
+            log.warn("消息推送失败：{}", e.getMessage());
+            if (msg.getMsgHeader().getNeedPersistent()) {
+                msgService.updateStatus(msg.getMsgBody().getMsgId(), MsgTransferStatus.FAIL);
+            }
         }
     }
 }

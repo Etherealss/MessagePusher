@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @Getter
-public class MsgMqTopic {
+public class MsgMqTopicProperties {
     @Value("${mp.acceptor.mq.producer.msg.topic}")
     private String msgTopic;
 }

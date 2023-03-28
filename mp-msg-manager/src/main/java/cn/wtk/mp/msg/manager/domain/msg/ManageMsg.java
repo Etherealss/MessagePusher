@@ -1,7 +1,9 @@
 package cn.wtk.mp.msg.manager.domain.msg;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -10,6 +12,8 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 public class ManageMsg {
     MsgHeader msgHeader;
     MsgBody msgBody;

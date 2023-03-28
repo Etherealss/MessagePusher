@@ -40,27 +40,27 @@ public class MsgSeqHandler {
 
     /**
      * 处理消息有序的逻辑
-     * @param spec
+     * @param msgHeader
      * @return 可保证前一条 msg 已送达时返回 true。无法保证前一条消息已送达时返回 false。
      */
-    public boolean handlerMsgSeq(MsgHeader spec) {
-        boolean preMsgAccepted = checkPreMsgAccepted(spec);
+    public boolean handlerMsgSeq(MsgHeader msgHeader) {
+        boolean preMsgAccepted = checkPreMsgAccepted(msgHeader);
         /*
         先等待前一条消息送达，如果确认已送达或超时，则会来到这里。
         此时设置当前消息的 tempId，后面的消息就可以与当前消息保证有序性
         TODO 问题：存在传递等待问题
          */
-        setCurMsgTempId4Seq(spec);
+        setCurMsgTempId4Seq(msgHeader);
         return preMsgAccepted;
     }
 
-    private boolean checkPreMsgAccepted(MsgHeader spec) {
-        if (isTimeLimitExceeded(spec.getPreMsgSendTime())) {
+    private boolean checkPreMsgAccepted(MsgHeader header) {
+        if (isTimeLimitExceeded(header.getPreMsgSendTime())) {
             return false;
         }
         try {
             Boolean result = msgSeqRetryTemplate.execute(retryContext -> {
-                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + spec.getTempId().toString();
+                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + header.getTempId().toString();
                 boolean exist = redisTemplate.opsForValue().get(tempIdKey) != null;
                 if (exist) {
                     return true;
@@ -68,20 +68,20 @@ public class MsgSeqHandler {
                     throw new MsgSeqRetryException();
                 }
             }, retryContext -> {
-                log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId。当前的 MsgHandlerSpec: {}", spec);
+                log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId。当前的 MsgHeader: {}", header);
                 return false;
             });
             return Boolean.TRUE.equals(result);
         } catch (MsgSeqRetryException e) {
-            log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId。当前的 MsgHandlerSpec: {}。异常信息：{}",
-                    spec, e.getMessage());
+            log.info("重试次数耗尽，没有获取到上一条 msg 的 tempId。当前的 MsgHeader: {}。异常信息：{}",
+                    header, e.getMessage());
         }
         return false;
     }
 
 
-    private void setCurMsgTempId4Seq(MsgHeader spec) {
-        String tempIdKey = msgSeqProperties.getCacheKey() + ":" + spec.getTempId().toString();
+    private void setCurMsgTempId4Seq(MsgHeader msgHeader) {
+        String tempIdKey = msgSeqProperties.getCacheKey() + ":" + msgHeader.getTempId().toString();
         redisTemplate.opsForValue().set(tempIdKey, DEFAULT_VALUE, Duration.ofMillis(msgSeqProperties.getExpireMs()));
     }
 

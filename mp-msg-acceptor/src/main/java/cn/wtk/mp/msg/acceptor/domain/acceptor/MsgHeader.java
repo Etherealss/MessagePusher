@@ -1,8 +1,7 @@
 package cn.wtk.mp.msg.acceptor.domain.acceptor;
 
 import cn.wtk.mp.common.msg.enums.MsgType;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
@@ -14,6 +13,9 @@ import java.util.UUID;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MsgHeader {
 
     /**

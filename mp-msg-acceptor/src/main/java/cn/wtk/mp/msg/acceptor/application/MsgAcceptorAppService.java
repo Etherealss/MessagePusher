@@ -24,18 +24,18 @@ public class MsgAcceptorAppService {
     private final MsgConverter msgConverter;
 
     public Long sendMsg(SendPersonalMsgCommand command, Long appId) {
-        MsgBody msg = msgConverter.toMsg(command);
-        MsgHeader spec = msgConverter.toMsgHeader(command);
-        msg.setAppId(appId);
-        msg.setMsgType(MsgType.PERSONAL);
-        return msgAcceptor.sendMsg(msg, spec);
+        MsgBody msgBody = msgConverter.toMsg(command);
+        MsgHeader msgHeader = msgConverter.toMsgHeader(command);
+        msgBody.setAppId(appId);
+        msgBody.setMsgType(MsgType.PERSONAL);
+        return msgAcceptor.sendMsg(msgBody, msgHeader);
     }
 
     public Long sendMsg(SendGroupMsgCommand command, Long appId) {
-        MsgBody msg = msgConverter.toMsg(command);
-        MsgHeader spec = msgConverter.toMsgHeader(command);
-        msg.setAppId(appId);
-        msg.setMsgType(MsgType.GROUP);
-        return msgAcceptor.sendMsg(msg, spec);
+        MsgBody msgBody = msgConverter.toMsg(command);
+        MsgHeader msgHeader = msgConverter.toMsgHeader(command);
+        msgBody.setAppId(appId);
+        msgBody.setMsgType(MsgType.GROUP);
+        return msgAcceptor.sendMsg(msgBody, msgHeader);
     }
 }
