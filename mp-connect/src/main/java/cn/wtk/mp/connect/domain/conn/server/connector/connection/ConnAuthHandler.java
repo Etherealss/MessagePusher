@@ -138,18 +138,15 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
         }
         try {
             Long appId = Long.valueOf(appIdStr);
-        } catch (NumberFormatException e) {
-            return AuthResult.fail("appId格式错误：非Long类型");
-        }
-
-        try {
             // 验证 connectorToken
             Long connectorId = Long.valueOf(connectorIdStr);
-            authFeign.verify(appIdStr, connectorId, connectorToken);
-            return AuthResult.success(connectorId, Long.valueOf(appIdStr));
+            authFeign.verify(appId, connectorId, connectorToken);
+            return AuthResult.success(connectorId, appId);
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getResult());
             return AuthResult.fail("token无效或appId错误");
+        } catch (NumberFormatException e) {
+            return AuthResult.fail("参数格式错误：非Long类型。appId=" + appIdStr + ", connectorId=" + connectorIdStr);
         }
     }
 
