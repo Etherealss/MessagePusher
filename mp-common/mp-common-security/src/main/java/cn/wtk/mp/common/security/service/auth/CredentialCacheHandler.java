@@ -45,6 +45,7 @@ public abstract class CredentialCacheHandler {
     }
 
     private TokenCredential getByCache(String key) {
+        log.trace("获取在 Redis 上缓存 Credential 的 key");
         TokenCredential credential = redisTemplate.opsForValue().get(key);
         return credential;
     }

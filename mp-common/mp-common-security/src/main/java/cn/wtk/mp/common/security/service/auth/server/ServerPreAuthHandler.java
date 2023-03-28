@@ -24,9 +24,10 @@ public class ServerPreAuthHandler implements IPreAuthHandler {
     public boolean checkNeedAuth(Method method) {
         InternalAuth internalAuth = method.getAnnotation(InternalAuth.class);
         if (internalAuth == null || !internalAuth.serv()) {
-            log.info("请求无需检验");
+            log.info("请求无需进行服务Token检验");
             return false;
         }
+        log.debug("请求需要进行服务Token检验");
         return true;
     }
 
