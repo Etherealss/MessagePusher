@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -29,7 +30,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class MsgResendProperties {
     
-    @NotEmpty
+    @NotBlank
     String cacheKey;
 
     @NotNull

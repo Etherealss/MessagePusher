@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -19,7 +19,7 @@ public class ManagerMsgBody {
     @NotNull Long msgId;
     @NotNull Long appId;
     @NotNull Long senderId;
-    @NotEmpty String msgTopic;
+    @NotBlank String msgTopic;
     @NotNull MsgType msgType;
     @NotNull Date sendTime;
     Object payload;

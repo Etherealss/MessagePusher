@@ -1,8 +1,7 @@
-package cn.wtk.mp.msg.manager.infrasturcture.config;
+package cn.wtk.mp.connect.infrastructure.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -13,18 +12,16 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @author wtk
- * @date 2023/2/24
+ * @date 2023/3/28
  */
 @Configuration
-@ConfigurationProperties("mp.manager.route.address")
+@ConfigurationProperties("mp.connector.address.cache")
 @Getter
-@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
-public class RouteAddressProperties {
-    @NotBlank
-    String cacheKey;
-
-    @NotNull
-    Long expireMs;
+public class ConnectorAddressCacheProperties {
+    @NotBlank String routeCacheKey;
+    @NotBlank String connectCacheKey;
+    @NotNull Long routeExpireMs;
+    @NotNull Long connectExpireMs;
 }

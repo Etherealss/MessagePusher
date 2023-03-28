@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -31,7 +31,7 @@ public class ServerCredentialConfig {
     /**
      * 获取 server-token 的 headerName
      */
-    @NotEmpty
+    @NotBlank
     private String headerName;
 
     /**
@@ -43,19 +43,19 @@ public class ServerCredentialConfig {
     /**
      * 当前系统的 serverName
      */
-    @NotEmpty
+    @NotBlank
     private String serverName;
 
     /**
      * 当前系统的 secret，在申请 serverToken 时使用
      */
-    @NotEmpty
+    @NotBlank
     private String secret;
 
     /**
      * 缓存当前系统的 Credential 的 key
      */
-    @NotEmpty
+    @NotBlank
     private String cacheKey;
 
     @PostConstruct

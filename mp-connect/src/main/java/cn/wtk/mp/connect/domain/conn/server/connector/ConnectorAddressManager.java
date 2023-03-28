@@ -4,7 +4,6 @@ import cn.wtk.mp.common.base.exception.service.NotFoundException;
 import cn.wtk.mp.common.base.lock.CacheLock;
 import cn.wtk.mp.common.base.lock.RedisLockHelper;
 import cn.wtk.mp.common.base.lock.RedisLockOperator;
-import cn.wtk.mp.common.security.service.auth.connector.ConnectorCredential;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
 import cn.wtk.mp.connect.infrastructure.config.ConnectorAddressLockProperties;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
@@ -66,16 +65,10 @@ public class ConnectorAddressManager {
     @CacheLock
     public ConnectorAddressDTO getAddress4Connect(Long appId, Long connectorId, String userToken) {
         log.debug("连接者：{} 请求获取路由信息以进行连接操作", connectorId);
-        ConnectorCredential connectorCredential = authFeign.verify(appId, connectorId, userToken);
         String lockFlag = UUID.randomUUID().toString();
         String lockKey = properties.getLockKeyPrefix() + ":" + connectorId;
         try {
-            long timeout = connectorCredential.getExpireAt().getTime() - System.currentTimeMillis();
-            connectRedisLockHelper.lock(
-                    lockKey,
-                    lockFlag,
-                    timeout
-            );
+            connectRedisLockHelper.lock(lockKey, lockFlag, 5, TimeUnit.SECONDS);
             ConnectorAddressDTO connectorAddress = getAddress(connectorId);
             String connectAddressKey = connectAddressKeyPrefix + ":" + connectorId.toString();
             if (connectorAddress == null) {
@@ -89,7 +82,7 @@ public class ConnectorAddressManager {
                 }
             } else {
                 String address = connectorAddress.getIp() + ":" + connectorAddress.getPort();
-                redisTemplate.opsForValue().set(connectAddressKey, address, timeout, TimeUnit.MILLISECONDS);
+                redisTemplate.opsForValue().set(connectAddressKey, address, 5, TimeUnit.MINUTES);
                 return connectorAddress;
             }
         } catch (Throwable e) {

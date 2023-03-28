@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class SendMsgCommand {
     @NotNull
     Date sendTime;
 
-    @NotEmpty
+    @NotBlank
     String msgTopic;
 
     Object payload;
