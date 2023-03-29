@@ -1,6 +1,9 @@
 # 服务配置
 server:
-  port: 8089
+  port: 8092
+mp:
+  client:
+    connector-id: ${server.port}
 spring:
   profiles:
     active: dev
@@ -23,6 +26,3 @@ spring:
           - mp-default-log-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
           - mp-default-cloud-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
           - mp-default-app-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-mp:
-  client:
-    connector-id: 1

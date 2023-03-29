@@ -1,6 +1,6 @@
 package cn.wtk.mp.connect.application.connector;
 
-import cn.wtk.mp.connect.domain.msg.connector.ConnectorMsgService;
+import cn.wtk.mp.connect.domain.conn.server.ServerConnContainer;
 import cn.wtk.mp.connect.domain.msg.connector.TransferMsg;
 import cn.wtk.mp.connect.infrastructure.client.command.MultiMsgPushCommand;
 import cn.wtk.mp.connect.infrastructure.client.converter.MsgConverter;
@@ -19,10 +19,10 @@ import java.util.List;
 @Slf4j
 public class MsgPushAppService {
     private final MsgConverter converter;
-    private final ConnectorMsgService connectorMsgService;
+    private final ServerConnContainer container;
 
     public void pushMsg(MultiMsgPushCommand command) {
         List<TransferMsg> msgs = converter.toConnectorTransferMsgs(command.getMsgs());
-        connectorMsgService.pushMsg(msgs);
+        container.pushMsg(msgs);
     }
 }

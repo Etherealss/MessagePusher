@@ -34,5 +34,6 @@ public class ServerPreAuthHandler implements IPreAuthHandler {
     @Override
     public void doAuth(Method method) {
         ServerSecurityContextHolder.require();
+        log.debug("服务Token检验通过");
     }
 }
