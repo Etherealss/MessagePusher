@@ -25,7 +25,7 @@ package domain {
         + void doDispatch(ManageMsg msg)
         # {abstract} List<Long> getRevrIds(MsgHeader msgHeader)
         - List<ConnectorAddressDTO> getAddresses(List<Long> revrIds)
-        - void pushMsg(String ip, Integer port, MsgPushCommand msgPushCommand)
+        - void pushMsg(String address, MsgPushCommand msgPushCommand)
     }
 
     class SingleRcvrMsgDispathcer{
@@ -44,21 +44,21 @@ package infrastructure {
     }
 
     interface ConnectFiegn {
-        + void pushMsg(\n\tMultiMsgPushCommand msg, String ip, Integer rcvrPort\n)
+        + void pushMsg(\n\tMultiMsgPushCommand msg, String address\n)
         + ConnectorAddress getConnectorAddress(Long connectorId)
     }
 
     class MsgPusher {
         - ConnectFiegn connectFiegn
-        + boolean pushMsg(\n\tMultiMsgPushCommand msg, \n\tString rcvrIp, Integer rcvrPort\n)
+        + boolean pushMsg(\n\tMultiMsgPushCommand msg, \n\tString address\n)
     }
 }
 
 MsgAppService ..> SingleRcvrMsgDispathcer
 MsgAppService ..> GroupRcvrMsgDispathcer
 
-AbstractMsgDispatcher ..> MsgPusher: 消息推送
-AbstractMsgDispatcher .> RelationFeign: 关系检查
+AbstractMsgDispatcher .> MsgPusher: 消息推送
+AbstractMsgDispatcher ..> RelationFeign: 关系检查
 AbstractMsgDispatcher .> ConnectFiegn: 连接路由
 
 MsgPusher ..> ConnectFiegn: 消息推送

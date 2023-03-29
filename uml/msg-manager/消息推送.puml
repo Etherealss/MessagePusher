@@ -52,14 +52,14 @@ package infrastructure {
     }
 
     interface ConnectFiegn {
-        + void pushMsg(\n\tMultiMsgPushCommand msg, String ip, Integer rcvrPort\n)
+        + void pushMsg(\n\tMultiMsgPushCommand msg, String address\n)
         + ConnectorAddress getConnectorAddress(Long connectorId)
     }
 
 
     class MsgPusher {
         - ConnectFiegn connectFiegn;
-        + boolean pushMsg(\n\tMultiMsgPushCommand msg, String rcvrIp, Integer rcvrPort\n)
+        + boolean pushMsg(\n\tMultiMsgPushCommand msg, String address\n)
     }
 }
 
