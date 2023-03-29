@@ -19,10 +19,14 @@ import java.util.List;
 )
 public interface ConnectFeign {
 
+    /**
+     * @see MsgRouteHandler 路由逻辑
+     * @param msg
+     * @param routeAddress
+     */
     @PostMapping("/list/connectors/msgs")
     void pushMsg(@RequestBody @Validated MultiMsgPushCommand msg,
-                 @RequestHeader(MsgRouteHandler.MSG_ROUTE_IP) String ip,
-                 @RequestHeader(MsgRouteHandler.MSG_ROUTE_PORT) Integer rcvrPort
+                 @RequestHeader(MsgRouteHandler.MSG_ROUTE_ADDRESS) String routeAddress
     );
 
     @GetMapping("/connectors/{connectorId}/addresses/routes")

@@ -27,19 +27,19 @@ public class MsgPusher {
         this.msgPushRetryTemplate = msgPushRetryTemplate;
     }
 
-    public boolean pushMsg(MultiMsgPushCommand msg, String rcvrIp, Integer rcvrPort) {
+    public boolean pushMsg(MultiMsgPushCommand msg, String routeAddress) {
         try {
             msgPushRetryTemplate.execute((RetryCallback<Void, FeignException>) context -> {
-                connectFeign.pushMsg(msg, rcvrIp, rcvrPort);
+                connectFeign.pushMsg(msg, routeAddress);
                 return null;
             }, context -> {
-                log.warn("消息推送失败, rcvrIp: {}, rcvrPort: {}", rcvrIp, rcvrPort);
+                log.warn("消息推送失败, 请求地址：{}", routeAddress);
                 return null;
             });
             return true;
         } catch (FeignException e) {
-            log.warn("消息推送失败, rcvrIp: {}, rcvrPort: {}， 异常信息: {}",
-                    rcvrIp, rcvrPort, e.getMessage());
+            log.warn("消息推送失败, 请求地址：{}， 异常信息: {}",
+                    routeAddress, e.getMessage());
             return false;
         }
     }

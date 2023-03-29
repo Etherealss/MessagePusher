@@ -12,8 +12,11 @@ import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.RelationFeign;
 import cn.wtk.mp.msg.manager.infrasturcture.service.MsgPusher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author wtk
@@ -35,15 +38,21 @@ public abstract class AbstractMsgDispatcher {
     public void doDispatch(ManageMsg msg) {
         List<Long> revrIds = this.getRcvrIds(msg.getMsgHeader());
         List<ConnectorAddressDTO> addresses = getAddresses(revrIds);
-        for (ConnectorAddressDTO address : addresses) {
-            if (address.getIp() == null || address.getPort() == null) {
-                log.debug("路由信息不存在，无法推送，rcvrId: {}, msgId: {}",
-                        address.getConnectorId(), msg.getMsgBody().getMsgId());
-                continue;
-            }
-            MsgPushCommand msgPushCommand = converter.toPushCommand(msg.getMsgBody());
-            msgPushCommand.setRcvrIds(revrIds);
-            this.pushMsg(address.getIp(), address.getPort(), msgPushCommand);
+        Set<String> set = addresses.stream()
+                .filter(address -> {
+                    if (StringUtils.hasText(address.getIp()) && address.getPort() > 0) {
+                        return true;
+                    }
+                    log.debug("connector {} 未连接，无法推送消息。msgId: {}",
+                            address.getConnectorId(), msg.getMsgBody().getMsgId());
+                    return false;
+                })
+                .map(address -> address.getIp() + ":" + address.getPort())
+                .collect(Collectors.toSet());
+        MsgPushCommand msgPushCommand = converter.toPushCommand(msg.getMsgBody());
+        msgPushCommand.setRcvrIds(revrIds);
+        for (String addr : set) {
+            this.pushMsg(addr, msgPushCommand);
         }
     }
 
@@ -53,8 +62,8 @@ public abstract class AbstractMsgDispatcher {
         return connectFeign.getConnectorAddress(revrIds);
     }
 
-    private void pushMsg(String ip, Integer port, MsgPushCommand msgPushCommand) {
+    private boolean pushMsg(String address, MsgPushCommand msgPushCommand) {
         MultiMsgPushCommand multiMsgPushCommand = new MultiMsgPushCommand(msgPushCommand);
-        msgPusher.pushMsg(multiMsgPushCommand, ip, port);
+        return msgPusher.pushMsg(multiMsgPushCommand, address);
     }
 }

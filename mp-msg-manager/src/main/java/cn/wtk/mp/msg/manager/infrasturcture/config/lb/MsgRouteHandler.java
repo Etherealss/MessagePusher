@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -20,26 +21,31 @@ import java.util.List;
 @Slf4j
 public class MsgRouteHandler {
 
-    public static final String MSG_ROUTE_IP = "x-msg-route-ip";
-    public static final String MSG_ROUTE_PORT = "x-msg-route-port";
-
-    public void setMsgRouteHeader(@NonNull HttpHeaders headers, String ip, int port) {
-        headers.set(MSG_ROUTE_IP, ip);
-        headers.set(MSG_ROUTE_PORT, String.valueOf(port));
-    }
+    public static final String MSG_ROUTE_ADDRESS = "x-msg-route-addresss";
 
     @Nullable
     public MsgRouteAddress getMsgRouteAddress(@NonNull HttpHeaders headers) {
-        List<String> serverIp = headers.get(MSG_ROUTE_IP);
-        List<String> serverPort = headers.get(MSG_ROUTE_PORT);
-        if (serverIp == null && serverPort == null) {
+        List<String> routeServerIpList = headers.get(MSG_ROUTE_ADDRESS);
+        if (CollectionUtils.isEmpty(routeServerIpList)) {
+            log.warn("远程调用时缺少消息路由的地址");
             return null;
         }
-        if (serverIp == null || serverPort == null || serverIp.size() != 1 || serverPort.size() != 1) {
-            log.warn("用于消息路由的 ip 和 port 出现多个：IPs: {}, ports: {}", serverIp, serverPort);
+        if (CollectionUtils.isEmpty(routeServerIpList) || routeServerIpList.size() != 1) {
+            log.warn("远程调用时路由地址存在多个: {}", routeServerIpList);
             return null;
         }
-        return new MsgRouteAddress(serverIp.get(0), Integer.parseInt(serverPort.get(0)));
+        String address = routeServerIpList.get(0);
+        String[] split = address.split(":");
+        if (split.length!= 2) {
+            log.warn("远程调用时路由地址格式错误: {}", address);
+            return null;
+        }
+        try {
+            return new MsgRouteAddress(split[1], Integer.parseInt(split[1]));
+        } catch (NumberFormatException e) {
+            log.warn("远程调用时路由地址格式错误: {}", address, e);
+            return null;
+        }
     }
 }
 @FieldDefaults(level = AccessLevel.PRIVATE)

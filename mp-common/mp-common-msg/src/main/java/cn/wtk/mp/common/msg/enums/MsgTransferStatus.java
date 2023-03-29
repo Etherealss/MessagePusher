@@ -29,6 +29,6 @@ public enum MsgTransferStatus implements BaseEnum {
      * @return
      */
     public static int getReadableStatus() {
-        return REND.getCode();
+        return FAIL.getCode();
     }
 }
