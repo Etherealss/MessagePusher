@@ -16,7 +16,7 @@ public class MsgEntityFieldName {
     public static final String SAVE_TIME = "saveTime";
     public static final String RECV_TIME = "recvTime";
     public static final String SENDER_ID = "senderId";
-    public static final String RCVR_ID = "revrId";
+    public static final String RCVR_ID = "rcvrId";
     public static final String GROUP_ID = "groupId";
     public static final String RELATION_TOPIC = "relationTopic";
     public static final String MSG_TYPE = "msgType";

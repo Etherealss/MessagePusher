@@ -13,4 +13,5 @@ import lombok.experimental.FieldDefaults;
 public class ConnectorAddressDTO {
     String ip;
     Integer port;
+    Long connectorId;
 }

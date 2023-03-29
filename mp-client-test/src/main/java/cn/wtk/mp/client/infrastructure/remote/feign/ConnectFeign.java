@@ -1,6 +1,9 @@
 package cn.wtk.mp.client.infrastructure.remote.feign;
 
+import cn.wtk.mp.client.infrastructure.remote.dto.ConnectorAddressDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 /**
  * @author wtk
@@ -12,4 +15,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 )
 public interface ConnectFeign {
 
+    @PutMapping("/connectors/{connectorId}/addresses/connect")
+    ConnectorAddressDTO updateConnectAddress(@PathVariable Long connectorId);
 }

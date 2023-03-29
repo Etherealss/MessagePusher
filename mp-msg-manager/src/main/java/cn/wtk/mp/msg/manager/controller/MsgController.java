@@ -8,27 +8,37 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author wtk
  * @date 2023-02-18
  */
 @Slf4j
 @RestController
-@RequestMapping("/msgs/{msgId}")
+@RequestMapping
 @RequiredArgsConstructor
 @ResponseAdvice
 public class MsgController {
     private final MsgService msgService;
 
-    @GetMapping
-    public MsgDTO getById(@PathVariable Long msgId) {
-        return msgService.getById(msgId);
+    @GetMapping("/msgs/{msgId}")
+    public MsgDTO getById(@PathVariable Long msgId, @RequestParam Boolean unread) {
+        return msgService.getById(msgId, unread);
     }
 
-    @PutMapping("/status")
+    @PutMapping("/msgs/{msgId}/status")
     public void updateStatus(@PathVariable Long msgId, @RequestBody UpdateMsgStatusCommand command) {
         msgService.updateStatus(msgId, command.getStatus());
     }
 
-
+    @GetMapping("/pages/msgs")
+    public List<MsgDTO> page(@RequestParam(required = false) Long senderId,
+                             @RequestParam Long rcvrId,
+                             @RequestParam Long cursorMsgId,
+                             @RequestParam(required = false) String msgTopic,
+                             @RequestParam(required = false, defaultValue = "false") Boolean unread,
+                             @RequestParam(required = false, defaultValue = "10") Integer size) {
+        return this.msgService.page(senderId, rcvrId, cursorMsgId, msgTopic, unread, size);
+    }
 }

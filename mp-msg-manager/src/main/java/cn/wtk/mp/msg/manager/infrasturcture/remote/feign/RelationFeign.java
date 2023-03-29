@@ -1,6 +1,5 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.feign;
 
-import cn.wtk.mp.common.security.annotation.InternalAuth;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,6 @@ public interface RelationFeign {
     List<Long> getGroupMembers(@PathVariable Long groupId);
 
     @GetMapping("/connectors/{connectorId}/relations/{subrId}/topics")
-    @InternalAuth
     Boolean checkSubRelation(@PathVariable Long connectorId,
                              @PathVariable Long subrId,
                              @RequestParam("topic") String relationTopic);

@@ -19,4 +19,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class PersonalMsgController {
     private final PersonalMsgService service;
 
+
 }

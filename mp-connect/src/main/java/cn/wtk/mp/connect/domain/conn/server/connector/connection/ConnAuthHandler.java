@@ -83,7 +83,7 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
                     ApiInfo.CONNECT_AUTH_FAIL, authResult.getErrorMsg()
             );
             MessageSender.send(ctx.channel(), resp);
-            ctx.close();
+//            ctx.close();
         }
     }
 
@@ -93,6 +93,7 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     private AuthResult auth4WebSocket(ChannelHandlerContext ctx, FullHttpRequest request) {
+        log.debug("使用WebSocket认证方案");
         String uri = request.uri();
         String origin = request.headers().get(HEADER_ORIGIN);
         Map<String, String> urlParameters = UrlUtil.getUrlParameters(uri);
@@ -106,6 +107,7 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     private AuthResult auth4Socket(ChannelHandlerContext ctx, ByteBuf slicedByteBuf) {
+        log.debug("使用Socket认证方案");
         int readableBytes = slicedByteBuf.readableBytes();
         byte[] bytes = new byte[readableBytes];
         slicedByteBuf.readBytes(bytes);
@@ -116,7 +118,11 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
         } catch (Exception e) {
             return AuthResult.fail("认证消息格式错误：" + e.getMessage());
         }
-        Map<String, String> urlParameters = UrlUtil.getUrlParameters(authMsg.getAuthUrl());
+        String authUrl = authMsg.getAuthUrl();
+        if (!StringUtils.hasText(authUrl)) {
+            return AuthResult.fail("缺少参数(authUrl)，不允许创建连接");
+        }
+        Map<String, String> urlParameters = UrlUtil.getUrlParameters(authUrl);
         AuthResult authResult = this.doAuth(urlParameters);
         return authResult;
     }
@@ -140,7 +146,8 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
             Long appId = Long.valueOf(appIdStr);
             // 验证 connectorToken
             Long connectorId = Long.valueOf(connectorIdStr);
-            authFeign.verify(appId, connectorId, connectorToken);
+            authFeign.verify(appId, connectorId, connectorToken,
+                    nettyServerConfig.getIp(), nettyServerConfig.getPort());
             return AuthResult.success(connectorId, appId);
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getResult());

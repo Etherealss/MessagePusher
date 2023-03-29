@@ -36,6 +36,11 @@ public abstract class AbstractMsgDispatcher {
         List<Long> revrIds = this.getRcvrIds(msg.getMsgHeader());
         List<ConnectorAddressDTO> addresses = getAddresses(revrIds);
         for (ConnectorAddressDTO address : addresses) {
+            if (address.getIp() == null || address.getPort() == null) {
+                log.debug("路由信息不存在，无法推送，rcvrId: {}, msgId: {}",
+                        address.getConnectorId(), msg.getMsgBody().getMsgId());
+                continue;
+            }
             MsgPushCommand msgPushCommand = converter.toPushCommand(msg.getMsgBody());
             msgPushCommand.setRcvrIds(revrIds);
             this.pushMsg(address.getIp(), address.getPort(), msgPushCommand);
