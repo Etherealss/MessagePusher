@@ -58,7 +58,7 @@ class MsgServiceTest {
 
     @Test
     void getMsg() {
-        MsgDTO msgDTO = msgService.getById(41591636664930304L);
+        MsgDTO msgDTO = msgService.getById(41591636664930304L, false);
         log.debug("{}", msgDTO);
     }
 

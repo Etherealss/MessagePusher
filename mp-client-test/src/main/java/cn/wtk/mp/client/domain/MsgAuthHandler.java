@@ -1,6 +1,7 @@
 package cn.wtk.mp.client.domain;
 
 import cn.wtk.mp.client.infrastructure.config.MpClientProperties;
+import cn.wtk.mp.client.infrastructure.event.AuthEvent;
 import cn.wtk.mp.client.infrastructure.pojo.dto.AuthMsg;
 import cn.wtk.mp.client.infrastructure.remote.command.CreateConnectCredentialCommand;
 import cn.wtk.mp.client.infrastructure.remote.dto.ConnectorAddressDTO;
@@ -11,9 +12,8 @@ import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.service.auth.connector.ConnectorCredential;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author wtk
@@ -30,8 +30,8 @@ public class MsgAuthHandler {
     private final ServerCredentialConfig serverCredentialConfig;
     private final NettyClient nettyClient;
 
-    @PostConstruct
-    public void auth() {
+    @EventListener(AuthEvent.class)
+    public void auth(AuthEvent authEvent) {
         ConnectorCredential connectorCredential = this.getConnectorCredential();
         AuthMsg authMsg = buildAuthMsg(connectorCredential.getToken());
         MessageSendUtil.send(nettyClient.getChannel(), authMsg);
