@@ -1,16 +1,14 @@
 package cn.wtk.mp.common.base.exception;
 
 
+import cn.wtk.mp.common.base.enums.ApiInfo;
+import cn.wtk.mp.common.base.enums.BaseEnum;
 import cn.wtk.mp.common.base.exception.rest.ParamErrorException;
-import cn.wtk.mp.common.base.exception.service.AuthenticationException;
 import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import cn.wtk.mp.common.base.pojo.Result;
-import cn.wtk.mp.common.base.enums.ApiInfo;
-import cn.wtk.mp.common.base.exception.internal.BugException;
-import cn.wtk.mp.common.base.exception.rest.RestException;
-import cn.wtk.mp.common.base.exception.service.SimpleServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -37,25 +35,12 @@ import javax.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
-            UnsupportedOperationException.class,
-            SimpleServiceException.class,
-            RestException.class
+            BaseException.class
     })
-    public Result<Void> handle(BaseException e) {
+    public ResponseEntity<Result<Void>> handle(BaseException e) {
         log.info("业务异常：" + e.getMessage());
-        return new Result<>(e);
-    }
-
-    /**
-     * 权限认证异常
-     */
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthenticationException.class)
-    public Result<Object> handle(AuthenticationException e) {
-        log.info("权限认证异常: {}", e.getMessage());
-        return new Result<>(e);
+        return ResponseEntity.status(e.getHttpStatus()).body(new Result<>(e));
     }
 
     /**
@@ -78,9 +63,8 @@ public class GlobalExceptionHandler {
         return new Result<>(false, ApiInfo.ERROR_PARAM, "参数不可读，请检查参数列表是否完整：" + e.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public Result<Void> handle(MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<Result<Void>> handle(MethodArgumentTypeMismatchException e) {
         // 可能会收到 EnumIllegalException
         Throwable throwable = e;
         while (throwable.getCause() != null) {
@@ -89,7 +73,8 @@ public class GlobalExceptionHandler {
         if (throwable instanceof BaseException) {
             return handle((BaseException) throwable);
         } else {
-            return new Result<>(false, ApiInfo.OPERATE_UNSUPPORTED, "方法参数不匹配：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Result<>(false, ApiInfo.OPERATE_UNSUPPORTED, "方法参数不匹配：" + e.getMessage()));
         }
     }
 
@@ -137,26 +122,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 后端有bug
-     * @param e
-     * @return
-     */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(BugException.class)
-    public Result<?> handle(BugException e) {
-        return new Result<>(e);
-    }
-
-    /**
      * 其他未处理异常
      * @param e
      * @return
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ServiceFiegnException.class)
-    public Result<?> handle(ServiceFiegnException e) {
-        log.warn("[全局异常处理器] OpenFeign 远程调用出现异常: {}", e.getResult());
-        return e.getResult();
+    public ResponseEntity<Result<?>> handle(ServiceFiegnException e) {
+        Result<?> result = e.getResult();
+        if (result.getCode() >= 5000000) {
+            log.warn("OpenFeign 远程调用出现异常：{}", result.getMessage());
+        } else {
+            log.debug("业务异常：{},", result.getMessage());
+        }
+        return ResponseEntity
+                .status(BaseEnum.fromCode(ApiInfo.class, result.getCode()).getHttpStatus())
+                .body(result);
     }
 
     /**
