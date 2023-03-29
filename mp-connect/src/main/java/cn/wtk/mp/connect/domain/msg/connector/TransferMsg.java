@@ -20,6 +20,7 @@ public class TransferMsg {
     MsgType msgType;
     String msgTopic;
     List<Long> rcvrIds;
+    Long groupId;
     Object payload;
     Date sendTime;
     Date saveTime;

@@ -36,10 +36,7 @@ public class MsgPushCommand {
     Object payload;
     @NotNull
     Date sendTime;
-    @NotNull
     Date saveTime;
-    @NotNull
     Long senderId;
-
     Long groupId;
 }

@@ -37,7 +37,7 @@ public class SocketStateHandler extends SimpleChannelInboundHandler<ByteBuf> {
         byteBuf.readBytes(bytes);
         String requestData = new String(bytes, StandardCharsets.UTF_8);
         log.debug("收到消息：{}", requestData);
-        MessageSender.send(ctx.channel(), new ChannelMsg(ApiInfo.OK, "ack:" + requestData));
+        MessageSender.send(ctx.channel(), new ChannelMsg(ApiInfo.OK, "ack: " + requestData));
     }
 
     @Override

@@ -23,7 +23,7 @@ public class ChannelMsg {
         this(apiInfo.getCode(), apiInfo.getMessage(), null);
     }
     public ChannelMsg(ApiInfo apiInfo, String desc) {
-        this(apiInfo.getCode(), apiInfo.getMessage() + desc, null);
+        this(apiInfo.getCode(), apiInfo.getMessage() + " " + desc, null);
     }
 
     public ChannelMsg(TransferMsg msg) {
