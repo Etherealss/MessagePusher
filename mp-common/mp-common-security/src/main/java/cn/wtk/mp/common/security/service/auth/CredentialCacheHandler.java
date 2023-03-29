@@ -1,6 +1,7 @@
 package cn.wtk.mp.common.security.service.auth;
 
 
+import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,9 +27,9 @@ public abstract class CredentialCacheHandler {
      */
     protected abstract String getCacheKey(String token);
 
-    protected abstract TokenCredential verifyAndGetCredential(String token);
+    protected abstract TokenCredential verifyAndGetCredential(String token) throws ServiceFiegnException;
 
-    public <T extends TokenCredential> T verifyAndGet(String token) {
+    public <T extends TokenCredential> T verifyAndGet(String token) throws ServiceFiegnException {
         String key = this.getCacheKey(token);
         TokenCredential credential = getByCache(key);
         if (credential != null) {

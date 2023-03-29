@@ -7,7 +7,7 @@ import cn.wtk.mp.msg.manager.infrasturcture.exception.RelationException;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFeign;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.RelationFeign;
 import cn.wtk.mp.msg.manager.infrasturcture.service.MsgPusher;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 public abstract class AbstractMsgDispatcher {
     protected final MsgPusher msgPusher;
-    protected final ConnectFiegn connectFiegn;
+    protected final ConnectFeign connectFeign;
     protected final MsgConverter converter;
     protected final RelationFeign relationFeign;
 
@@ -45,7 +45,7 @@ public abstract class AbstractMsgDispatcher {
     protected abstract List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException;
 
     private List<ConnectorAddressDTO> getAddresses(List<Long> revrIds) {
-        return connectFiegn.getConnectorAddress(revrIds);
+        return connectFeign.getConnectorAddress(revrIds);
     }
 
     private void pushMsg(String ip, Integer port, MsgPushCommand msgPushCommand) {

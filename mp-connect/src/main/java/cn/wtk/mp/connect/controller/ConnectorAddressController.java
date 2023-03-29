@@ -4,11 +4,9 @@ import cn.wtk.mp.common.base.web.ResponseAdvice;
 import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.connect.application.connector.RouteAddressAppService;
-import cn.wtk.mp.connect.infrastructure.client.command.UpdateConnectAddressCommand;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,10 +26,9 @@ public class ConnectorAddressController {
 
     @PutMapping("/connectors/{connectorId}/addresses/connect")
     @InternalAuth
-    public ConnectorAddressDTO updateConnectAddress4(@PathVariable Long connectorId,
-                                                     @RequestBody @Validated UpdateConnectAddressCommand command) {
+    public ConnectorAddressDTO updateConnectAddress4(@PathVariable Long connectorId) {
         return routeAddressAppService.getAddress4Connect(
-                ServerSecurityContextHolder.require().getServerId(), connectorId, command
+                ServerSecurityContextHolder.require().getServerId(), connectorId
         );
     }
 

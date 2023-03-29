@@ -1,7 +1,7 @@
 package cn.wtk.mp.msg.manager.infrasturcture.remote.redis;
 
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.connect.ConnectorAddressDTO;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFeign;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class RouteAddressRedisHandler {
-    private ConnectFiegn connectFiegn;
+    private ConnectFeign connectFeign;
 
     /**
      * TODO 缓存时间、缓存失效
@@ -24,6 +24,6 @@ public class RouteAddressRedisHandler {
      */
     @Cacheable(cacheNames = "${mp.manager.route.address.cache-key}", key="#connectorId")
     public ConnectorAddressDTO getRouteAddress(Long connectorId) {
-        return connectFiegn.getConnectorAddress(connectorId);
+        return connectFeign.getConnectorAddress(connectorId);
     }
 }

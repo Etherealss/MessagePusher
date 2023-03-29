@@ -1,5 +1,6 @@
 package cn.wtk.mp.common.security.service.auth.server;
 
+import cn.wtk.mp.common.base.exception.service.ServiceFiegnException;
 import cn.wtk.mp.common.security.config.ServerCredentialConfig;
 import cn.wtk.mp.common.security.feign.ServerCredentialFeign;
 import cn.wtk.mp.common.security.service.auth.TokenCredential;
@@ -32,7 +33,7 @@ public class ServerCredentialCacheHandler extends CredentialCacheHandler {
     }
 
     @Override
-    protected TokenCredential verifyAndGetCredential(String token) {
+    protected TokenCredential verifyAndGetCredential(String token) throws ServiceFiegnException {
         return serverCredentialFeign.verify(token);
     }
 }

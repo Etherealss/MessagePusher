@@ -2,10 +2,9 @@ package cn.wtk.mp.auth.controller;
 
 
 import cn.wtk.mp.auth.application.ServerAuthenticationAppService;
-import cn.wtk.mp.auth.infrastructure.client.command.RegisterServerCommand;
 import cn.wtk.mp.auth.domain.auth.server.info.ServerInfoService;
+import cn.wtk.mp.auth.infrastructure.client.command.RegisterServerCommand;
 import cn.wtk.mp.common.base.web.ResponseAdvice;
-import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.TokenCredential;
 import cn.wtk.mp.common.security.service.auth.server.ServerAuthCommand;
 import cn.wtk.mp.common.security.service.auth.server.ServerTokenCredential;
@@ -46,7 +45,6 @@ public class ServerCredentialController {
         return serverAuthenticationAppService.createServerCredential(command);
     }
 
-    @InternalAuth
     @GetMapping("/credentials/{token}")
     public TokenCredential verify(@PathVariable String token) {
         return serverAuthenticationAppService.verifyAndGetToken(token);

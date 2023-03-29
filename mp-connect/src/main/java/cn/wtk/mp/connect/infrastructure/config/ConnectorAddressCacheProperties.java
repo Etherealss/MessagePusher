@@ -2,6 +2,7 @@ package cn.wtk.mp.connect.infrastructure.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import javax.validation.constraints.NotNull;
 @Configuration
 @ConfigurationProperties("mp.connect.address.cache")
 @Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 public class ConnectorAddressCacheProperties {

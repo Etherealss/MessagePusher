@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
  */
 @SuppressWarnings("AlibabaEnumConstantsMustHaveComment")
 @Getter
-public enum ApiInfo {
+public enum ApiInfo implements BaseEnum {
 
     // ------------------- 00 通用------------------------
     OK(HttpStatus.OK, 2000000, "OK"),
@@ -28,12 +28,12 @@ public enum ApiInfo {
 
     // ------------------- 03 auth ------------------------
     USER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED, 4010301, "[认证-用户token缺失]"),
-    USER_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,4010302, "[认证-用户token无效或已过期]"),
+    USER_TOKEN_INVALID(HttpStatus.FORBIDDEN,4010302, "[认证-用户token无效或已过期]"),
     SERVER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,4010303, "[认证-服务token缺失]"),
-    SERVER_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,4010304, "[认证-服务token无效或已过期]"),
+    SERVER_TOKEN_INVALID(HttpStatus.FORBIDDEN,4010304, "[认证-服务token无效或已过期]"),
     NOT_PERMISSION(HttpStatus.FORBIDDEN, 4010305, "[认证-没有访问权限]"),
     NOT_ROLE(HttpStatus.FORBIDDEN, 4010306, "[认证-非可访问角色]"),
-    PASSWORD_ERROR(4030307, "[认证-摘要错误]"),
+    PASSWORD_ERROR(HttpStatus.FORBIDDEN,4030307, "[认证-摘要错误]"),
 
     // ------------------- 04 消息发送 ------------------------
     MSG_DUPILICATE(HttpStatus.OK, 2000401, "[消息发送-消息重复]"),
@@ -64,5 +64,10 @@ public enum ApiInfo {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    @Override
+    public String getName() {
+        return message;
     }
 }

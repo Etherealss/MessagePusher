@@ -81,6 +81,7 @@ public class GroupRelationService {
     public boolean checkGroupRelation(Long groupId, Long memberId) {
         Query query = Query.query(Criteria
                 .where(GroupRelationEntity.MEMBER_IDS).is(memberId)
+                .and(GroupRelationEntity.GROUP_ID).is(groupId)
         );
         // 判断是否存在时，只查一个字段，提高性能
         query.fields().include(GroupRelationEntity.GROUP_ID);

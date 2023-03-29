@@ -2,7 +2,7 @@ package cn.wtk.mp.msg.manager.infrasturcture.service;
 
 import cn.wtk.mp.msg.manager.infrasturcture.config.MsgPushRetryConfiguration;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.dto.command.MultiMsgPushCommand;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFeign;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,20 +17,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class MsgPusher {
-    private final ConnectFiegn connectFiegn;
+    private final ConnectFeign connectFeign;
     private final RetryTemplate msgPushRetryTemplate;
 
-    public MsgPusher(ConnectFiegn connectFiegn,
+    public MsgPusher(ConnectFeign connectFeign,
                      @Qualifier(MsgPushRetryConfiguration.BEAN_NAME)
                      RetryTemplate msgPushRetryTemplate) {
-        this.connectFiegn = connectFiegn;
+        this.connectFeign = connectFeign;
         this.msgPushRetryTemplate = msgPushRetryTemplate;
     }
 
     public boolean pushMsg(MultiMsgPushCommand msg, String rcvrIp, Integer rcvrPort) {
         try {
             msgPushRetryTemplate.execute((RetryCallback<Void, FeignException>) context -> {
-                connectFiegn.pushMsg(msg, rcvrIp, rcvrPort);
+                connectFeign.pushMsg(msg, rcvrIp, rcvrPort);
                 return null;
             }, context -> {
                 log.warn("消息推送失败, rcvrIp: {}, rcvrPort: {}", rcvrIp, rcvrPort);

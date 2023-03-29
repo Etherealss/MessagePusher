@@ -17,7 +17,7 @@ import java.util.List;
         value = "mp-connect",
         path = "/connect"
 )
-public interface ConnectFiegn {
+public interface ConnectFeign {
 
     @PostMapping("/list/connectors/msgs")
     void pushMsg(@RequestBody @Validated MultiMsgPushCommand msg,

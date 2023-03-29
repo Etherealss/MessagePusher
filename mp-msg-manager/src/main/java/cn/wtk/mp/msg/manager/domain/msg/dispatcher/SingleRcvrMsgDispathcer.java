@@ -3,7 +3,7 @@ package cn.wtk.mp.msg.manager.domain.msg.dispatcher;
 import cn.wtk.mp.msg.manager.domain.msg.MsgHeader;
 import cn.wtk.mp.msg.manager.infrasturcture.client.converter.MsgConverter;
 import cn.wtk.mp.msg.manager.infrasturcture.exception.RelationException;
-import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFiegn;
+import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.ConnectFeign;
 import cn.wtk.mp.msg.manager.infrasturcture.remote.feign.RelationFeign;
 import cn.wtk.mp.msg.manager.infrasturcture.service.MsgPusher;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ import java.util.List;
 public class SingleRcvrMsgDispathcer extends AbstractMsgDispatcher {
 
 
-    public SingleRcvrMsgDispathcer(MsgPusher msgPusher, ConnectFiegn connectFiegn, MsgConverter converter, RelationFeign relationFeign) {
-        super(msgPusher, connectFiegn, converter, relationFeign);
+    public SingleRcvrMsgDispathcer(MsgPusher msgPusher, ConnectFeign connectFeign, MsgConverter converter, RelationFeign relationFeign) {
+        super(msgPusher, connectFeign, converter, relationFeign);
     }
 
     @Override

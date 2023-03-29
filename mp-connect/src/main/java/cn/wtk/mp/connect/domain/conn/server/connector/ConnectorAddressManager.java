@@ -1,15 +1,14 @@
 package cn.wtk.mp.connect.domain.conn.server.connector;
 
 import cn.wtk.mp.common.base.exception.service.NotFoundException;
-import cn.wtk.mp.common.base.lock.CacheLock;
 import cn.wtk.mp.connect.infrastructure.client.dto.ConnectorAddressDTO;
 import cn.wtk.mp.connect.infrastructure.config.ConnectorAddressCacheProperties;
 import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
 import cn.wtk.mp.connect.infrastructure.remote.feign.AuthFeign;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -28,33 +27,16 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class ConnectorAddressManager {
     private final RedisTemplate<String, String> redisTemplate;
     private final NettyServerConfig config;
     private final ConnectorAddressCacheProperties cacheProperties;
-    private final String connectorMappingKeyPrefix;
-    private final String connectAddressKeyPrefix;
     private final AuthFeign authFeign;
 
-    public ConnectorAddressManager(RedisTemplate<String, String> redisTemplate,
-                                   NettyServerConfig config,
-                                   ConnectorAddressCacheProperties cacheProperties,
-                                   @Value("${mp.redis-key.connector.server-mapping}")
-                                   String connectorMappingKeyPrefix,
-                                   @Value("${mp.redis-key.connector.pre-server-mapping}")
-                                   String connectAddressKeyPrefix, AuthFeign authFeign) {
-        this.redisTemplate = redisTemplate;
-        this.config = config;
-        this.cacheProperties = cacheProperties;
-        this.connectorMappingKeyPrefix = connectorMappingKeyPrefix;
-        this.connectAddressKeyPrefix = connectAddressKeyPrefix;
-        this.authFeign = authFeign;
-    }
-
-    @CacheLock
-    public ConnectorAddressDTO getAddress4Connect(Long appId, Long connectorId, String userToken) {
+    public ConnectorAddressDTO getAddress4Connect(Long appId, Long connectorId) {
         log.debug("连接者：{} 请求获取路由信息以进行连接操作", connectorId);
-        String connectAddressKey = connectAddressKeyPrefix + ":" + connectorId.toString();
+        String connectAddressKey = cacheProperties.getConnectCacheKey() + ":" + connectorId.toString();
         redisTemplate.expire(connectAddressKey, cacheProperties.getConnectExpireMs(), TimeUnit.MILLISECONDS);
         String redisAddress = redisTemplate.opsForValue().get(connectAddressKey);
         if (StringUtils.hasText(redisAddress)) {
@@ -91,7 +73,7 @@ public class ConnectorAddressManager {
     public void handleConnectorCreated(ConnectorCreatedEvent event) {
         Long connectorId = event.getConnectorId();
         log.debug("新增连接者：{} 的路由信息", connectorId);
-        String redisKey = connectorMappingKeyPrefix + ":" + connectorId.toString();
+        String redisKey = cacheProperties.getRouteCacheKey() + ":" + connectorId.toString();
         String address = config.getIp() + ":" + config.getPort();
         redisTemplate.opsForValue().set(redisKey, address);
     }
@@ -105,7 +87,7 @@ public class ConnectorAddressManager {
     }
 
     private ConnectorAddressDTO getAddress(Long connectorId) {
-        String redisKey = connectorMappingKeyPrefix + ":" + connectorId;
+        String redisKey = cacheProperties.getRouteCacheKey() + ":" + connectorId;
         String address = redisTemplate.opsForValue().get(redisKey);
         if (!StringUtils.hasText(address)) {
             return null;
@@ -115,7 +97,7 @@ public class ConnectorAddressManager {
 
     public List<ConnectorAddressDTO> getConnectorRouteAddresses(List<Long> connectorIds) {
         List<String> keys = connectorIds.stream()
-                .map(id -> connectorMappingKeyPrefix + ":" + id)
+                .map(id -> cacheProperties.getRouteCacheKey() + ":" + id)
                 .collect(Collectors.toList());
         List<String> addresses = redisTemplate.opsForValue().multiGet(keys);
         if (CollectionUtils.isEmpty(addresses)) {
@@ -145,7 +127,7 @@ public class ConnectorAddressManager {
     public void handleConnectorRemove(ConnectorRemovedEvent event) {
         Long connectorId = event.getConnectorId();
         log.debug("删除连接者：{} 的路由信息", connectorId);
-        String redisKey = connectorMappingKeyPrefix + ":" + connectorId.toString();
+        String redisKey = cacheProperties.getRouteCacheKey() + ":" + connectorId.toString();
         redisTemplate.opsForValue().getAndDelete(redisKey);
         // TODO MQ 消息关闭，清内存
     }
