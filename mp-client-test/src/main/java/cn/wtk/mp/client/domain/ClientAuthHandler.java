@@ -1,6 +1,6 @@
 package cn.wtk.mp.client.domain;
 
-import cn.wtk.mp.client.infrastructure.config.MpClientProperties;
+import cn.wtk.mp.client.infrastructure.config.ClientProperties;
 import cn.wtk.mp.client.infrastructure.pojo.dto.AuthMsg;
 import cn.wtk.mp.client.infrastructure.remote.command.CreateConnectCredentialCommand;
 import cn.wtk.mp.client.infrastructure.remote.dto.ConnectorAddressDTO;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author wtk
- * @date 2023/3/27
+ * @date 2023/3/12
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class ClientAuthHandler {
     public static final String AUTH_URL = "/auth?connectorToken=%s&appId=%d&connectorId=%d";
     private final AuthFeign authFeign;
     private final ConnectFeign connectFeign;
-    private final MpClientProperties clientProperties;
+    private final ClientProperties clientProperties;
     private final ServerCredentialConfig serverCredentialConfig;
 
     public void auth(Channel serverChannel) {

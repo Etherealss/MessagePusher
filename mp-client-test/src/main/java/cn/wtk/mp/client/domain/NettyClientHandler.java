@@ -31,7 +31,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         byte[] bytes = new byte[readableBytes];
         byteBuf.readBytes(bytes);
         String jsonData = new String(bytes, StandardCharsets.UTF_8);
-        log.info("服务器推送消息: {}", jsonData);
+        log.info("连接者 {} 收到服务器推送消息: {}", nettyClient.getClientProperties().getConnectorId(), jsonData);
     }
 
     @Override

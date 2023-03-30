@@ -20,6 +20,7 @@ public class MsgBody {
     String msgTopic;
     MsgType msgType;
     Date sendTime;
+    Date saveTime;
     Object payload;
     Object detail;
     Long rcvrId;

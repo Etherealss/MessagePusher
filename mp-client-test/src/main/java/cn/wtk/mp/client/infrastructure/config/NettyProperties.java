@@ -1,4 +1,4 @@
-package cn.wtk.mp.client.infrastructure;
+package cn.wtk.mp.client.infrastructure.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 @Getter
 @Setter
-public class NettyClientProperties {
+public class NettyProperties {
 
     @NotBlank
     private String serverIp;

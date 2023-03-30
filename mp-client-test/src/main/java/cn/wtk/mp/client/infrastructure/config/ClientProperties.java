@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
-public class MpClientProperties {
+public class ClientProperties {
     @NotNull
     Long connectorId;
 }

@@ -23,3 +23,12 @@ spring:
           - mp-default-log-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
           - mp-default-cloud-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
           - mp-default-app-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+logging:
+  level:
+    cn:
+      wtk:
+        mp:
+          msg:
+            acceptor:
+              domain:
+                acceptor: trace

@@ -1,6 +1,7 @@
 package cn.wtk.mp.client.domain;
 
-import cn.wtk.mp.client.infrastructure.NettyClientProperties;
+import cn.wtk.mp.client.infrastructure.config.ClientProperties;
+import cn.wtk.mp.client.infrastructure.config.NettyProperties;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -9,6 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -22,15 +24,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class NettyClient {
-    private final NettyClientProperties properties;
+    @Getter
+    private final NettyProperties nettyProperties;
+    @Getter
+    private final ClientProperties clientProperties;
     private final ApplicationEventPublisher publisher;
     private final Bootstrap bootstrap;
     private final ClientAuthHandler clientAuthHandler;
 
     private Channel channel;
 
-    public NettyClient(NettyClientProperties properties, ApplicationEventPublisher publisher, ClientAuthHandler clientAuthHandler) {
-        this.properties = properties;
+    public NettyClient(NettyProperties nettyProperties,
+                       ClientProperties clientProperties,
+                       ApplicationEventPublisher publisher,
+                       ClientAuthHandler clientAuthHandler) {
+        this.nettyProperties = nettyProperties;
+        this.clientProperties = clientProperties;
         this.publisher = publisher;
         this.clientAuthHandler = clientAuthHandler;
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -55,7 +64,7 @@ public class NettyClient {
     }
 
     public void connectServer() {
-        ChannelFuture future = bootstrap.connect(properties.getServerIp(), properties.getServerPort());
+        ChannelFuture future = bootstrap.connect(nettyProperties.getServerIp(), nettyProperties.getServerPort());
         //断线重连
         future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {

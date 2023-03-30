@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,8 +37,9 @@ public class MsgService {
     private final PersonalMsgService personalMsgService;
     private final GroupMsgService groupMsgService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void insert(MsgBody msg) {
+        msg.setSaveTime(new Date());
         MsgEntity entity = msgConverter.toEntity(msg);
         entity.setTransferStatus(MsgTransferStatus.SENDING);
         mongoTemplate.insert(entity);

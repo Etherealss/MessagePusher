@@ -28,6 +28,7 @@ public class MsgResendHandler {
      * @return 重复消息返回 true，首次接受到的消息返回 false
      */
     public boolean checkAndSet4Duplicate(UUID tempId) {
+        log.trace("消息幂等性检查");
         String tempIdKey = msgResendProperties.getCacheKey() + ":" + tempId.toString();
         Duration duration = Duration.ofMillis(msgResendProperties.getExpireMs());
         // setIfAbsent 如果为空就set值，并返回1；如果存在(不为空)则不进行操作
@@ -35,6 +36,7 @@ public class MsgResendHandler {
         // 添加成功返回 true，也就是说，返回 true 说明是第一次传输，redis 没有重复记录
         // 如果 addSuccessful==false，说明已收到过该消息，则当前消息为重复消息，返回 true
         boolean dupilicate = Boolean.FALSE.equals(addSuccessful);
+        log.trace("消息幂等性检查结果：{}", dupilicate);
         return dupilicate;
     }
 }
