@@ -1,7 +1,6 @@
 package cn.wtk.mp.client.domain;
 
 import cn.wtk.mp.client.infrastructure.NettyClientProperties;
-import cn.wtk.mp.client.infrastructure.event.AuthEvent;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -10,12 +9,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,19 +20,22 @@ import java.util.concurrent.TimeUnit;
  * @date 2023/3/27
  */
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class NettyClient {
     private final NettyClientProperties properties;
-    private Channel channel;
-    private Bootstrap bootstrap = null;
     private final ApplicationEventPublisher publisher;
+    private final Bootstrap bootstrap;
+    private final ClientAuthHandler clientAuthHandler;
 
-    @PostConstruct
-    private void init() {
-        bootstrap = new Bootstrap();
+    private Channel channel;
+
+    public NettyClient(NettyClientProperties properties, ApplicationEventPublisher publisher, ClientAuthHandler clientAuthHandler) {
+        this.properties = properties;
+        this.publisher = publisher;
+        this.clientAuthHandler = clientAuthHandler;
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        bootstrap.group(workerGroup)
+        this.bootstrap = new Bootstrap()
+                .group(workerGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -55,13 +55,13 @@ public class NettyClient {
     }
 
     public void connectServer() {
-        ChannelFuture f = bootstrap.connect(properties.getServerIp(), properties.getServerPort());
+        ChannelFuture future = bootstrap.connect(properties.getServerIp(), properties.getServerPort());
         //断线重连
-        f.addListener((ChannelFutureListener) channelFuture -> {
+        future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
-                channel = channelFuture.channel();
-                log.info("连接成功，准备进行连接认证");
-                publisher.publishEvent(new AuthEvent());
+                this.channel = channelFuture.channel();
+                log.info("连接成功");
+                clientAuthHandler.auth(this.channel);
             } else {
                 final EventLoop loop = channelFuture.channel().eventLoop();
                 loop.schedule(() -> {
