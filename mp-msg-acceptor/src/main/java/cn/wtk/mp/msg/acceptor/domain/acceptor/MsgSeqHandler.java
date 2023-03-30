@@ -57,22 +57,22 @@ public class MsgSeqHandler {
 
     private boolean checkPreMsgAccepted(MsgHeader header) {
         if (ignoreSeq(header)) {
-            log.debug("不需要有序性保证");
+            log.debug("消息 {} 不需要有序性保证", header.getTempId());
             return true;
         }
         if (isTimeLimitExceeded(header.getPreMsgSendTime())) {
-            log.debug("超过时间限制，跳过有序性保证");
+            log.debug("消息 {} 与前一条消息的发送间隔超过时间限制，跳过有序性保证", header.getTempId());
             return true;
         }
         try {
             Boolean result = msgSeqRetryTemplate.execute(retryContext -> {
-                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + header.getTempId().toString();
+                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + header.getPreMsgTempId().toString();
                 boolean exist = redisTemplate.opsForValue().get(tempIdKey) != null;
                 if (exist) {
-                    log.trace("消息有序");
+                    log.trace("有序性检查结果：消息 {} 有序", header.getTempId());
                     return true;
                 } else {
-                    log.trace("消息无序，等待……");
+                    log.trace("有序性检查结果：消息 {} 无序，等待前一条消息：{}", header.getTempId(), header.getPreMsgTempId());
                     throw new MsgSeqRetryException();
                 }
             }, retryContext -> {

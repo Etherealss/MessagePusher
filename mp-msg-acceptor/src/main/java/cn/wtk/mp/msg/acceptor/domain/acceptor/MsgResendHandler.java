@@ -36,7 +36,7 @@ public class MsgResendHandler {
         // 添加成功返回 true，也就是说，返回 true 说明是第一次传输，redis 没有重复记录
         // 如果 addSuccessful==false，说明已收到过该消息，则当前消息为重复消息，返回 true
         boolean dupilicate = Boolean.FALSE.equals(addSuccessful);
-        log.trace("消息幂等性检查结果：{}", dupilicate);
+        log.trace("tempId: {} 消息幂等性检查结果：{}", tempId, dupilicate);
         return dupilicate;
     }
 }
