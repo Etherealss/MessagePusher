@@ -43,8 +43,17 @@ public class SendMsgCommand {
 
     Object detail;
 
+    /**
+     * 是否需要持久化
+     */
     @NotNull
     Boolean needPersistent;
+
+    /**
+     * 是否需要进行消息推送
+     */
+    @NotNull
+    Boolean needPush;
 
     @NotNull
     Long senderId;

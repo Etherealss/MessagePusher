@@ -1,7 +1,7 @@
 package cn.wtk.mp.msg.acceptor.application;
 
 import cn.wtk.mp.common.base.enums.ApiInfo;
-import cn.wtk.mp.common.base.exception.service.SimpleServiceException;
+import cn.wtk.mp.common.base.exception.BaseException;
 import cn.wtk.mp.common.msg.enums.MsgType;
 import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgAcceptor;
 import cn.wtk.mp.msg.acceptor.domain.acceptor.MsgBody;
@@ -27,8 +27,8 @@ public class MsgAcceptorAppService {
     private final MsgConverter msgConverter;
 
     public void sendMsg(SendPersonalMsgCommand command, Long appId) {
-        if (command.getSenderId().equals(command.getRcvrId())) {
-            throw new SimpleServiceException(ApiInfo.MSG_SEND_FAIL);
+        if (!command.getNeedPersistent() && !command.getNeedPush()) {
+            throw new BaseException(ApiInfo.MSG_SEND_FAIL, "不需要存储与不需要持久化，消息就没有必要推送了");
         }
         MsgBody msgBody = msgConverter.toMsg(command);
         MsgHeader msgHeader = msgConverter.toMsgHeader(command);

@@ -37,6 +37,10 @@ public abstract class AbstractMsgDispatcher {
      */
     public void doDispatch(ManageMsg msg) {
         List<Long> revrIds = this.getRcvrIds(msg.getMsgHeader());
+        if (!msg.getMsgHeader().getNeedPush()) {
+            log.debug("消息不需要推送");
+            return;
+        }
         List<ConnectorAddressDTO> addresses = getAddresses(revrIds);
         Set<String> set = addresses.stream()
                 .filter(address -> {
