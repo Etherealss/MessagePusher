@@ -36,12 +36,15 @@ public abstract class AbstractMsgDispatcher {
      * @return 推送失败的 rcvrId
      */
     public void doDispatch(ManageMsg msg) {
-        List<Long> revrIds = this.getRcvrIds(msg.getMsgHeader());
+        List<Long> rcvrIds = this.getRcvrIds(msg.getMsgHeader());
         if (!msg.getMsgHeader().getNeedPush()) {
             log.debug("消息不需要推送");
             return;
         }
-        List<ConnectorAddressDTO> addresses = getAddresses(revrIds);
+        if (msg.getMsgHeader().getNeedSendToMyself()) {
+            rcvrIds.add(msg.getMsgHeader().getSenderId());
+        }
+        List<ConnectorAddressDTO> addresses = getAddresses(rcvrIds);
         Set<String> set = addresses.stream()
                 .filter(address -> {
                     if (StringUtils.hasText(address.getIp()) && address.getPort() > 0) {
@@ -54,7 +57,7 @@ public abstract class AbstractMsgDispatcher {
                 .map(address -> address.getIp() + ":" + address.getPort())
                 .collect(Collectors.toSet());
         MsgPushCommand msgPushCommand = converter.toPushCommand(msg.getMsgBody());
-        msgPushCommand.setRcvrIds(revrIds);
+        msgPushCommand.setRcvrIds(rcvrIds);
         for (String addr : set) {
             this.pushMsg(addr, msgPushCommand);
         }

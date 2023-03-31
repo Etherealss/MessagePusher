@@ -26,4 +26,6 @@ public class MsgBody {
     Object detail;
     Long rcvrId;
     Long groupId;
+    String senderIp;
+    Integer senderPort;
 }

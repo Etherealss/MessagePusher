@@ -19,6 +19,7 @@ public class ManagerMsgHeader {
     @NotNull Boolean needPersistent;
     @NotNull Boolean needRelationVerify;
     @NotNull Boolean needPush;
+    @NotNull Boolean needSendToMyself;
     @NotNull Long senderId;
     String relationTopic;
     Long rcvrId;

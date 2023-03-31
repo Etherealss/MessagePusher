@@ -16,6 +16,7 @@ public class MsgHeader {
     Boolean needPersistent;
     Boolean needRelationVerify;
     Boolean needPush;
+    Boolean needSendToMyself;
     String relationTopic;
     Long senderId;
     Long rcvrId;

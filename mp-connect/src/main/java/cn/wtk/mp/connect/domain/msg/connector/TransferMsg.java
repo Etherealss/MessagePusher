@@ -25,4 +25,6 @@ public class TransferMsg {
     Date sendTime;
     Date saveTime;
     Long senderId;
+    String sendIp;
+    Integer sendPort;
 }

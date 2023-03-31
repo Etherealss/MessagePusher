@@ -19,6 +19,8 @@ public class ManagerMsgBody {
     @NotNull Long msgId;
     @NotNull Long appId;
     @NotNull Long senderId;
+    @NotBlank String senderIp;
+    @NotNull Integer senderPort;
     @NotBlank String msgTopic;
     @NotNull MsgType msgType;
     @NotNull Date sendTime;

@@ -33,10 +33,6 @@ public class Connector {
     }
 
     public boolean pushMsg(TransferMsg msg) {
-        if (msg.getSenderId().equals(this.connectorId)) {
-            log.debug("自己发送的消息不必重复推送。connectorId：{}, msgId：{}", this.connectorId, msg.getMsgId());
-            return true;
-        }
         for (Connection conn : conns.values()) {
             conn.pushMsg(msg);
         }

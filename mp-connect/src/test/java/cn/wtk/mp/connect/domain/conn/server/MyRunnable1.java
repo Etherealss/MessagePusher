@@ -25,7 +25,7 @@ public class MyRunnable1 implements Runnable {
     public void run() {
         UUID connId = UUID.randomUUID();
         queue.offer(connId);
-        Connection connection = new Connection(connId, 1L, 1L, null);
+        Connection connection = new Connection(connId, 1L, 1L, null, null, null);
         container.addConn(connection);
         System.out.println(no + "\t完成");
         try {
