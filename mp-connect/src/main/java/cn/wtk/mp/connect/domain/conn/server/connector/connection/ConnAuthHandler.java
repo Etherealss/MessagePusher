@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
@@ -170,7 +171,11 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
         // 认证完毕，可以建立连接
         UUID connId = UUIDUtil.get();
         Long connectorId = authResult.getConnectorId();
-        Connection conn = new Connection(connId, connectorId, authResult.getAppId(), ctx);
+        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+        Connection conn = new Connection(
+                connId, connectorId, authResult.getAppId(), ctx,
+                insocket.getHostName(), insocket.getPort()
+        );
         ctx.channel().attr(ChannelAttrKey.CONNECTOR).set(connectorId);
         ctx.channel().attr(ChannelAttrKey.CONN_ID).set(connId);
         serverConnContainer.addConn(conn);

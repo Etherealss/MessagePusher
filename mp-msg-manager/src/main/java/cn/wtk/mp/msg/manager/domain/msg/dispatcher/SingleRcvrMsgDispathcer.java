@@ -9,7 +9,7 @@ import cn.wtk.mp.msg.manager.infrasturcture.service.MsgPusher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +27,8 @@ public class SingleRcvrMsgDispathcer extends AbstractMsgDispatcher {
 
     @Override
     protected List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException {
-        List<Long> rcvrIds = Collections.singletonList(msgHeader.getRcvrId());
+        List<Long> rcvrIds = new ArrayList<>();
+        rcvrIds.add(msgHeader.getRcvrId());
         if (!msgHeader.getNeedRelationVerify()) {
             return rcvrIds;
         }

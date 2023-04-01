@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author wtk
  * @date 2023-02-12
@@ -29,14 +31,20 @@ public class MsgController {
 
     @PostMapping("/personal")
     @InternalAuth
-    public void sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command) {
+    public void sendPersonalMsg(@RequestBody @Validated SendPersonalMsgCommand command,
+                                HttpServletRequest req) {
+        command.setSenderIp(req.getRemoteHost());
+        command.setSenderPort(req.getRemotePort());
         Long appId = ServerSecurityContextHolder.require().getServerId();
         msgAcceptorAppService.sendMsg(command, appId);
     }
 
     @PostMapping("/group")
     @InternalAuth
-    public void sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command) {
+    public void sendGroupMsg(@RequestBody @Validated SendGroupMsgCommand command,
+                             HttpServletRequest req) {
+        command.setSenderIp(req.getRemoteHost());
+        command.setSenderPort(req.getRemotePort());
         Long appId = ServerSecurityContextHolder.require().getServerId();
         msgAcceptorAppService.sendMsg(command, appId);
     }

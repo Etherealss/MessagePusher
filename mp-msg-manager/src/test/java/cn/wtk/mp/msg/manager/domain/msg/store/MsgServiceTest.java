@@ -48,6 +48,7 @@ class MsgServiceTest {
         body.setPayload("MsgPayload");
         body.setSendTime(new Date());
         msgService.insert(body);
+        log.debug("insert:{}", body);
     }
 
     @Test

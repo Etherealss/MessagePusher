@@ -33,6 +33,9 @@ public class MqMsgProducer {
     private final MsgMqTopicProperties msgMqTopicProperties;
 
     public void produce(@Valid KafkaMsg kafkaMsg) throws SendMsgException {
+        if (log.isTraceEnabled()) {
+            log.trace("发布Kafka消息：{}", kafkaMsg);
+        }
         try {
             ManagerMsgBody msgBody = kafkaMsg.getMsgBody();
             Long key = msgBody.getMsgType().equals(MsgType.PERSONAL) ?

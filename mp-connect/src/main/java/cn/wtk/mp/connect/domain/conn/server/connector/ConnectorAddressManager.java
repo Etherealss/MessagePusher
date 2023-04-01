@@ -108,11 +108,7 @@ public class ConnectorAddressManager {
         for (int i = 0; i < size; i++) {
             String address = addresses.get(i);
             if (StringUtils.hasText(address)) {
-                String[] info = address.split(":");
-                ConnectorAddressDTO dto = new ConnectorAddressDTO();
-                dto.setIp(info[0]);
-                dto.setPort(Integer.parseInt(info[1]));
-                dto.setConnectorId(connectorIds.get(i));
+                ConnectorAddressDTO dto = new ConnectorAddressDTO(connectorIds.get(i), address);
                 dtos.add(dto);
             } else {
                 ConnectorAddressDTO dto = new ConnectorAddressDTO();

@@ -38,6 +38,10 @@ public class MsgPushCommand {
     Date saveTime;
     @NotNull
     Long senderId;
+    @NotBlank
+    String senderIp;
+    @NotNull
+    Integer senderPort;
     @NotEmpty
     List<Long> rcvrIds;
 

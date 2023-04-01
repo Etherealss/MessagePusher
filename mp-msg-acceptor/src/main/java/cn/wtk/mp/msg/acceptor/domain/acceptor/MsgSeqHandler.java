@@ -32,7 +32,8 @@ public class MsgSeqHandler {
 
     public MsgSeqHandler(RedisTemplate<String, String> redisTemplate,
                          MsgSeqProperties msgSeqProperties,
-                         @Qualifier(MsgSeqRetryConfiguration.BEAN_NAME) RetryTemplate msgSeqRetryTemplate) {
+                         @Qualifier(MsgSeqRetryConfiguration.BEAN_NAME)
+                         RetryTemplate msgSeqRetryTemplate) {
         this.redisTemplate = redisTemplate;
         this.msgSeqProperties = msgSeqProperties;
         this.msgSeqRetryTemplate = msgSeqRetryTemplate;
@@ -44,11 +45,11 @@ public class MsgSeqHandler {
      * @return 可认为前一条 msg 已送达时返回 true（无法严格保证）。无法保证前一条消息已送达时返回 false。
      */
     public boolean handlerMsgSeq(MsgHeader header) {
+        log.trace("进入消息有序性保证逻辑");
         boolean preMsgAccepted = checkPreMsgAccepted(header);
         /*
         先等待前一条消息送达，如果确认已送达或超时，则会来到这里。
         此时设置当前消息的 tempId，后面的消息就可以与当前消息保证有序性
-        TODO 问题：存在传递等待问题
          */
         setCurMsgTempId4Seq(header);
         return preMsgAccepted;
@@ -56,18 +57,22 @@ public class MsgSeqHandler {
 
     private boolean checkPreMsgAccepted(MsgHeader header) {
         if (ignoreSeq(header)) {
+            log.debug("消息 {} 不需要有序性保证", header.getTempId());
             return true;
         }
         if (isTimeLimitExceeded(header.getPreMsgSendTime())) {
+            log.debug("消息 {} 与前一条消息的发送间隔超过时间限制，跳过有序性保证", header.getTempId());
             return true;
         }
         try {
             Boolean result = msgSeqRetryTemplate.execute(retryContext -> {
-                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + header.getTempId().toString();
+                String tempIdKey = msgSeqProperties.getCacheKey() + ":" + header.getPreMsgTempId().toString();
                 boolean exist = redisTemplate.opsForValue().get(tempIdKey) != null;
                 if (exist) {
+                    log.trace("有序性检查结果：消息 {} 有序", header.getTempId());
                     return true;
                 } else {
+                    log.trace("有序性检查结果：消息 {} 无序，等待前一条消息：{}", header.getTempId(), header.getPreMsgTempId());
                     throw new MsgSeqRetryException();
                 }
             }, retryContext -> {
