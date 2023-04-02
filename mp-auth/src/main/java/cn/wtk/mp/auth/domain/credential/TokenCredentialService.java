@@ -42,7 +42,7 @@ public class TokenCredentialService {
     public <T extends TokenCredential> T verifyAndGet(String token, Class<T> credentialType) {
         TokenCredential credential = tokenHandler.getToken(token);
         if (credential == null) {
-            throw new TokenException(ApiInfo.USER_TOKEN_INVALID);
+            throw new TokenException(ApiInfo.TOKEN_INVALID);
         }
         if (credential.getClass() == credentialType) {
             return (T) credential;
@@ -55,7 +55,7 @@ public class TokenCredentialService {
     public <T extends TokenCredential> T verifyAndInvalidateToken(String token, Class<T> credentialType) {
         TokenCredential credential = tokenHandler.getAndDeleteToken(token);
         if (credential == null) {
-            throw new TokenException(ApiInfo.USER_TOKEN_INVALID);
+            throw new TokenException(ApiInfo.TOKEN_INVALID);
         }
         credential.setExpireAt(new Date());
         if (credential.getClass() == credentialType) {

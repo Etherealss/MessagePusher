@@ -20,6 +20,8 @@ public enum ApiInfo implements BaseEnum {
     EXIST(4000003, "[通用-目标已存在]"),
     MISMATCH(4000004, "[通用-信息不匹配]"),
     OPERATE_UNSUPPORTED(4000005, "[通用-请求不支持]"),
+    SERVER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,4010003, "[认证-服务token缺失]"),
+    SERVER_TOKEN_INVALID(HttpStatus.FORBIDDEN,4010004, "[认证-服务token无效或已过期]"),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000006, "[服务运行异常]"),
     SERVER_BUSY(HttpStatus.SERVICE_UNAVAILABLE, 5000007, "[服务繁忙]"),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, 5030008, "[服务不可用]"),
@@ -27,10 +29,7 @@ public enum ApiInfo implements BaseEnum {
     // ------------------- 02 登录 ------------------------
 
     // ------------------- 03 auth ------------------------
-    USER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED, 4010301, "[认证-用户token缺失]"),
-    USER_TOKEN_INVALID(HttpStatus.FORBIDDEN,4010302, "[认证-用户token无效或已过期]"),
-    SERVER_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,4010303, "[认证-服务token缺失]"),
-    SERVER_TOKEN_INVALID(HttpStatus.FORBIDDEN,4010304, "[认证-服务token无效或已过期]"),
+    TOKEN_INVALID(HttpStatus.FORBIDDEN,4010302, "[认证-token无效或已过期]"),
     NOT_PERMISSION(HttpStatus.FORBIDDEN, 4010305, "[认证-没有访问权限]"),
     NOT_ROLE(HttpStatus.FORBIDDEN, 4010306, "[认证-非可访问角色]"),
     PASSWORD_ERROR(HttpStatus.FORBIDDEN,4030307, "[认证-摘要错误]"),

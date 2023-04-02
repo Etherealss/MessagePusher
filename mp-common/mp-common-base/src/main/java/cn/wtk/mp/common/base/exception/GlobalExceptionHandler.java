@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
             BaseException.class
     })
     public ResponseEntity<Result<Void>> handle(BaseException e) {
-        log.info("业务异常：" + e.getMessage());
+        log.info("业务异常：", e);
         return ResponseEntity.status(e.getHttpStatus()).body(new Result<>(e));
     }
 
