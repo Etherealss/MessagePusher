@@ -11,8 +11,8 @@ skinparam activity  {
 
 package application {
     class GroupAppService {
-        - GroupRelationService groupRelationService;
-        - GroupService groupService;
+        - GroupRelationService groupRelationService
+        - GroupService groupService
         + Long createGroup(Long groupId, Long joinerId)
         + void joinGroup(Long groupId, Long joinerId)
         + void quitGroup(Long groupId, Long quitterId)
@@ -23,23 +23,23 @@ package application {
 
 package domain {
     class GroupService {
-        - GroupRelationRepository groupRelationRepository;
-        - UidGenerator uidGenerator;
+        - GroupRelationRepository groupRelationRepository
+        - UidGenerator uidGenerator
         + Long createGroup(CreateGroupCommand command)
     }
     class GroupRelationService {
-        - MongoTemplate mongoTemplate;
+        - MongoTemplate mongoTemplate
         + void createGroupRelation(Long groupId, Long joinerId)
         + void removeGroupRelation(Long groupId, Long quitterId)
         + List<Long> getGroupRelations(Long groupId)
         + boolean checkGroupRelation(Long groupId, Long memberId)
     }
     class GroupRelationEntity {
-        - Long groupId;
-        - Long appId;
-        - String groupTopic;
-        - Long creatorId;
-        - List<Long> memberIds;
+        - Long groupId
+        - Long appId
+        - String groupTopic
+        - Long creatorId
+        - List<Long> memberIds
     }
 }
 GroupAppService ..> GroupRelationService: 群组关系操作

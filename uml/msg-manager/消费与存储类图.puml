@@ -11,7 +11,7 @@ skinparam activity  {
 
 package infrastructure {
     class MsgMqListener {
-        - ApplicationEventPublisher eventPublisher;
+        - ApplicationEventPublisher eventPublisher
         + void consumeMsg(\n\tList<ConsumerRecord<Long, Msg>> record,\n\tAcknowledgment ack\n)
     }
 }
@@ -26,8 +26,8 @@ MsgMqListener ..> MsgConsumeEventListener: 消费到新消息，发布事件
 
 package app {
     class MsgAppService {
-        - PersonalMsgService personalMsgService;
-        - GroupMsgService groupMsgService;
+        - PersonalMsgService personalMsgService
+        - GroupMsgService groupMsgService
         + void recvNewMsg(List<Msg> msgs, Acknowledgment)
         - void save(List<Msg> msgs)
         - List<MsgBody> find(List<Long> msgIds)
@@ -37,14 +37,14 @@ package app {
 }
 package domain {
     class PersonalMsgService {
-        - MongoTemplate mongoTemplate;
+        - MongoTemplate mongoTemplate
         + void insert(List<PersonalMsgBody> msgs)
         + List<PersonalMsgBody> get(List<Long> msgIds)
         - void delete(List<Long> msgIds)
         - void updateTransferStatus(Map<Long, TransferStatus>)
     }
     class GroupMsgService {
-        - MongoTemplate mongoTemplate;
+        - MongoTemplate mongoTemplate
         + void insert(List<GroupMsgBody> msgs)
         + List<GroupMsgBody> get(List<Long> msgIds)
         - void delete(List<Long> msgIds)

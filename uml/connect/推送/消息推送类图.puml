@@ -11,14 +11,14 @@ skinparam activity  {
 
 package application {
     class ConnectorMsgAppService {
-        - ConnectorMsgService connectorMsgService;
+        - ConnectorMsgService connectorMsgService
         + void pushMsg(MultiConnectorMsgPushCommand command)
     }
 }
 
 package domain {
     class ServerConnContainer {
-        - Map<Long, Connector> connectors;
+        - Map<Long, Connector> connectors
         + Connector getConnector(Long connectorId)
     }
 
@@ -35,14 +35,14 @@ class MultiConnectorMsgPushCommand {
 }
 
 class MsgPushCommand {
-    - Long msgId;
-    - Long appId;
-    - MsgType msgType;
-    - String msgTopic;
-    - Object payload;
-    - Date sendTime;
-    - Long senderId;
-    - List<Long> rcvrIds;
+    - Long msgId
+    - Long appId
+    - MsgType msgType
+    - String msgTopic
+    - Object payload
+    - Date sendTime
+    - Long senderId
+    - List<Long> rcvrIds
 }
 
 

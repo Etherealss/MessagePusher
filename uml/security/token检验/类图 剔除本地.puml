@@ -10,8 +10,8 @@ skinparam activity  {
 }
 
 class HeaderInterceptor {
-    - ICredentialVerifier<ServerTokenCredential> tokenVerifier;
-    - ServerCredentialConfig serverCredentialConfig;
+    - ICredentialVerifier<ServerTokenCredential> tokenVerifier
+    - ServerCredentialConfig serverCredentialConfig
     + boolean preHandle(HttpServletRequest, HttpServletResponse, Object handler)
 }
 HeaderInterceptor ..> ICredentialVerifier: 验证请求方的 token

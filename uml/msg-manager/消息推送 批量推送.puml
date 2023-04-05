@@ -12,7 +12,7 @@ package application {
     class MsgAppService {
         - SingleRcvrMsgDispathcer singleRcvrMsgDispathcer
         - GroupRcvrMsgDispathcer groupRcvrMsgDispathcer
-        + void recvNewMsg(List<Msg> msgs, Acknowledgment)
+        + void recvNewMsg(ManageMsg msg, Acknowledgment)
     }
 }
 

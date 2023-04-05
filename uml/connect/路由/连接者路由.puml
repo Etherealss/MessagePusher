@@ -11,7 +11,7 @@ skinparam activity  {
 
 package application {
     class RouteAddressAppService {
-        - RouteAddressManager routeAddressManager;
+        - RouteAddressManager routeAddressManager
         + ConnectorAddressDTO getConnectorRouteAddress(Long connectorId)
     }
 }
@@ -19,20 +19,18 @@ package application {
 
 package domain {
     class RouteAddressManager {
-        - RedisTemplate<String, String> redisTemplate;
-        - NettyServerConfig config;
+        - RedisTemplate<String, String> redisTemplate
+        - NettyServerConfig config
         + void addRouteAddress(Long connectorId)
         + void removeRouteAddress(Long connectorId)
         + ConnectorAddressDTO getConnectorRouteAddress(Long connectorId)
     }
 }
 
-package infrastructure {
-    class ConnectionListener {
-        - ServerConnContainer serverConnContainer;
-        void addConn(ConnectorCreatedEvent event)
-        void removeConn(ConnectorRemovedEvent event)
-    }
+class ConnectionListener {
+    - ServerConnContainer serverConnContainer
+    void addConn(ConnectorCreatedEvent event)
+    void removeConn(ConnectorRemovedEvent event)
 }
 
 RouteAddressAppService ..> RouteAddressManager: 获取路由信息

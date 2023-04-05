@@ -11,22 +11,22 @@ skinparam activity  {
 
 package domain {
     class MsgAcceptor {
-        - MsgResendHandler msgResendHandler;
-        - MsgSeqHandler msgSeqHandler;
+        - MsgResendHandler msgResendHandler
+        - MsgSeqHandler msgSeqHandler
         + Result<Long> sendMsg(Msg)
     }
     class MsgSeqHandler {
-        - TempIdHandler tempIdHandler;
-        - MsgSeqProperties msgSeqProperties;
-        - RetryTemplate msgSeqRetryTemplate;
+        - TempIdHandler tempIdHandler
+        - MsgSeqProperties msgSeqProperties
+        - RetryTemplate msgSeqRetryTemplate
         + boolean handlerMsgSeq(MsgHeader)
         - boolean checkPreMsgAccepted(MsgHeader)
         - boolean isTimeLimitExceeded(Date preSendTime)
     }
 
     class MsgResendHandler {
-        - TempIdHandler tempIdHandler;
-        - MsgResendProperties msgResendProperties;
+        - TempIdHandler tempIdHandler
+        - MsgResendProperties msgResendProperties
         + boolean isDuplicateMsg(MsgHeader)
     }
 }
@@ -34,19 +34,19 @@ package domain {
 
 package infrastructure {
     class MsgSeqProperties {
-        Long timeLimit;
-        Integer retryTimes;
-        Long retryInterval;
-        String cacheKey;
-        Long expireMs;
+        Long timeLimit
+        Integer retryTimes
+        Long retryInterval
+        String cacheKey
+        Long expireMs
     }
 
     class MsgResendProperties {
-        String cacheKey;
-        Long expireMs;
+        String cacheKey
+        Long expireMs
     }
     class TempIdHandler {
-        - RedisTemplate redisTemplate;
+        - RedisTemplate redisTemplate
         - void setCurMsgTempId(UUID tempId)
         + UUID isTempIdExist(UUID tempId)
     }

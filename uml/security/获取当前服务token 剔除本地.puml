@@ -19,14 +19,14 @@ class CurServerAuthenticationHolder {
 IServerCredentialProvider <- CurServerAuthenticationHolder : 获取服务凭证
 
 interface IServerCredentialProvider {
-    ServerTokenCredential create();
+    ServerTokenCredential create()
 }
 
 class RemoteServerCredentialProvider implements IServerCredentialProvider {
-    - ServerCredentialFeign serverCredentialFeign;
-    - ServerCredentialConfig config;
-    - RedisTemplate<String, ServerTokenCredential> redisTemplate;
-    - ServerDigestGenerator serverDigestGenerator;
+    - ServerCredentialFeign serverCredentialFeign
+    - ServerCredentialConfig config
+    - RedisTemplate<String, ServerTokenCredential> redisTemplate
+    - ServerDigestGenerator serverDigestGenerator
     + ServerTokenCredential create()
 }
 
@@ -40,19 +40,20 @@ class ServerDigestGenerator {
 }
 
 class ServerTokenFeignRequestInterceptor {
-    - ServerCredentialConfig config;
-    - CurServerAuthenticationHolder curServerAuthenticationHolder;
+    - ServerCredentialConfig config
+    - CurServerAuthenticationHolder curServerAuthenticationHolder
+    + void apply(RequestTemplate requestTemplate)
 }
 note left of ServerTokenFeignRequestInterceptor: OpenFeign远程调用拦截器，\n在进行远程调用时自动配置本服务的Token
 
 ServerTokenFeignRequestInterceptor ..> CurServerAuthenticationHolder: 获取token
 
 class ServerCredentialConfig {
-    - String headerName;
-    - Long serverId;
-    - String serverName;
-    - String secret;
-    - String cacheKey;
+    - String headerName
+    - Long serverId
+    - String serverName
+    - String secret
+    - String cacheKey
 }
 
 @enduml

@@ -11,25 +11,23 @@ skinparam activity  {
 
 package infrastructure {
     class AuthFeign {
-        + Boolean authToken(ConnectorCredential);
-    }
-
-    class ConnectionListener {
-        - ServerConnContainer serverConnContainer;
-        void addConn(ConnCreatedEvent event)
-        void removeConn(ConnRemovedEvent event)
+        + Boolean authToken(ConnectorCredential)
     }
 }
-
+class ConnectionListener {
+    - ServerConnContainer serverConnContainer
+    void addConn(ConnCreatedEvent event)
+    void removeConn(ConnRemovedEvent event)
+}
 class ConnectionAuthHandler  {
-    - AuthFeign authFeign;
-    - ApplicationEventPublisher applicationEventPublisher;
+    - AuthFeign authFeign
+    - ApplicationEventPublisher applicationEventPublisher
     + void channelRead(ChannelHandlerContext, Object msg)
     + AuthResult doAuth(Map<String, String> urlParameters)
     - void publishConnCreatedEvent(ChannelHandlerContext ctx)
 }
 class ServerConnManager {
-    - Map<Long, Connector> connectors;
+    - Map<Long, Connector> connectors
     + void addConn(Long connectorId, Connection)
     + void removeConn(Long connectorId, UUID connId)
     + Connection getConn(Long connectorId, UUID connId)
@@ -37,9 +35,9 @@ class ServerConnManager {
 }
 
 class Connector {
-    - Long appId;
-    - Serializable connectorId;
-    - Map<UUID, Connection> conns;
+    - Long appId
+    - Serializable connectorId
+    - Map<UUID, Connection> conns
     + void addConn(Connection)
     + Connection getConn(Long connId)
     + Connection removeConn(Long connId)
@@ -48,16 +46,16 @@ class Connector {
 }
 
 class Connection {
-    - UUID connId;
-    - Long connectorId;
-    - Long appId;
-    - ChannelHandlerContext ctx;
+    - UUID connId
+    - Long connectorId
+    - Long appId
+    - ChannelHandlerContext ctx
     + int hashCode()
     + boolean equals(Object o)
 }
 
 class ConnectionStateHandler  {
-    - ApplicationEventPublisher applicationEventPublisher;
+    - ApplicationEventPublisher applicationEventPublisher
     + void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     + void channelInactive(ChannelHandlerContext ctx) throws Exception
     - void publishConnClosedEvent(ChannelHandlerContext ctx)

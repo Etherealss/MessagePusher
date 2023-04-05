@@ -11,7 +11,7 @@ skinparam activity  {
 
 package application {
     class SubRelationAppService {
-        - SubRelationService subRelationService;
+        - SubRelationService subRelationService
         + void createSubRelation(Long connectorId, Long subrId, String relationTopic)
         + void removeSubRelation(Long connectorId, Long subrId, String relationTopic)
         + List<String> getSubRelations(Long connectorId, Long subrId)
@@ -21,19 +21,19 @@ package application {
 
 package domain {
     class SubRelationService {
-        - MongoTemplate mongoTemplate;
+        - MongoTemplate mongoTemplate
         + void upsertSubRelation(Long connectorId, Long subrId, String relationTopic)
         + void removeSubRelation(Long connectorId, Long subrId, String relationTopic)
         + List<String> getSubRelations(Long connectorId, Long subrId)
         + boolean checkSubRelation(Long connectorId, Long subrId, String relationTopic)
     }
     class SubRelationEntity {
-        Long connectorId;
-        List<SubRelationItem> relations;
+        Long connectorId
+        List<SubRelationItem> relations
     }
     class SubRelationItem {
-        Long subrId;
-        String relationTopic;
+        Long subrId
+        String relationTopic
     }
 }
 
