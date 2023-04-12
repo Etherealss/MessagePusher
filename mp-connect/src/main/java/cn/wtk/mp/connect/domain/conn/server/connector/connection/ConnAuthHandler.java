@@ -18,8 +18,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -35,7 +35,6 @@ import java.util.UUID;
  */
 @ChannelHandler.Sharable
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
 
@@ -47,6 +46,17 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
     private final AuthFeign authFeign;
     private final ServerConnContainer serverConnContainer;
     private final NettyServerConfig nettyServerConfig;
+    private final Integer serverPort;
+
+    public ConnAuthHandler(AuthFeign authFeign,
+                           ServerConnContainer serverConnContainer,
+                           NettyServerConfig nettyServerConfig,
+                           @Value("${server.port}") Integer serverPort) {
+        this.authFeign = authFeign;
+        this.serverConnContainer = serverConnContainer;
+        this.nettyServerConfig = nettyServerConfig;
+        this.serverPort = serverPort;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object data) throws Exception {
@@ -148,7 +158,7 @@ public class ConnAuthHandler extends SimpleChannelInboundHandler<Object> {
             // 验证 connectorToken
             Long connectorId = Long.valueOf(connectorIdStr);
             authFeign.verify(appId, connectorId, connectorToken,
-                    nettyServerConfig.getIp(), nettyServerConfig.getPort());
+                    nettyServerConfig.getIp(), serverPort);
             return AuthResult.success(connectorId, appId);
         } catch (ServiceFiegnException e) {
             log.info("认证失败，异常报告：{}，RPC 返回值：{}", e.getMessage(), e.getResult());
