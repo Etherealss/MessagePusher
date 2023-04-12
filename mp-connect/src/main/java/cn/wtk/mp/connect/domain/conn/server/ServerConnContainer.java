@@ -87,6 +87,7 @@ public class ServerConnContainer {
      * @param msgs
      */
     public void pushMsg(List<TransferMsg> msgs) {
+        log.debug("进行消息推送：{}", msgs);
         for (TransferMsg msg : msgs) {
             for (Long rcvrId : msg.getRcvrIds()) {
                 Connector connector = this.getConnector(rcvrId);

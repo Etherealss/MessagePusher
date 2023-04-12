@@ -58,13 +58,17 @@ public class ConnectorAddressManager {
         ConnectorAddressDTO connectorAddress = getAddress(connectorId);
         String finalAddress;
         if (connectorAddress == null) {
-            String curAddress = config.getIp() + ":" + config.getPort();
+            String curAddress = getCurAddress();
             finalAddress = this.cas(connectAddressKey, curAddress);
         } else {
             String routeAddress = connectorAddress.getIp() + ":" + connectorAddress.getPort();
             finalAddress = this.cas(connectAddressKey, routeAddress);
         }
         return new ConnectorAddressDTO(connectorId, finalAddress);
+    }
+
+    private String getCurAddress() {
+        return config.getIp() + ":" + serverPort;
     }
 
     /**
@@ -87,7 +91,7 @@ public class ConnectorAddressManager {
         Long connectorId = event.getConnectorId();
         log.debug("新增连接者：{} 的路由信息", connectorId);
         String redisKey = cacheProperties.getRouteCacheKey() + ":" + connectorId.toString();
-        String address = config.getIp() + ":" + serverPort;
+        String address = getCurAddress();
         redisTemplate.opsForValue().set(redisKey, address);
     }
 

@@ -61,6 +61,7 @@ public abstract class AbstractMsgDispatcher {
         for (String addr : set) {
             this.pushMsg(addr, msgPushCommand);
         }
+        log.debug("消息推送完毕");
     }
 
     protected abstract List<Long> getRcvrIds(MsgHeader msgHeader) throws RelationException;
