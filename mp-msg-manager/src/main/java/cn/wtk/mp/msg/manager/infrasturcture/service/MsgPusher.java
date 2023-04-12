@@ -33,6 +33,10 @@ public class MsgPusher {
                 connectFeign.pushMsg(msg, routeAddress);
                 return null;
             }, context -> {
+                Throwable lastThrowable = context.getLastThrowable();
+                if (lastThrowable != null) {
+                    log.warn("消息推送失败, 请求地址：{}，异常信息：{}", routeAddress, lastThrowable, lastThrowable);
+                }
                 log.warn("消息推送失败, 请求地址：{}", routeAddress);
                 return null;
             });

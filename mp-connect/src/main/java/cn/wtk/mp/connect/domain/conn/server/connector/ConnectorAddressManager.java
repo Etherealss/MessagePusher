@@ -7,8 +7,8 @@ import cn.wtk.mp.connect.infrastructure.config.NettyServerConfig;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorCreatedEvent;
 import cn.wtk.mp.connect.infrastructure.event.ConnectorRemovedEvent;
 import cn.wtk.mp.connect.infrastructure.remote.feign.AuthFeign;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -27,12 +27,25 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class ConnectorAddressManager {
     private final RedisTemplate<String, String> redisTemplate;
     private final NettyServerConfig config;
+    private final Integer serverPort;
     private final ConnectorAddressCacheProperties cacheProperties;
     private final AuthFeign authFeign;
+
+    public ConnectorAddressManager(RedisTemplate<String, String> redisTemplate,
+                                   NettyServerConfig config,
+                                   @Value("${server.port}")
+                                   Integer serverPort,
+                                   ConnectorAddressCacheProperties cacheProperties,
+                                   AuthFeign authFeign) {
+        this.redisTemplate = redisTemplate;
+        this.config = config;
+        this.serverPort = serverPort;
+        this.cacheProperties = cacheProperties;
+        this.authFeign = authFeign;
+    }
 
     public ConnectorAddressDTO getAddress4Connect(Long appId, Long connectorId) {
         log.debug("连接者：{} 请求获取路由信息以进行连接操作", connectorId);
@@ -74,7 +87,7 @@ public class ConnectorAddressManager {
         Long connectorId = event.getConnectorId();
         log.debug("新增连接者：{} 的路由信息", connectorId);
         String redisKey = cacheProperties.getRouteCacheKey() + ":" + connectorId.toString();
-        String address = config.getIp() + ":" + config.getPort();
+        String address = config.getIp() + ":" + serverPort;
         redisTemplate.opsForValue().set(redisKey, address);
     }
 

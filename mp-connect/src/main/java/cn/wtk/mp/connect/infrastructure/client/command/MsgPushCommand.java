@@ -33,9 +33,9 @@ public class MsgPushCommand {
     @NotEmpty
     List<Long> rcvrIds;
     @NotNull
-    Object payload;
-    @NotNull
     Date sendTime;
+
+    Object payload;
     Date saveTime;
     Long senderId;
     Long groupId;

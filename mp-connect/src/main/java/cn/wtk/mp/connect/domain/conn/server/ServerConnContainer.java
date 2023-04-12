@@ -90,7 +90,9 @@ public class ServerConnContainer {
         for (TransferMsg msg : msgs) {
             for (Long rcvrId : msg.getRcvrIds()) {
                 Connector connector = this.getConnector(rcvrId);
-                connector.pushMsg(msg);
+                if (connector != null) {
+                    connector.pushMsg(msg);
+                }
             }
         }
     }
