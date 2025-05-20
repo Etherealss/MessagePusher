@@ -3,6 +3,7 @@
 
 skinparam shadowing false
 skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
 skinparam dpi 300
 skinparam activity  {
     DiamondFontSize 14
@@ -22,9 +23,9 @@ activate Server
 activate Auth
 activate ServerInfoService
 
-Auth <- ServerInfoService--: 验证通过
+Auth <- ServerInfoService--: 验证通过\n生成Token
 Auth -> TokenCredentialService ++: 生成Token
-TokenCredentialService -> TokenCredentialService ++--: 根据配置生成服务Token
+TokenCredentialService -> TokenCredentialService ++--: 根据配置\n生成服务Token
 TokenCredentialService -> IToeknHandler ++: 缓存Token
 IToeknHandler -> Redis ++: 缓存Token
 return ok

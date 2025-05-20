@@ -33,7 +33,7 @@ public class FeignResultDecoder implements Decoder {
         } catch (Exception e) {
             throw new DecodeException(
                     response.status(),
-                    "没有返回预期的数据，响应体无法转为 Msg.class。相应数据：" + bodyStr,
+                    "没有返回预期的数据，响应体无法转为 Result.class。相应数据：" + bodyStr,
                     response.request()
             );
         }

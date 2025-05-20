@@ -1,10 +1,12 @@
 package cn.wtk.mp.relation.domain.group;
 
+import cn.wtk.mp.common.base.exception.service.NotFoundException;
 import cn.wtk.mp.common.base.uid.UidGenerator;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationEntity;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationRepository;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.converter.GroupRelationConverter;
+import cn.wtk.mp.relation.infrasturcture.client.dto.GroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,5 +35,11 @@ public class GroupService {
         entity.setMemberIds(Collections.singletonList(command.getCreatorId()));
         groupRelationRepository.save(entity);
         return groupId;
+    }
+
+    public GroupDTO getGroup(Long groupId) {
+        GroupRelationEntity entity = groupRelationRepository.findById(groupId)
+                .orElseThrow(() -> new NotFoundException(GroupRelationEntity.class, groupId.toString()));
+        return converter.toDTO(entity);
     }
 }

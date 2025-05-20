@@ -3,6 +3,7 @@
 
 skinparam shadowing false
 skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
 skinparam dpi 300
 skinparam activity  {
     DiamondFontSize 14

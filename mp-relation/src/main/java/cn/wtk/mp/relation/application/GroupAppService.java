@@ -5,6 +5,7 @@ import cn.wtk.mp.relation.domain.group.relation.GroupRelationService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.JoinGroupCommand;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.QuitGroupRelationCommand;
+import cn.wtk.mp.relation.infrasturcture.client.dto.GroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,10 @@ public class GroupAppService {
 
     public Long createGroup(CreateGroupCommand command) {
         return groupService.createGroup(command);
+    }
+
+    public GroupDTO getGroup(Long groupId) {
+        return groupService.getGroup(groupId);
     }
 
     public void joinGroup(JoinGroupCommand command) {

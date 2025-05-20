@@ -3,6 +3,7 @@
 
 skinparam shadowing false
 skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
 skinparam dpi 300
 skinparam activity  {
     DiamondFontSize 14
@@ -18,8 +19,8 @@ participant ThreadLocal as ThreadLocal
 
 activate Server
 Server -> HeaderInterceptor ++: 拦截请求
-HeaderInterceptor -> HeaderInterceptor++--: 获取Header中的token
-HeaderInterceptor -> ICreentialVerifier ++: 验证token
+HeaderInterceptor -> HeaderInterceptor++--: 获取Header中的Token
+HeaderInterceptor -> ICreentialVerifier ++: 验证Token
 alt 验证不通过
     HeaderInterceptor <- ICreentialVerifier: null
 else 验证通过

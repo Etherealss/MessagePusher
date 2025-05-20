@@ -5,13 +5,11 @@ import cn.wtk.mp.common.security.annotation.InternalAuth;
 import cn.wtk.mp.common.security.service.auth.server.ServerSecurityContextHolder;
 import cn.wtk.mp.relation.application.GroupAppService;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
+import cn.wtk.mp.relation.infrasturcture.client.dto.GroupDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author wtk
@@ -30,5 +28,11 @@ public class GroupController {
     public Long createGroup(@RequestBody @Validated CreateGroupCommand command) {
         command.setAppId(ServerSecurityContextHolder.require().getServerId());
         return groupAppService.createGroup(command);
+    }
+
+    @GetMapping("/{id}")
+    @InternalAuth
+    public GroupDTO getGroup(@PathVariable Long id) {
+        return groupAppService.getGroup(id);
     }
 }

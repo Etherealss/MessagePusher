@@ -37,7 +37,8 @@ public class MsgPusher {
                 if (lastThrowable != null) {
                     log.warn("消息推送失败, 请求地址：{}，异常信息：{}", routeAddress, lastThrowable, lastThrowable);
                 }
-                log.warn("消息推送失败, 请求地址：{}", routeAddress);
+                Throwable throwable = context.getLastThrowable();
+                log.warn("消息推送失败, 请求地址：{}，失败原因：{}", routeAddress, throwable.getMessage());
                 return null;
             });
             return true;

@@ -3,6 +3,7 @@
 
 skinparam shadowing false
 skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
 skinparam dpi 300
 skinparam activity  {
     DiamondFontSize 14
@@ -26,7 +27,7 @@ Sender -> Acceptor ++: 推送消息
 Acceptor -> Auth ++: 安全认证
 return 认证结果
 Acceptor -> NonFunctional ++: 非功能性特性保证
-note over NonFunctional: 暂时忽略细节
+note over NonFunctional: 暂时忽略细节，后文补充
 return ok
 Acceptor -> Kafka ++: 发布消息
 return ok

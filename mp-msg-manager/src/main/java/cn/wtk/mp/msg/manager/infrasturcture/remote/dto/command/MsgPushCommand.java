@@ -31,8 +31,6 @@ public class MsgPushCommand {
     @NotBlank
     String msgTopic;
     @NotNull
-    Object payload;
-    @NotNull
     Date sendTime;
     @NotNull
     Date saveTime;
@@ -44,6 +42,6 @@ public class MsgPushCommand {
     Integer senderPort;
     @NotEmpty
     List<Long> rcvrIds;
-
+    Object payload;
     Long groupId;
 }

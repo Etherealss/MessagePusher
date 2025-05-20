@@ -26,7 +26,7 @@ public class Connection {
     private Integer port;
 
     public void pushMsg(TransferMsg msg) {
-        if (ip.equals(msg.getSendIp()) && port.equals(msg.getSendPort())) {
+        if (ip.equals(msg.getSenderIp()) && port.equals(msg.getSenderPort())) {
             log.info("相同IP和端口的连接不处理");
             return;
         }

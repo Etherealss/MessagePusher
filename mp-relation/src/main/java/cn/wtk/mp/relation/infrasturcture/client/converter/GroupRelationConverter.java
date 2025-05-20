@@ -3,6 +3,7 @@ package cn.wtk.mp.relation.infrasturcture.client.converter;
 import cn.wtk.mp.common.base.enums.MapperComponentModel;
 import cn.wtk.mp.relation.domain.group.relation.GroupRelationEntity;
 import cn.wtk.mp.relation.infrasturcture.client.command.relation.group.CreateGroupCommand;
+import cn.wtk.mp.relation.infrasturcture.client.dto.GroupDTO;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,4 +13,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = MapperComponentModel.SPRING)
 public interface GroupRelationConverter {
     GroupRelationEntity toEntity(CreateGroupCommand command);
+    GroupDTO toDTO(GroupRelationEntity entity);
 }

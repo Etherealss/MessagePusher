@@ -4,6 +4,7 @@
 
 skinparam shadowing false
 skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
 skinparam dpi 300
 skinparam activity  {
     DiamondFontSize 14
@@ -32,6 +33,7 @@ Connect -> ServerConnContainer ++: 添加连接
 ServerConnContainer -> ServerConnContainer++--: 保存连接
 ServerConnContainer -> RouteAddressManager++: 如果是新连接者则保存路由信息
 RouteAddressManager -> Redis ++: 保存路由信息
+return ok
 return ok
 return ok
 return ok

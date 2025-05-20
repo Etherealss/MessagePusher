@@ -1,5 +1,6 @@
 package cn.wtk.mp.common.base.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -26,12 +27,11 @@ public class JsonUtil {
     static {
         MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        //支持key为null
-//        MAPPER.getSerializerProvider().setNullKeySerializer(new Jsr310NullKeySerializer());
+        // 忽略null值
+        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     public static <T> T convertValue(Object obj, Class<T> type) {
-
         return MAPPER.convertValue(obj, type);
     }
 

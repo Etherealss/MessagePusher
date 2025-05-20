@@ -3,6 +3,7 @@
 
 skinparam shadowing false
 skinparam defaultFontName xfonts-wqy
+skinparam defaultFontName times
 skinparam dpi 300
 skinparam activity  {
     DiamondFontSize 14
@@ -18,6 +19,7 @@ database 数据库 as DB
 participant 服务摘要验证器 as ServerDigestValidator
 participant 服务摘要生成器 as ServerDigestGenerator
 
+activate Server
 Server -> Auth ++: 提供digest，\n请求获取Token
 Auth -> ServerInfoService ++: 验证服务信息
 ServerInfoService -> DB ++: 获取服务信息
@@ -31,7 +33,7 @@ alt 验证不通过
     Auth <- ServerInfoService: 服务信息不匹配
     Server <- Auth: 服务信息不匹配
 else 验证通过
-    return: 验证成功
-    return: 验证成功
+    return 验证成功
+    return 验证成功\n继续后续流程
 end
 @enduml
